@@ -21,6 +21,8 @@ public class Community {
 	private List<Board> boardList;
 	private List<User> userList;
 	
+	private String comm_reg_cont;
+	
 	public long getComm_idx() {
 		return comm_idx;
 	}
@@ -81,12 +83,18 @@ public class Community {
 	public void setUserList(List<User> userList) {
 		this.userList = userList;
 	}
+	public String getComm_reg_cont() {
+		return comm_reg_cont;
+	}
+	public void setComm_reg_cont(String comm_reg_cont) {
+		this.comm_reg_cont = comm_reg_cont;
+	}
 	@Override
 	public String toString() {
 		return "Community [comm_idx=" + comm_idx + ", comm_name=" + comm_name + ", comm_type_cd=" + comm_type_cd
 				+ ", comm_type_nm=" + comm_type_nm + ", comm_stat_cd=" + comm_stat_cd + ", comm_stat_nm=" + comm_stat_nm
 				+ ", comm_role_cd=" + comm_role_cd + ", reg_date=" + reg_date + ", boardList=" + boardList
-				+ ", userList=" + userList + "]";
+				+ ", userList=" + userList + ", comm_reg_cont=" + comm_reg_cont + "]";
 	}
 	
 	

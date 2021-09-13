@@ -8,14 +8,18 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dev.comm.community.service.CommunityService;
+import com.dev.comm.community.vo.Community;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.SessionManager;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Controller
 public class CommunityController {
@@ -57,5 +61,44 @@ public class CommunityController {
 		return null;
 		
 	}
+	
+	@RequestMapping(value = "/community/insertCommunity", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String insertCommunity(HttpServletRequest request, HttpServletResponse response, Model model, @RequestBody String data) throws Exception {
+		log.info("=== insertCommunity ===");
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "실패했습니다.");
+			return obj.toString();
+		}
+		
+		String comm_name = element.getAsJsonObject().get("comm_name").getAsString();
+		String comm_type = element.getAsJsonObject().get("comm_category").getAsString();
+		String comm_reg_cont = element.getAsJsonObject().get("comm_reg_cont").getAsString();
+		
+		Community community = new Community();
+		community.setComm_name(comm_name);
+		community.setComm_type_cd(comm_type);
+		community.setComm_reg_cont(comm_reg_cont);
+		community.setComm_stat_cd("I"); //신청할 때 비활성으로 insert. 관리자 승인 후 활성시키는 걸로..
+		
+		if(communityService.insertCommunity(community) > 0) {
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "신청에 성공했습니다.\n관리자 승인 후 커뮤니티가 활성화 됩니다.");
+			return obj.toString();
+		} else {
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "실패했습니다.");
+			return obj.toString();
+		}
+	}
+	
+	
+	
 
 }

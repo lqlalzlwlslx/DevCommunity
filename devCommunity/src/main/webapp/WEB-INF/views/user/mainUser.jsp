@@ -92,10 +92,15 @@
 	}
 	
 	function createCommunity(){
-		fetch("/community/nameDupleCheck.do?name="+document.querySelector("#communityNameValue").value)
+		var comm_name = document.querySelector("#communityNameValue").value;
+		fetch("/community/nameDupleCheck.do?name="+comm_name)
 			.then(res => res.json())
 			.then((data) => {
-				if(data.result == false) alert("커뮤니티명을 다시 확인해주세요.");
+				if(data.result == false) {
+					alert("커뮤니티명을 다시 확인해주세요.");
+					document.querySelector("#communityNameValue").focus();
+					return;
+				}
 			});
 		var comm_category;
 		var categorys = document.getElementsByName("communityCategory");
@@ -106,6 +111,24 @@
 			}
 		}
 		const comm_reg_cont = document.querySelector("#communityRegCont").value;
+		const communityData = {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({comm_name, comm_category, comm_reg_cont})
+		};
+		
+		fetch("/community/insertCommunity", communityData)
+			.then(res => res.json())
+			.then((data) => {
+				//console.log(data);
+				if(data.result == true){
+					alert(data.msg);
+					document.querySelector("#modalCancelBtn").click();
+				}else{
+					alert(data.msg);
+					return;
+				}
+			});
 		
 	}
 	
@@ -670,10 +693,10 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 							<td><input type="button" value="카테고리 선택" /></td>
 							<td></td>
 							<td colspan="3">
-								<input type="radio" id="categoryJava" name="communityCategory" value="Java"/><label for="categoryJava">Java</label>
+								<input type="radio" id="categoryJava" name="communityCategory" value="J"/><label for="categoryJava">Java</label>
 								<input type="radio" id="categoryC" name="communityCategory" value="C"/><label for="categoryC">C</label>
-								<input type="radio" id="categoryPython" name="communityCategory" value="Python"/><label for="categoryPython">Python</label>
-								<input type="radio" id="categoryDatabase" name="communityCategory" value="Database"/><label for="categoryDatabase">Database</label>
+								<input type="radio" id="categoryPython" name="communityCategory" value="P"/><label for="categoryPython">Python</label>
+								<input type="radio" id="categoryDatabase" name="communityCategory" value="D"/><label for="categoryDatabase">Database</label>
 							</td>
 						</tr>
 						<tr>
@@ -685,7 +708,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				</table>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="modalClosed();">취소</button>
+				<button type="button" id="modalCancelBtn" class="btn btn-secondary" data-bs-dismiss="modal" onclick="modalClosed();">취소</button>
 				<button type="button" class="btn btn-primary" onclick="createCommunity();">개설 신청</button>
 			</div>
 		</div>

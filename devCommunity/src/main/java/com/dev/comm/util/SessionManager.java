@@ -13,5 +13,12 @@ public class SessionManager {
 		
 		return user;
 	}
+	
+	public static User getAdminSession(HttpServletRequest request) throws Exception {
+		HttpSession session = request.getSession();
+		User admin = (User) session.getAttribute(Constants.ADMIN_SESSION_KEY);
+		
+		return admin;
+	}
 
 }

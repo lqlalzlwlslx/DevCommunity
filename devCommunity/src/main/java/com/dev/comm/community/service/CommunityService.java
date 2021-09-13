@@ -11,4 +11,6 @@ public interface CommunityService {
 
 	String communityNameDupleCheck(String value) throws Exception;
 
+	int insertCommunity(Community community) throws Exception;
+
 }

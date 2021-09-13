@@ -24,5 +24,10 @@ public class CommunityServiceImpl implements CommunityService {
 	public String communityNameDupleCheck(String value) throws Exception {
 		return communityDao.communityNameDupleCheck(value);
 	}
+
+	@Override
+	public int insertCommunity(Community community) throws Exception {
+		return communityDao.insertCommunity(community);
+	}
 	
 }

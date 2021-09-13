@@ -30,5 +30,10 @@ public class CommunityDaoImpl implements CommunityDao {
 	public String communityNameDupleCheck(String value) throws Exception {
 		return sqlSession.selectOne("community.selectCommunityNameDupleCheck", value);
 	}
+
+	@Override
+	public int insertCommunity(Community community) throws Exception {
+		return sqlSession.insert("community.insertCommunity", community);
+	}
 	
 }

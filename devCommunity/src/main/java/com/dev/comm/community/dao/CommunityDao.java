@@ -11,4 +11,6 @@ public interface CommunityDao {
 
 	String communityNameDupleCheck(String value) throws Exception;
 
+	int insertCommunity(Community community) throws Exception;
+
 }

@@ -28,6 +28,13 @@
 		WHERE comm_name = #{value}
 	]]>
 	</select>
+	
+	<insert id="insertCommunity" parameterType="community">
+	<![CDATA[
+		INSERT INTO dec_community(comm_name, comm_type_cd, comm_stat_cd, comm_reg_cont, reg_date)
+		VALUES(#{comm_name}, #{comm_type_cd}, #{comm_stat_cd}, #{comm_reg_cont}, NOW())
+	]]>
+	</insert>
 
 
 
