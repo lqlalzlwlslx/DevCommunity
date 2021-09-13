@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	
+	<!-- <properties resource="classpath:db.properties" /> -->
+	
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias alias="user" type="com.dev.comm.user.vo.User" />
+		<typeAlias alias="community" type="com.dev.comm.community.vo.Community" />
+		<typeAlias alias="board" type="com.dev.comm.board.vo.Board" />
+		<typeAlias alias="boardFile" type="com.dev.comm.board.vo.BoardFile" />
+		<typeAlias alias="reply" type="com.dev.comm.board.vo.Reply" />
+		<typeAlias alias="conf" type="com.dev.comm.common.vo.Conf" />
+		<typeAlias alias="blackList" type="com.dev.comm.common.vo.BlackList" />
+		<typeAlias alias="communityBlackList" type="com.dev.comm.community.vo.CommunityBlackList" />
+		<typeAlias alias="communityUser" type="com.dev.comm.community.vo.CommunityUser" />
+		<typeAlias alias="userAccessLog" type="com.dev.comm.common.vo.UserAccessLog" />
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="mappers/user/user-mapper.xml" />
+		<mapper resource="mappers/community/community-mapper.xml" />
+		<mapper resource="mappers/userAccessLog/userAccessLog-mapper.xml" />
+		
+	</mappers>
+	
+</configuration>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="user">
+	
+	<select id="selectUserInfoAsLogin" parameterType="user" resultType="user">
+	<![CDATA[
+		SELECT user_idx,
+			user_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE CONF_TYPE = 'USER_STAT' AND user_stat_cd = conf_type_cd) as user_stat_nm,
+			user_name,
+			login_id,
+			nick_name,
+			password,
+			user_role_cd,
+			reg_date,
+			login_date,
+			pwd_date,
+			access_ip,
+			tryed,
+			profile_src
+		FROM dec_user
+		WHERE login_id = #{login_id}
+	]]>
+	</select>
+	
+	<select id="selectUserInfoAsIdx" parameterType="_int" resultType="user">
+	<![CDATA[
+		SELECT user_idx,
+			user_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE CONF_TYPE = 'USER_STAT' AND user_stat_cd = conf_type_cd) as user_stat_nm,
+			user_name,
+			login_id,
+			nick_name,
+			password,
+			user_role_cd,
+			reg_date,
+			login_date,
+			pwd_date,
+			access_ip,
+			tryed,
+			profile_src
+		FROM dec_user
+		WHERE user_idx = #{user_idx}
+	]]>
+	</select>
+	
+	<update id="updateUserInfo" parameterType="user">
+	<![CDATA[
+		UPDATE dec_user
+		SET password = #{password}
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<insert id="insertUser" parameterType="user">
+	<![CDATA[
+		INSERT INTO dec_user(user_stat_cd, user_name, login_id, nick_name, password, user_role_cd, reg_date, profile_src)
+		VALUES(#{user_stat_cd}, #{user_name}, #{login_id}, #{nick_name}, #{password}, #{user_role_cd}, NOW(), ]]>
+		<if test='profile_src == ""'><![CDATA[NULL]]></if>
+		<if test='profile_src != ""'><![CDATA[#{profile_src}]]></if><![CDATA[
+		)
+	]]>
+	</insert>
+	
+	<update id="updateUserLogin" parameterType="user">
+	<![CDATA[
+		UPDATE dec_user
+		SET access_ip = #{access_ip}, login_date = NOW(), tryed = #{tryed}
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<update id="updateUserLoginTry" parameterType="user">
+	<![CDATA[
+		UPDATE dec_user
+		SET tryed = #{tryed}
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<update id="updateUserProfile" parameterType="user">
+	<![CDATA[
+		UPDATE dec_user
+		SET user_name = #{user_name}, nick_name = #{nick_name}, password = #{password}, profile_src = #{profile_src}
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<select id="getUserProfileSrc" parameterType="_int" resultType="java.lang.String">
+	<![CDATA[
+		SELECT profile_src
+		FROM dec_user
+		WHERE user_idx = #{user_idx}
+	]]>
+	</select>
+	
+	<select id="getUserPassword" parameterType="_int" resultType="java.lang.String">
+	<![CDATA[
+		SELECT password
+		FROM dec_user
+		WHERE user_idx = #{user_idx}
+	]]>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>
