@@ -13,4 +13,6 @@ public interface CommunityDao {
 
 	int insertCommunity(Community community) throws Exception;
 
+	int selectCommunityStatus(String value) throws Exception;
+
 }

@@ -13,4 +13,6 @@ public interface CommunityService {
 
 	int insertCommunity(Community community) throws Exception;
 
+	int selectCommunityStatus(String value) throws Exception;
+
 }

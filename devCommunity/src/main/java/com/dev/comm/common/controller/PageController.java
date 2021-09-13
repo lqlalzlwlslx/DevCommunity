@@ -1,7 +1,5 @@
 package com.dev.comm.common.controller;
 
-import java.io.File;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dev.comm.user.vo.User;
 import com.dev.comm.util.Constants;
+import com.dev.comm.util.SessionManager;
 
 @Controller
 @PropertySource("classpath:config.properties")
@@ -35,20 +35,6 @@ public class PageController {
 	public ModelAndView mainAdmin(HttpServletRequest request, Model model) throws Exception {
 		
 		log.debug("admin console.");
-		
-		String defaultProfile = servletContext.getRealPath("/resources");
-		String defaultProfileSrc = env.getProperty("file.user.default.profile");
-		
-		log.info("defaultProfile : " + defaultProfile);
-		log.info("defaultProfileSrc : " + defaultProfileSrc);
-		log.info("");
-		log.info(defaultProfile + defaultProfileSrc);
-		
-		String filePath = defaultProfile + defaultProfileSrc;
-		
-		File file = new File(filePath);
-		
-		log.info("exist???: " + file.exists());
 		
 		return new ModelAndView("console/index");
 	}
@@ -78,6 +64,15 @@ public class PageController {
 		}
 		
 		return new ModelAndView("redirect:/");
+	}
+	
+	@RequestMapping(value = "/console/mainAdmin")
+	public ModelAndView mainAdmin(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		return new ModelAndView("console/mainAdmin");
 	}
 	
 	

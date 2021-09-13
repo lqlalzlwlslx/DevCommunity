@@ -23,6 +23,11 @@ public class Community {
 	
 	private String comm_reg_cont;
 	
+	private String comm_type_j;
+	private String comm_type_c;
+	private String comm_type_p;
+	private String comm_type_d;
+	
 	public long getComm_idx() {
 		return comm_idx;
 	}
@@ -88,6 +93,30 @@ public class Community {
 	}
 	public void setComm_reg_cont(String comm_reg_cont) {
 		this.comm_reg_cont = comm_reg_cont;
+	}
+	public String getComm_type_j() {
+		return comm_type_j;
+	}
+	public void setComm_type_j(String comm_type_j) {
+		this.comm_type_j = comm_type_j;
+	}
+	public String getComm_type_c() {
+		return comm_type_c;
+	}
+	public void setComm_type_c(String comm_type_c) {
+		this.comm_type_c = comm_type_c;
+	}
+	public String getComm_type_p() {
+		return comm_type_p;
+	}
+	public void setComm_type_p(String comm_type_p) {
+		this.comm_type_p = comm_type_p;
+	}
+	public String getComm_type_d() {
+		return comm_type_d;
+	}
+	public void setComm_type_d(String comm_type_d) {
+		this.comm_type_d = comm_type_d;
 	}
 	@Override
 	public String toString() {

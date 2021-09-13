@@ -35,5 +35,10 @@ public class CommunityDaoImpl implements CommunityDao {
 	public int insertCommunity(Community community) throws Exception {
 		return sqlSession.insert("community.insertCommunity", community);
 	}
+
+	@Override
+	public int selectCommunityStatus(String value) throws Exception {
+		return sqlSession.selectOne("community.selectCommunityStatus", value);
+	}
 	
 }

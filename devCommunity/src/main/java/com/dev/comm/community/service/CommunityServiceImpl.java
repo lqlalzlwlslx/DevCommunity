@@ -29,5 +29,10 @@ public class CommunityServiceImpl implements CommunityService {
 	public int insertCommunity(Community community) throws Exception {
 		return communityDao.insertCommunity(community);
 	}
+
+	@Override
+	public int selectCommunityStatus(String value) throws Exception {
+		return communityDao.selectCommunityStatus(value);
+	}
 	
 }

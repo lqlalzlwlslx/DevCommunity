@@ -98,7 +98,26 @@ public class CommunityController {
 		}
 	}
 	
-	
-	
-
+	@RequestMapping(value = "/console/community/communityStatus", method = RequestMethod.GET, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String communityStatus(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		log.info("=== admin communityStatus ===");
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		JsonObject obj = new JsonObject();
+		
+		int comm_type_j = communityService.selectCommunityStatus("J");
+		int comm_type_c = communityService.selectCommunityStatus("C");
+		int comm_type_p = communityService.selectCommunityStatus("P");
+		int comm_type_d = communityService.selectCommunityStatus("D");
+		
+		obj.addProperty("result", true);
+		obj.addProperty("comm_type_j", comm_type_j);
+		obj.addProperty("comm_type_c", comm_type_c);
+		obj.addProperty("comm_type_p", comm_type_p);
+		obj.addProperty("comm_type_d", comm_type_d);
+		return obj.toString();
+		
+	}
 }

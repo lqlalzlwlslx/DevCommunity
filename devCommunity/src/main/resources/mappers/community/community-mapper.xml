@@ -35,6 +35,14 @@
 		VALUES(#{comm_name}, #{comm_type_cd}, #{comm_stat_cd}, #{comm_reg_cont}, NOW())
 	]]>
 	</insert>
+	
+	<select id="selectCommunityStatus" parameterType="java.lang.String" resultType="_int">
+	<![CDATA[
+		SELECT COUNT(*) as count
+		FROM dec_community
+		WHERE comm_type_cd = #{value}
+	]]>
+	</select>
 
 
 
