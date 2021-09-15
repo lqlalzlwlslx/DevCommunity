@@ -22,4 +22,8 @@ public interface UserService {
 
 	String getUserProfileSrc(int user_idx) throws Exception;
 
+	String selectAdminEmail() throws Exception;
+
+	String userNickDupleCheck(String nickName) throws Exception;
+
 }

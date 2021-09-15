@@ -2,6 +2,7 @@ package com.dev.comm.user.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dev.comm.common.base.Email;
+import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.common.service.UserAccessLogService;
 import com.dev.comm.common.vo.UserAccessLog;
 import com.dev.comm.community.service.CommunityService;
@@ -55,6 +59,9 @@ public class UserController {
 	
 	@Autowired
 	private Environment env;
+	
+	@Autowired(required=true)
+	private EmailSender mailSender;
 	
 	@RequestMapping(value = "/user/login", method = RequestMethod.POST, produces="text/plain;charset=UTF-8")
 	@ResponseBody
@@ -223,7 +230,11 @@ public class UserController {
 		if(user != null) {
 			profilePath += Integer.toString(user.getUser_idx()) + "/";
 			file = new File(profilePath);
-			if(!file.exists()) file.mkdirs();
+			log.debug("profilePath: " + profilePath);
+			log.debug(file.getAbsolutePath());
+			if(!file.exists()) {
+				file.mkdirs();
+			}
 			
 			int len = file.listFiles().length;
 			if(len > 0) {
@@ -245,7 +256,11 @@ public class UserController {
 		} else {
 			profilePath += "temp/";
 			file = new File(profilePath);
-			if(!file.exists()) file.mkdirs();
+			log.debug("profilePath: " + profilePath);
+			log.debug(file.getAbsolutePath());
+			if(!file.exists()) {
+				file.mkdirs();
+			}
 			
 			renameFile = "____" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString() + "." + extension; // 언더바 4개. 실제 회원가입 신청때는 파일 리네임이 필요할 듯 해서 구분자 ..
 			
@@ -298,6 +313,82 @@ public class UserController {
 			obj.addProperty("msg", "실패했습니다.");
 			return obj.toString();
 		}
+	}
+	
+	@RequestMapping(value = "/user/sendAuthCode", method = RequestMethod.POST)
+	@ResponseBody
+	public ModelMap sendAuthCode(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		ModelMap mp = new ModelMap();
+		boolean result = false;
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		String email = element.getAsJsonObject().get("mailto").getAsString();
+		log.debug("requested email: " + email);
+		
+		HttpSession session = request.getSession();
+		log.debug("SESSION: " + session.getId());
+		session.removeAttribute(Constants.USER_SESSION_PASSCODE);
+		
+		session = request.getSession();
+		session.setAttribute(Constants.USER_SESSION_PASSCODE, sendPasscode(email));
+		log.debug("attributeNew: " + session.getAttribute(Constants.USER_SESSION_PASSCODE));
+		
+		try {
+			Thread.sleep(800L);
+		}catch(InterruptedException ie) {
+			ie.printStackTrace();
+			result = false;
+		}
+		result = true;
+		
+		mp.addAttribute("result", result);
+		mp.addAttribute("passcode", session.getAttribute(Constants.USER_SESSION_PASSCODE));
+		return mp;
+	}
+	
+	private String sendPasscode(String emailto) throws Exception {
+		String passcode = new Integer(1000000 + (new Random()).nextInt(1000000)).toString().substring(1);
+		Email email = new Email();
+		email.setFrom("devcomm00@gmail.com");
+		email.setMailto(emailto);
+		email.setSubject("[DevCommunity] 회원가입 인증번호가 전송되었습니다.");
+		String content = "";
+		content += "<h2>인증번호</h2><br />";
+		content += "<h3>"+passcode+"</h3>";
+		email.setContent(content);
+		
+		mailSender.sendMail(email);
+		
+		passcode += "|" + emailto + "|" + System.currentTimeMillis();
+		log.debug("passcode: " + passcode);
+		
+		return passcode;
+	}
+	
+	@RequestMapping(value = "/user/nickDupleCheck", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap nickDupleCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		
+		String nickName = request.getParameter("nick");
+		if(nickName.equals("")) {
+			mp.addAttribute("result", false);
+			mp.addAttribute("msg", "닉네임을 입력해주세요.");
+		}
+		
+		String count = userService.userNickDupleCheck(nickName) == null ? "0" : "1";
+		int dupleCount = Integer.parseInt(count);
+		
+		if(dupleCount > 0) {
+			mp.addAttribute("result", false);
+			mp.addAttribute("msg", "사용중인 닉네임입니다.");
+		} else {
+			mp.addAttribute("result", true);
+			mp.addAttribute("msg", "사용가능한 닉네임입니다.");
+		}
+		
+		return mp;
 	}
 	
 	/*

@@ -15,4 +15,8 @@ public interface CommunityDao {
 
 	int selectCommunityStatus(String value) throws Exception;
 
+	ArrayList<Community> selectAllCommunityList() throws Exception;
+
+	ArrayList<Community> selectConfirmCommunityList() throws Exception;
+
 }

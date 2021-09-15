@@ -1,30 +1,39 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
+
+<%
+String passcode = (String) session.getAttribute(Constants.USER_SESSION_PASSCODE);
+passcode = passcode.substring(0, passcode.indexOf("|"));
+%>
+
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
 <style>
 	input[type="text"], input[type="password"], input[type="button"]{
-		width:80% !important;
-		margin-bottom:2%;
+		width:90% !important;
 	}
 	.leftBtn:hover{pointer-events: none !important;}
 	fieldset{
 		border:0px groove !important;
 		width:50%; margin-top:4%;
 	}
-	div#login_field_wrap{display:flex;}
-	div#left_field{width: 33%; padding-left:10%;}
-	div#right_field{width: 63%;}
-	span#noticeStage{font-size: 12px;}
 	span.image.avatar>img{
-  		width: 250px;
-  		height: 250px;
+  		width: 150px;
+  		height: 150px;
   		object-fit: cover;
 	}
-	.rightBtn{margin-right:10% !important;}
+	#cancelButton, #signUpButton{
+		width:35% !important;
+	}
+	.signTd{vertical-align:middle; padding: 0.25em 0.25em;}
 </style>
+
+<c:set var="passcode" value="<%=passcode%>" />
 <script type="text/javascript">
 	window.onload = function(){
+		
+		var passedCode;
+		
 		const submit = document.querySelector("#signUpButton");
 		submit.addEventListener("click", function(){
 			//console.log('submit click');
@@ -71,6 +80,12 @@
 			.then(data => showProfile(data));
 		});
 		
+		document.querySelector("#cancelButton").addEventListener("click", function(){
+			if(confirm("메인페이지로 돌아가시겠습니까?")){
+				location.href="<%=request.getContextPath()%>/";
+			}
+		});
+		
 	}
 	function showProfile(res){
 		console.log(res);
@@ -87,6 +102,72 @@
 			return;
 		}
 	}
+	
+	function authSend(){
+		const mailto = document.querySelector("#id_field").value;
+		if(!mailto){ alert("이메일을 입력해주세요."); document.querySelector("#id_field").focus(); return; }
+		
+		const sendData = {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({mailto})
+		};
+		
+		fetch("/user/sendAuthCode.do", sendData)
+			.then(res => res.json())
+			.then(data => remaining(data));
+	}
+	var authsetId;
+	function remaining(res){
+		console.log(res);
+		if(res.result == true){
+			alert("인증번호를 전송했습니다. 메일을 확인해주세요.");
+			passedCode = res.passcode.substring(0, res.passcode.indexOf("|"));
+			
+			var elem = document.getElementById("authCode");
+			var remains = 180;
+			authsetId = setInterval(frame, 1000);
+			function frame(){
+				if(remains <= 0){
+					clearInterval(authsetId);
+					elem.innerHTML = '인증시간만료. 다시 시도해주세요.';
+					return;
+				} else {
+					remains --;
+					elem.innerHTML = remains + '초';
+				}
+			}
+		}
+	}
+	
+	function authSendCheck(){
+		var inputAuthCode = document.getElementById("authCodeTxt").value;
+		if(!inputAuthCode) { alert("인증번호를 입력해주세요."); document.querySelector("#authCodeTxt").focus(); return; }
+		
+		if(inputAuthCode == passedCode){
+			console.log('okay');
+			clearInterval(authsetId);
+			document.getElementById("authCode").innerHTML = "인증완료";
+			document.getElementById("id_field").readOnly = true;
+		} else {
+			alert("인증번호가 틀립니다. 다시 확인해주세요.");
+			document.querySelector("#authCodeTxt").focus();
+			return;
+		}
+	}
+	
+	function dupleCheckNick(value){
+		fetch("/user/nickDupleCheck.do?nick="+value)
+			.then(res => res.json())
+			.then(data => moveTo(data));
+	}
+	function moveTo(res){
+		if(res.result == true){
+			alert(res.msg);
+		}else{
+			alert(res.msg);
+		}
+	}
 </script>
 </head>
 <body>
@@ -95,6 +176,61 @@
 			<fieldset>
 				<legend align="center" style="font-size:36px;">&nbsp;&nbsp;회원가입&nbsp;&nbsp;</legend>
 				<br /><br />
+				<table>
+				<colgroup>
+					<col width="20%">
+					<col width="40%">
+					<col width="20%">
+					<col width="20%">
+				</colgroup>
+					<tbody>
+						<tr>
+							<td class="signTd"><input class="leftBtn" type="button" value="아이디"/></td>
+							<td colspan="2" class="signTd"><input type="text" id="id_field" placeholder="이메일 주소가 아이디로 사용됩니다." /></td>
+							<td class="signTd"><input type="button" value="인증번호 발송" onclick="authSend();"/></td>
+						</tr>
+						<tr>
+							<td class="signTd"></td>
+							<td class="signTd"><input type="text" id="authCodeTxt" placeholder="인증번호를 입력해주세요." /></td>
+							<td class="signTd"><span id="authCode"></span></td>
+							<td class="signTd"><input type="button" value="인증번호 확인" onclick="authSendCheck();"/></td>
+						</tr>
+						<tr>
+							<td class="signTd"><input class="leftBtn" type="button" value="닉네임"/></td>
+							<td colspan="2" class="signTd"><input type="text" id="nick_field" placeholder="닉네임을 입력해주세요." /></td>
+							<td class="signTd"><input type="button" value="중복체크" onclick="dupleCheckNick(document.querySelector('#nick_field').value);"/></td>
+						</tr>
+						<tr>
+							<td class="signTd"><input class="leftBtn" type="button" value="비밀번호"/></td>
+							<td colspan="2" class="signTd"><input type="password" id="pw_field" placeholder="대문자, 소문자, 숫자를 조합하여 8~15자리로 입력하세요." /></td>
+							<td class="signTd"></td>
+						</tr>
+						<tr>
+							<td class="signTd"><input class="leftBtn" type="button" value="비밀번호확인"/></td>
+							<td colspan="2" class="signTd"><input type="password" id="pw_field2" placeholder="대문자, 소문자, 숫자를 조합하여 8~15자리로 입력하세요." /></td>
+							<td class="signTd"></td>
+						</tr>
+						<tr>
+							<td class="signTd"><input class="leftBtn" type="button" value="프로필이미지"/></td>
+							<td colspan="2" class="signTd" align="right">
+								<span class="image avatar" style="margin-right: 10%;">
+									<img id="prosrc" src="<%=request.getContextPath()%>/resources/images/default_profile.png" alt="" />
+								</span></td>
+							<td class="signTd">
+								<input type="file" id="fileUpload" style="display: none;" accept="image/*" />
+								<input type="button" value="사진추가" onclick="document.querySelector('#fileUpload').click()" />
+							</td>
+						</tr>
+						<tr>
+							<td class="signTd"></td>
+							<td colspan="2" class="signTd">
+								<input type="button" id="cancelButton" value="취소" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="button" id="signUpButton" value="회원가입신청" /><br /></td>
+							<td class="signTd"></td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- <br /><br />
 				<div id="login_field_wrap">
 					<div id="left_field">
 						<input class="leftBtn" type="button" value="아이디" style="margin-bottom: 5.5%;" />
@@ -107,9 +243,7 @@
 					<div id="right_field">
 						<input class="rightBtn" type="text" id="id_field" placeholder="이메일 주소가 아이디로 사용됩니다." />
 						<input class="rightBtn" type="text" id="nick_field" placeholder="닉네임을 입력해주세요." />
-						<!-- <div align="left" class="inputTxt"><span style="margin-left:10%;">&nbsp;✔︎&nbsp;email 주소가 아이디로 사용됩니다.</span></div> -->
-						<input class="rightBtn" type="password" id="pw_field" placeholder="대문자,소문자,숫자를 조합하여 8~15자리로 입력하세요." /><!-- oninput="keyup(this.value);" -->
-						<!-- <div style="margin-bottom:2%; margin-left:12%;" align="left"><span id="noticeStage">&nbsp;</span></div> -->
+						<input class="rightBtn" type="password" id="pw_field" placeholder="대문자,소문자,숫자를 조합하여 8~15자리로 입력하세요." />
 						<input class="rightBtn" type="password" id="pw_field2" placeholder="대문자,소문자,숫자를 조합하여 8~15자리로 입력하세요." />
 						<div style="display: flex;">
 							<span class="image avatar" style="float: left; padding-top:2%;">
@@ -123,12 +257,12 @@
 				<br />
 				<input type="button" id="signUpButton" value="회원가입신청" style="width: 78% !important; margin-left: 2%;" /><br />
 				
-				<!-- <div>
+				<div>
 					<span style="float:left; margin-left:10%;">비밀번호가 기억이 나지 않으신가요?</span><span style="float:right; margin-right:10%;"><a href="#">비밀번호 찾기</a></span><br />
 					<span style="float:left; margin-left:10%;">회원이 아니신가요?</span><span style="float:right; margin-right:10%;"><a href="#" onclick="signUp();">회원가입</a></span><br /><br />
-				</div> -->
+				</div>
 				
-				<br />
+				<br /> -->
 			</fieldset>
 		</form>
 	</div>

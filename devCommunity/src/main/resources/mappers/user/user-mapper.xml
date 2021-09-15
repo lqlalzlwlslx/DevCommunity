@@ -103,6 +103,22 @@
 	]]>
 	</select>
 	
+	<select id="selectAdminEmail" resultType="java.lang.String">
+	<![CDATA[
+		SELECT GROUP_CONCAT(login_id)
+		FROM dec_user
+		WHERE user_role_cd = 99
+	]]>
+	</select>
+	
+	<select id="userNickDupleCheck" parameterType="java.lang.String" resultType="java.lang.String">
+	<![CDATA[
+		SELECT nick_name
+		FROM dec_user
+		WHERE nick_name = #{nickName}
+	]]>
+	</select>
+	
 	
 	
 	

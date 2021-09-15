@@ -57,5 +57,15 @@ public class UserServiceImpl implements UserService {
 		return userDao.getUserProfileSrc(user_idx);
 	}
 
+	@Override
+	public String selectAdminEmail() throws Exception {
+		return userDao.selectAdminEmail();
+	}
+
+	@Override
+	public String userNickDupleCheck(String nickName) throws Exception {
+		return userDao.userNickDupleCheck(nickName);
+	}
+
 	
 }

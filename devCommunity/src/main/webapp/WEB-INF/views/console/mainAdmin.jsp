@@ -4,16 +4,20 @@
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
 <style>
+	html, body{
+		margin: 0;
+		height: 100%;
+		overflow: hidden;
+	}
+	div{height: 100%;}
 	.flex_container{
 		display: flex;
 		flex-direction: row;
-		height: 100%;
 	}
 	.flex_item1, .flex_item2{
 		flex: 1;
 		overflow: auto;
 		align: center;
-		height: 100%;
 	}
 </style>
 <script type="text/javascript">
@@ -35,69 +39,70 @@
 	}
 	
 	function drawPieChart(res){
-		console.log(res);
-		if(res.result == true){
-			var typej = res.comm_type_j;
-			var typec = res.comm_type_c;
-			var typep = res.comm_type_p;
-			var typed = res.comm_type_d;
-			
-			var pieElement = document.querySelector(".flex_item1");
-			pieElement.innerHTML = "<canvas id='pie-chart' style='width: 100%; height: 100%; margin: auto;'></canvas>";
-			
-			new Chart(document.getElementById("pie-chart"), {
-				type: 'pie',
-				data: {
-					labels: ['Java', 'C', 'Python', 'Database'],
-					datasets: [{
-						label: 'label',
-						data: {typej, typec, typep, typed}
-					}]
+		//console.log(res);
+		var pieElement = document.querySelector(".flex_item1");
+		pieElement.innerHTML = "<canvas id='pieChart' style='width: 100%; height: 100%; margin: auto; padding: auto;'></canvas>";
+		
+		new Chart(document.getElementById("pieChart"), {
+			type: 'pie',
+			data: {
+				labels: ["Java", "C", "Python", "Database"],
+				datasets: [{
+					//label: ["JAVA"],
+					backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9"],
+					data: [res.comm_type_j, res.comm_type_c, res.comm_type_p, res.comm_type_d]
+				}]
+			},
+			options: {
+				legend: {display: true },
+				title: {
+					display: true,
+					text: "커뮤니티 카테고리별 개설 현황"
 				},
-				options: {
-					title: {
-						display: true
-					},
-					legend: {display: false},
-					maintainAspectRatio: true
-				}
-			});
+				//maintainAspectRatio: false,
+				responsive: false
+			}
+		});
 			
-		}
 	}
 	
 	function drawBarChart(res){
+		//console.log(res);
 		var barElement = document.querySelector(".flex_item2");
 		barElement.innerHTML = "<canvas id='barChart' style='width: 100%; height: 100%; margin: auto; padding: auto;'></canvas>";
 		
 		new Chart(document.getElementById("barChart"),{
 			type: 'bar',
 			data: {
-				labels: ['Java', 'C', 'Python', 'Database'],
+				labels: ["Java", "C", "Python", "Database"],
 				datasets: [{
-					label: 'Java',
-					data: [res.typej, res.typec, res.typep, res.typed],
-					backgroundColor: [
-						'rgba(54, 162, 235, 0.2)',
-						'rgba(255, 99, 132, 0.2)',
-						'rgba(255, 206, 86, 0.2)',
-						'rgba(255, 159, 64, 0.2)'
-					],
-					borderColor: [
-						'rgba(54, 162, 235, 0.2)',
-						'rgba(255, 99, 132, 0.2)',
-						'rgba(255, 206, 86, 0.2)',
-						'rgba(255, 159, 64, 0.2)'
-					],
-					borderWidth: 1
-			}],
+					//label: "커뮤니티 카테고리 별 개설 현황",
+					backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9"],
+					data: [res.comm_type_j, res.comm_type_c, res.comm_type_p, res.comm_type_d]
+				}]
 			},
 			options: {
-				maintainAspectRatio: true,
-				title: {display: true},
-				legend:{display: false}
+				legend: {display: false },
+				title: {
+					display: true,
+					text: "커뮤니티 카테고리별 개설 현황"
+				},
+				//maintainAspectRatio: false,
+				responsive: false
 			}
+			
 		});
+	}
+	
+	function pageHandler(value){
+		console.log(value);
+		if(value == "communityStatus"){ //communityStatus.
+			//current page. nothing.
+		} else if(value == "userStatus"){ //userStatus.
+			
+		} else { //communityManage.
+			location.href="<%=request.getContextPath()%>/console/community/communityManage.do";
+		}
 	}
 </script>
 </head>
@@ -123,9 +128,9 @@
 		<c:if test="${not empty adminBean }">
 		<nav id="nav">
 			<ul>
-				<li><a href="#" id="communityStatus">커뮤니티 현황</a></li>
-				<li id="ucLi"><a href="#" id="ucListView">회원정보 관리</a></li>
-				<li id="communityFrm"><a href="#">커뮤니티 관리</a></li>
+				<li><a href="#" id="communityStatus" onclick="pageHandler(this.id);">커뮤니티 현황</a></li>
+				<li><a href="#" id="userStatus" onclick="pageHandler(this.id);">회원정보 관리</a></li>
+				<li><a href="#" id="communityManage" onclick="pageHandler(this.id);">커뮤니티 관리</a></li>
 				<li><a href="#" onclick="logout();">로그아웃</a></li>
 			</ul>
 		</nav>

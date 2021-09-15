@@ -33,9 +33,7 @@ public class PageController {
 	
 	@RequestMapping("/console")
 	public ModelAndView mainAdmin(HttpServletRequest request, Model model) throws Exception {
-		
-		log.debug("admin console.");
-		
+		log.debug("admin console access.");
 		return new ModelAndView("console/index");
 	}
 	

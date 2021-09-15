@@ -34,13 +34,14 @@
 	}
 </script>
 
-
 		<!-- Header -->
 			<section id="header">
 				<header>
 					<c:if test="${ empty userBean }">
 					<span class="image avatar"><img src="/resources/images/avatar.jpg" alt="" /></span>
 					<h1 id="logo"><span id="loginbtn">로그인</span></h1><br />
+					<div><span onclick="kakaoLogin();">카카오로그인</span></div>
+					<br />
 					<div style="display:flex;" align="center">
 					<p></p>
 						<div style="width:35%;" align="right"><a href="#" onclick="signUp();">회원가입</a></div>

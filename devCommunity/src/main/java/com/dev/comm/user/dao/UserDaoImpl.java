@@ -62,5 +62,15 @@ public class UserDaoImpl implements UserDao {
 		return sqlSession.selectOne("user.getUserProfileSrc", user_idx);
 	}
 
+	@Override
+	public String selectAdminEmail() throws Exception {
+		return sqlSession.selectOne("user.selectAdminEmail");
+	}
+
+	@Override
+	public String userNickDupleCheck(String nickName) throws Exception {
+		return sqlSession.selectOne("user.userNickDupleCheck", nickName);
+	}
+
 	
 }

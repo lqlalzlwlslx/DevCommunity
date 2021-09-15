@@ -22,4 +22,8 @@ public interface UserDao {
 
 	String getUserProfileSrc(int user_idx) throws Exception;
 
+	String selectAdminEmail() throws Exception;
+
+	String userNickDupleCheck(String nickName) throws Exception;
+
 }

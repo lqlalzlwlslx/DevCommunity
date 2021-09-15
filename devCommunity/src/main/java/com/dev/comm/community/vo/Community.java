@@ -28,6 +28,9 @@ public class Community {
 	private String comm_type_p;
 	private String comm_type_d;
 	
+	private String manager_idx;
+	private String manager_name;
+	
 	public long getComm_idx() {
 		return comm_idx;
 	}
@@ -118,12 +121,27 @@ public class Community {
 	public void setComm_type_d(String comm_type_d) {
 		this.comm_type_d = comm_type_d;
 	}
+	public String getManager_name() {
+		return manager_name;
+	}
+	public void setManager_name(String manager_name) {
+		this.manager_name = manager_name;
+	}
+	
+	public String getManager_idx() {
+		return manager_idx;
+	}
+	public void setManager_idx(String manager_idx) {
+		this.manager_idx = manager_idx;
+	}
 	@Override
 	public String toString() {
 		return "Community [comm_idx=" + comm_idx + ", comm_name=" + comm_name + ", comm_type_cd=" + comm_type_cd
 				+ ", comm_type_nm=" + comm_type_nm + ", comm_stat_cd=" + comm_stat_cd + ", comm_stat_nm=" + comm_stat_nm
 				+ ", comm_role_cd=" + comm_role_cd + ", reg_date=" + reg_date + ", boardList=" + boardList
-				+ ", userList=" + userList + ", comm_reg_cont=" + comm_reg_cont + "]";
+				+ ", userList=" + userList + ", comm_reg_cont=" + comm_reg_cont + ", comm_type_j=" + comm_type_j
+				+ ", comm_type_c=" + comm_type_c + ", comm_type_p=" + comm_type_p + ", comm_type_d=" + comm_type_d
+				+ ", manager_name=" + manager_name + "]";
 	}
 	
 	

@@ -34,5 +34,15 @@ public class CommunityServiceImpl implements CommunityService {
 	public int selectCommunityStatus(String value) throws Exception {
 		return communityDao.selectCommunityStatus(value);
 	}
+
+	@Override
+	public ArrayList<Community> selectAllCommunityList() throws Exception {
+		return communityDao.selectAllCommunityList();
+	}
+
+	@Override
+	public ArrayList<Community> selectConfirmCommunityList() throws Exception {
+		return communityDao.selectConfirmCommunityList();
+	}
 	
 }
