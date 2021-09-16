@@ -60,6 +60,12 @@ public class UserController {
 	@Autowired
 	private Environment env;
 	
+	private String mailFrom;
+	private String mailTo;
+	private String mailSubject;
+	private String mailContent;
+	private String mailContentType = "text/html";
+	
 	@Autowired(required=true)
 	private EmailSender mailSender;
 	
@@ -83,8 +89,8 @@ public class UserController {
 		User user = new User();
 		user.setLogin_id(login_id);
 		
-		User tUser = userService.selectUserInfoAsLogin(user);
 		boolean result = false;
+		User tUser = userService.selectUserInfoAsLogin(user);
 		
 		if(tUser != null) {
 			result = true;
@@ -123,8 +129,12 @@ public class UserController {
 			}
 			obj.addProperty("result", result);
 			return obj.toString();
+		}else {
+			result = false;
+			obj.addProperty("result", result);
+			obj.addProperty("msg", "아이디 또는 비밀번호를 잘못입력하셨습니다.\n다시 확인해주세요.");
+			return obj.toString();
 		}
-		return null;
 	}
 	
 	private boolean authentication(HttpServletRequest request, User user) throws Exception {
@@ -349,16 +359,13 @@ public class UserController {
 	
 	private String sendPasscode(String emailto) throws Exception {
 		String passcode = new Integer(1000000 + (new Random()).nextInt(1000000)).toString().substring(1);
-		Email email = new Email();
-		email.setFrom("devcomm00@gmail.com");
-		email.setMailto(emailto);
-		email.setSubject("[DevCommunity] 회원가입 인증번호가 전송되었습니다.");
-		String content = "";
-		content += "<h2>인증번호</h2><br />";
-		content += "<h3>"+passcode+"</h3>";
-		email.setContent(content);
+		mailFrom = "devcomm00@gmail.com";
+		mailTo = emailto;
+		mailSubject = "[DevCommunity] 회원가입 인증번호가 전송되었습니다.";
+		mailContent += "<h2>인증번호</h2><br />";
+		mailContent += "<h3>"+passcode+"</h3>";
 		
-		mailSender.sendMail(email);
+		mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
 		
 		passcode += "|" + emailto + "|" + System.currentTimeMillis();
 		log.debug("passcode: " + passcode);

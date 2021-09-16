@@ -18,6 +18,15 @@ public class Email {
 		contentType = "text/html";
 	}
 	
+	public Email(String from, String mailto, String subject, String content, String contentType) {
+		super();
+		this.from = from;
+		this.mailto = mailto;
+		this.subject = subject;
+		this.content = content;
+		this.contentType = contentType;
+	}
+	
 	public Email(String from, String mailto, String mailcc, String mailbcc, String subject, String content, String templateName, String contentType) {
 		super();
 		this.from = from;

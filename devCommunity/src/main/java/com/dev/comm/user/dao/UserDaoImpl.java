@@ -72,5 +72,10 @@ public class UserDaoImpl implements UserDao {
 		return sqlSession.selectOne("user.userNickDupleCheck", nickName);
 	}
 
+	@Override
+	public String getLoginIdAsIdx(int manager_idx) throws Exception {
+		return sqlSession.selectOne("user.getLoginIdAsIdx", manager_idx);
+	}
+
 	
 }

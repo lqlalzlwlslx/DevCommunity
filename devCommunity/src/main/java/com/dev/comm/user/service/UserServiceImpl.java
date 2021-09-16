@@ -67,5 +67,10 @@ public class UserServiceImpl implements UserService {
 		return userDao.userNickDupleCheck(nickName);
 	}
 
+	@Override
+	public String getLoginIdAsIdx(int manager_idx) throws Exception {
+		return userDao.getLoginIdAsIdx(manager_idx);
+	}
+
 	
 }

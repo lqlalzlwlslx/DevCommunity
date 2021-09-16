@@ -31,6 +31,8 @@ public class Community {
 	private String manager_idx;
 	private String manager_name;
 	
+	private String status;
+	
 	public long getComm_idx() {
 		return comm_idx;
 	}
@@ -134,6 +136,12 @@ public class Community {
 	public void setManager_idx(String manager_idx) {
 		this.manager_idx = manager_idx;
 	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	@Override
 	public String toString() {
 		return "Community [comm_idx=" + comm_idx + ", comm_name=" + comm_name + ", comm_type_cd=" + comm_type_cd
@@ -141,7 +149,7 @@ public class Community {
 				+ ", comm_role_cd=" + comm_role_cd + ", reg_date=" + reg_date + ", boardList=" + boardList
 				+ ", userList=" + userList + ", comm_reg_cont=" + comm_reg_cont + ", comm_type_j=" + comm_type_j
 				+ ", comm_type_c=" + comm_type_c + ", comm_type_p=" + comm_type_p + ", comm_type_d=" + comm_type_d
-				+ ", manager_name=" + manager_name + "]";
+				+ ", manager_idx=" + manager_idx + ", manager_name=" + manager_name + ", status=" + status + "]";
 	}
 	
 	

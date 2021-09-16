@@ -26,4 +26,6 @@ public interface UserDao {
 
 	String userNickDupleCheck(String nickName) throws Exception;
 
+	String getLoginIdAsIdx(int manager_idx) throws Exception;
+
 }

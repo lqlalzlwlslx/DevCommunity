@@ -1,6 +1,7 @@
 package com.dev.comm.community.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,6 +42,12 @@ public class CommunityController {
 	
 	@Autowired
 	private UserService userService;
+	
+	private String mailFrom;
+	private String mailTo;
+	private String mailSubject;
+	private String mailContent;
+	private String mailContentType = "text/html";
 	
 	@RequestMapping(value = "/community/nameDupleCheck", method = RequestMethod.GET, produces = "text/plain;charset=UTF-8")
 	@ResponseBody
@@ -95,30 +103,28 @@ public class CommunityController {
 		
 		Community community = new Community();
 		community.setComm_name(comm_name);
-		community.setManager_idx(user.getUser_idx()+"");
+		community.setManager_idx(Integer.toString(user.getUser_idx()));
 		community.setManager_name(user.getNick_name());
 		community.setComm_type_cd(comm_type);
 		community.setComm_reg_cont(comm_reg_cont);
 		community.setComm_stat_cd("I"); //신청할 때 비활성으로 insert. 관리자 승인 후 활성시키는 걸로..
 		
 		if(communityService.insertCommunity(community) > 0) {
-			String adminEmail = userService.selectAdminEmail(); //decadmin@gmail.com,saint@pdic.co.kr
-			String content = "";
-			content += "<h2>커뮤니티 신청 건이 있습니다.</h2><br />";
-			content += "<h3>확인 후 사이트에 접속하셔서 승인 바랍니다.</h3><br /><br />";
-			content += "<h4>신청자(닉네임) : " + community.getManager_name() + "<br />";
-			content += "커뮤니티명 : " + community.getComm_name() + "<br />";
-			content += "커뮤니티 타입 : " + community.getComm_type_cd() + "<br />";
-			content += "신청사유 : " + community.getComm_reg_cont() + "<br /></h4>";
+			
+			mailFrom = user.getLogin_id();
+			mailTo = userService.selectAdminEmail(); //decadmin@gmail.com,saint@pdic.co.kr
+			
+			mailContent += "<h2>커뮤니티 신청 건이 있습니다.</h2><br />";
+			mailContent += "<h3>확인 후 사이트에 접속하셔서 승인 바랍니다.</h3><br /><br />";
+			mailContent += "<h4>신청자(닉네임) : " + community.getManager_name() + "<br />";
+			mailContent += "커뮤니티명 : " + community.getComm_name() + "<br />";
+			mailContent += "커뮤니티 타입 : " + community.getComm_type_cd() + "<br />";
+			mailContent += "신청사유 : " + community.getComm_reg_cont() + "<br /></h4>";
 			//content += "신청일자 : " + community.getReg_date();
 			
-			Email email = new Email();
-			email.setFrom(user.getLogin_id());
-			email.setMailto(adminEmail);
-			email.setSubject(user.getNick_name() + "님의 [" + community.getComm_name() + "] 개설 신청");
-			email.setContent(content);
+			mailSubject = user.getNick_name() + "님의 [" + community.getComm_name() + "] 개설 신청";
 			
-			mailSender.sendMail(email);
+			mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
 			
 			obj.addProperty("result", true);
 			obj.addProperty("msg", "신청에 성공했습니다.\n관리자 승인 후 커뮤니티가 활성화 됩니다.");
@@ -170,4 +176,79 @@ public class CommunityController {
 		
 		return new ModelAndView("console/communityManage");
 	}
+	
+	@RequestMapping(value = "/console/communityApproval", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String communityApproval(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== communityApproval ===");
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+//		ModelMap mp = new ModelMap();
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		String approval = element.getAsJsonObject().get("status").getAsString();
+		int manager_idx = element.getAsJsonObject().get("value1").getAsInt();
+		int comm_idx = element.getAsJsonObject().get("value2").getAsInt();
+		log.debug("managerIdx: " + manager_idx);
+		log.debug("communityIdx: " + comm_idx);
+		
+		Community community = new Community();
+		community.setComm_idx(comm_idx);
+		community.setStatus(approval);
+		
+		communityService.updateCommunityApprovalAsStatus(community); 
+		
+		mailFrom = admin.getLogin_id();
+		mailTo = userService.getLoginIdAsIdx(manager_idx);
+		
+		if(approval.equals("settle")) {
+			mailSubject = "[DevCommunity] 커뮤니티 개설신청 승인 알림";
+			mailContent = "<h2>커뮤니티 개설 신청 건이 승인되었습니다.</h2>";
+		}else {
+			mailSubject = "[DevCommunity] 커뮤니티 개설신청 반려 알림";
+			mailContent = "<h2>커뮤니티 개설 신청 건이 반려되었습니다.</h2>";
+		}
+		
+		mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+		
+		try {
+			Thread.sleep(800L);
+		}catch(InterruptedException e) {
+			log.error(e);
+		}
+		
+		obj.addProperty("result", true);
+		obj.addProperty("status", approval);
+		obj.addProperty("comm_idx", comm_idx);
+		obj.addProperty("manager_idx", manager_idx);
+		
+		return obj.toString();
+		
+	}
+	
+	@RequestMapping(value = "/console/insertCommunityManager", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap insertCommunityManager(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		
+		int comm_idx = Integer.parseInt(request.getParameter("comm_idx"));
+		int manager_idx = Integer.parseInt(request.getParameter("manager_idx"));
+		
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("comm_idx", comm_idx);
+		map.put("manager_idx", manager_idx);
+		
+		try {
+			communityService.insertCoummunityManager(map);
+			mp.addAttribute("result", true);
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error(e);
+		}
+		
+		return mp;
+	}
+	
 }

@@ -95,7 +95,6 @@
 	}
 	
 	function pageHandler(value){
-		console.log(value);
 		if(value == "communityStatus"){ //communityStatus.
 			//current page. nothing.
 		} else if(value == "userStatus"){ //userStatus.
@@ -138,7 +137,7 @@
 	</section>
 	
 	<div id="wrapper">
-	
+		<!-- <h2>&nbsp;&nbsp;Developer Community</h2> -->
 		<div id="main" class="flex_container" align="center">
 			<div class="flex_item1"></div>
 			<div class="flex_item2"></div>

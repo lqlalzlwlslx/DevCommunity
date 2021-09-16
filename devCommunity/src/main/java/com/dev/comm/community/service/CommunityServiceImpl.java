@@ -1,6 +1,7 @@
 package com.dev.comm.community.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,16 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	public ArrayList<Community> selectConfirmCommunityList() throws Exception {
 		return communityDao.selectConfirmCommunityList();
+	}
+
+	@Override
+	public void updateCommunityApprovalAsStatus(Community community) throws Exception {
+		communityDao.updateCommunityApprovalAsStatus(community);
+	}
+
+	@Override
+	public void insertCoummunityManager(HashMap<String, Integer> map) throws Exception {
+		communityDao.insertCommunityManager(map);
 	}
 	
 }

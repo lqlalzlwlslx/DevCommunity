@@ -119,7 +119,13 @@
 	]]>
 	</select>
 	
-	
+	<select id="getLoginIdAsIdx" parameterType="_int" resultType="java.lang.String">
+	<![CDATA[
+		SELECT login_id
+		FROM dec_user
+		WHERE user_idx = #{manager_idx}
+	]]>
+	</select>
 	
 	
 	

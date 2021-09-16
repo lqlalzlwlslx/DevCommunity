@@ -1,6 +1,7 @@
 package com.dev.comm.community.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.user.vo.User;
@@ -18,5 +19,9 @@ public interface CommunityDao {
 	ArrayList<Community> selectAllCommunityList() throws Exception;
 
 	ArrayList<Community> selectConfirmCommunityList() throws Exception;
+
+	void updateCommunityApprovalAsStatus(Community community) throws Exception;
+
+	void insertCommunityManager(HashMap<String, Integer> map) throws Exception;
 
 }

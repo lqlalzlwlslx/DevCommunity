@@ -7,7 +7,6 @@
 	html, body{
 		margin: 0;
 		height: 100%;
-		overflow: hidden;
 	}
 	div  flex_item2{height: 100%;}
 	.flex_container{
@@ -29,20 +28,38 @@
 		
 	}
 	
-	function approval(status, value){
-		//console.log(status);
-		//console.log(value);
-		if(status == "settle"){
-			alert("승인");
+	function approval(status, value1, value2){
+		var approval = status == "settle" ? "승인" : "반려";
+		
+		if(confirm(approval + '처리 하시겠습니까?\n처리 결과는 신청자에게 메일 발송됩니다.')){
+			const approvalData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({status, value1, value2})
+			};
+			
+			fetch("/console/communityApproval", approvalData)
+				.then(res => res.json())
+				.then(data => updateStatus(data));
 		}
-		if(status == "reject"){
-			alert("반려");
+	}
+	
+	function updateStatus(res){
+		console.log(res);
+		if(res.result == true){
+			if(res.status == "settle"){
+				fetch("/console/insertCommunityManager.do?comm_idx="+res.comm_idx+"&manager_idx="+res.manager_idx);
+				alert("처리되었습니다.");
+				location.reload();
+			}else{
+				alert("처리되었습니다.");
+				location.reload();
+			}
 		}
 	}
 	
 	
 	function pageHandler(value){
-		console.log(value);
 		if(value == "communityStatus"){ //communityStatus.
 			location.href="<%=request.getContextPath()%>/console/mainAdmin.do";
 		} else if(value == "userStatus"){ //userStatus.
@@ -52,21 +69,6 @@
 		}
 	}
 	
-	<!--
-	<c:if test="${not empty communityList}">
-	console.log("not empty communityList.. value is : \n");
-		<c:forEach items="${communityList}" var="commList" varStatus="status">
-			console.log("${commList}");
-		</c:forEach>
-	</c:if>
-	
-	<c:if test="${not empty communityConfirmList}">
-	console.log("not empty communityConfirmList.. value is : \n");
-		<c:forEach items="${communityConfirmList}" var="ccList" varStatus="status">
-			console.log("${ccList}");
-		</c:forEach>
-	</c:if>
-	-->
 </script>
 </head>
 <body>
@@ -130,8 +132,8 @@
 									<td>${ccList.comm_type_nm}</td>
 									<td>${ccList.comm_reg_cont}</td>
 									<td>${ccList.reg_date}</td>
-									<td><span><a href="#" onclick="approval('settle', ${ccList.comm_idx});">승인</a></span></td>
-									<td><span><a href="#" onclick="approval('reject', ${ccList.comm_idx});">반려</a></span></td>
+									<td><span><a href="#" onclick="approval('settle', ${ccList.manager_idx}, ${ccList.comm_idx});">승인</a></span></td>
+									<td><span><a href="#" onclick="approval('reject', ${ccList.manager_idx}, ${ccList.comm_idx});">반려</a></span></td>
 								</tr>
 							</c:forEach>
 						</tbody>

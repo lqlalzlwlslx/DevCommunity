@@ -2,11 +2,6 @@
     pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 
-<%
-String passcode = (String) session.getAttribute(Constants.USER_SESSION_PASSCODE);
-passcode = passcode.substring(0, passcode.indexOf("|"));
-%>
-
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
 <style>
 	input[type="text"], input[type="password"], input[type="button"]{
@@ -28,7 +23,6 @@ passcode = passcode.substring(0, passcode.indexOf("|"));
 	.signTd{vertical-align:middle; padding: 0.25em 0.25em;}
 </style>
 
-<c:set var="passcode" value="<%=passcode%>" />
 <script type="text/javascript">
 	window.onload = function(){
 		

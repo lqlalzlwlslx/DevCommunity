@@ -1,6 +1,7 @@
 package com.dev.comm.community.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,6 +55,16 @@ public class CommunityDaoImpl implements CommunityDao {
 	@Override
 	public ArrayList<Community> selectConfirmCommunityList() throws Exception {
 		return (ArrayList) sqlSession.selectList("community.selectConfirmCommunityList");
+	}
+
+	@Override
+	public void updateCommunityApprovalAsStatus(Community community) throws Exception {
+		sqlSession.update("community.updateCommunityApprovalAsStatus", community);
+	}
+
+	@Override
+	public void insertCommunityManager(HashMap<String, Integer> map) throws Exception {
+		sqlSession.insert("community.insertCommunityManager", map);
 	}
 	
 }

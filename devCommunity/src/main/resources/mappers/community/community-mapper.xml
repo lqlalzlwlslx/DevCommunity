@@ -78,6 +78,24 @@
 		WHERE comm_stat_cd = 'I'
 	]]>
 	</select>
+	
+	<update id="updateCommunityApprovalAsStatus" parameterType="community">
+		<![CDATA[
+			UPDATE dec_community
+			SET comm_stat_cd = ]]>
+			<if test='status == "settle"'><![CDATA['A']]></if>
+			<if test='status == "reject"'><![CDATA['D']]></if>
+		<![CDATA[
+			WHERE comm_idx = #{comm_idx}
+		]]>
+	</update>
+	
+	<insert id="insertCommunityManager" parameterType="java.util.HashMap">
+	<![CDATA[
+		INSERT INTO dec_community_user(comm_idx, user_idx, comm_role_cd, comm_user_stat_cd, reg_date, login_date)
+		VALUES(#{comm_idx}, #{manager_idx}, 9, 'A', NOW(), NULL)
+	]]>
+	</insert>
 
 
 
