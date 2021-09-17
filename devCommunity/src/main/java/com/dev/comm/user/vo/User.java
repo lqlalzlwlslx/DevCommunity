@@ -22,7 +22,12 @@ public class User {
 	private String access_status;
 	private String access_ip;
 	
+	private String black_sdate;
+	private String black_edate;
+	
 	private int tryed;
+	
+	private String bl_scope;
 	
 	public boolean isAdmin() {
 		return (user_role_cd == 99);
@@ -128,14 +133,40 @@ public class User {
 		this.profile_src = profile_src;
 	}
 
+	public String getBl_scope() {
+		return bl_scope;
+	}
+
+	public void setBl_scope(String bl_scope) {
+		this.bl_scope = bl_scope;
+	}
+
+	public String getBlack_sdate() {
+		return black_sdate;
+	}
+
+	public void setBlack_sdate(String black_sdate) {
+		this.black_sdate = black_sdate;
+	}
+
+	public String getBlack_edate() {
+		return black_edate;
+	}
+
+	public void setBlack_edate(String black_edate) {
+		this.black_edate = black_edate;
+	}
+
 	@Override
 	public String toString() {
 		return "User [user_idx=" + user_idx + ", user_stat_cd=" + user_stat_cd + ", user_name=" + user_name
 				+ ", login_id=" + login_id + ", nick_name=" + nick_name + ", password=" + password + ", user_role_cd="
 				+ user_role_cd + ", reg_date=" + reg_date + ", login_date=" + login_date + ", pwd_date=" + pwd_date
 				+ ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm + ", access_status=" + access_status
-				+ ", access_ip=" + access_ip + ", tryed=" + tryed + "]";
+				+ ", access_ip=" + access_ip + ", black_sdate=" + black_sdate + ", black_edate=" + black_edate
+				+ ", tryed=" + tryed + ", bl_scope=" + bl_scope + "]";
 	}
+
 
 
 	

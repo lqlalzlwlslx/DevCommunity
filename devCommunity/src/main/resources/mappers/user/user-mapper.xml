@@ -127,7 +127,55 @@
 	]]>
 	</select>
 	
+	<select id="selectBlackListUser" resultType="user">
+	<![CDATA[
+		SELECT u.user_idx,
+			u.user_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'USER_STAT' AND conf_type_cd = user_stat_cd) as user_stat_nm,
+			u.login_id,
+			u.nick_name,
+			u.user_role_cd,
+			u.reg_date,
+			u.login_date,
+			u.access_ip,
+			u.profile_src,
+			b.start_date as black_sdate,
+			b.end_date as black_edate
+		FROM dec_blacklist b, dec_user u
+		WHERE b.user_idx = u.user_idx
+	]]>
+	</select>
 	
+	<select id="selectAllUserList" resultType="user">
+	<![CDATA[
+		SELECT user_idx,
+			user_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'USER_STAT' AND conf_type_cd = user_stat_cd) as user_stat_nm,
+			login_id,
+			nick_name,
+			user_role_cd,
+			reg_date,
+			login_date,
+			access_ip,
+			profile_src,
+			profile_src
+		FROM dec_user
+		WHERE user_role_cd <> 99
+	]]>
+	</select>
+	
+	<select id="selectConfAsBlackListScope" resultType="conf">
+	<![CDATA[
+		SELECT conf_type,
+			conf_type_cd,
+			conf_name,
+			conf_etc
+		FROM dec_conf
+		WHERE conf_type = 'BLACK_SCOP'
+		AND conf_type_cd <> '0000000000000000'
+		ORDER BY conf_type_cd ASC
+	]]>
+	</select>
 	
 	
 	

@@ -73,6 +73,22 @@ public class PageController {
 		return new ModelAndView("console/mainAdmin");
 	}
 	
+	@RequestMapping(value = "/console/logout")
+	public ModelAndView consoleLogout(HttpServletRequest request) throws Exception {
+		HttpSession session = request.getSession();
+		if(session.getAttribute(Constants.USER_SESSION_KEY) == null) session.invalidate();
+		else session.removeAttribute(Constants.ADMIN_SESSION_KEY);
+		
+		try {
+			Thread.sleep(100L);
+		}catch(InterruptedException e) {
+			e.printStackTrace();
+			log.error(e);
+		}
+		
+		return new ModelAndView("redirect:/");
+	}
+	
 	
 	
 

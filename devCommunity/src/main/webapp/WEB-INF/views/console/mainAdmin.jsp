@@ -22,7 +22,7 @@
 </style>
 <script type="text/javascript">
 	<c:if test="${empty adminBean}">
-		location.href="<%=request.getContextPath()%>/logout.do";
+		location.href="<%=request.getContextPath()%>/console/logout.do";
 	</c:if>
 	
 	window.onload = function(){
@@ -98,7 +98,7 @@
 		if(value == "communityStatus"){ //communityStatus.
 			//current page. nothing.
 		} else if(value == "userStatus"){ //userStatus.
-			
+			location.href="<%=request.getContextPath()%>/console/user/userManage.do";
 		} else { //communityManage.
 			location.href="<%=request.getContextPath()%>/console/community/communityManage.do";
 		}
@@ -118,7 +118,7 @@
 		<c:if test="${not empty adminBean.profile_src }">
 			<span class="image avatar"><img src="${contextPath}${userBean.profile_src}" alt="" /></span>
 		</c:if>
-		<h1 id="logo"><span id="loginbtn">${adminBean.nick_name} 님</span></h1><br />
+		<h1 id="logo"><span id="loginbtn">${adminBean.nick_name}</span></h1><br />
 		<div style="display:flex;" align="center">
 			<p></p>
 		</div>

@@ -1,5 +1,8 @@
 package com.dev.comm.user.dao;
 
+import java.util.ArrayList;
+
+import com.dev.comm.common.vo.Conf;
 import com.dev.comm.user.vo.User;
 
 public interface UserDao {
@@ -27,5 +30,11 @@ public interface UserDao {
 	String userNickDupleCheck(String nickName) throws Exception;
 
 	String getLoginIdAsIdx(int manager_idx) throws Exception;
+
+	ArrayList<User> selectBlackListUser() throws Exception;
+
+	ArrayList<User> selectAllUserList() throws Exception;
+
+	ArrayList<Conf> selectConfAsBlackListScope() throws Exception;
 
 }

@@ -1,10 +1,13 @@
 package com.dev.comm.user.dao;
 
+import java.util.ArrayList;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
 
+import com.dev.comm.common.vo.Conf;
 import com.dev.comm.user.vo.User;
 
 @Repository
@@ -75,6 +78,21 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public String getLoginIdAsIdx(int manager_idx) throws Exception {
 		return sqlSession.selectOne("user.getLoginIdAsIdx", manager_idx);
+	}
+
+	@Override
+	public ArrayList<User> selectBlackListUser() throws Exception {
+		return (ArrayList)sqlSession.selectList("user.selectBlackListUser");
+	}
+
+	@Override
+	public ArrayList<User> selectAllUserList() throws Exception {
+		return (ArrayList)sqlSession.selectList("user.selectAllUserList");
+	}
+
+	@Override
+	public ArrayList<Conf> selectConfAsBlackListScope() throws Exception {
+		return (ArrayList)sqlSession.selectList("user.selectConfAsBlackListScope");
 	}
 
 	

@@ -51,6 +51,16 @@
 			.then(data => updateProfile(data));
 			
 		});
+		
+		document.querySelector("#escapeBtn").addEventListener("click", function(){
+			if(confirm("회원탈퇴 하시겠습니까?\n탈퇴 시 동일계정으로 가입이 불가합니다.")){
+				fetch("/user/userEscape.do?idx="+${userBean.user_idx})
+					.then(res => res.json())
+					.then((data) => {
+						
+					});
+			}
+		});
 
 	}
 	
@@ -163,7 +173,8 @@
 				<br />
 				<div id="saveField" style="margin-top:1%;">
 					<input id="saveBtn" class="saveBtn" type="button" style="width:20% !important;" value="저장"/>&nbsp;&nbsp;&nbsp;&nbsp;
-					<input id="cancelBtn" class="saveBtn" type="button" style="width:20% !important;" value="취소"/>
+					<input id="cancelBtn" class="saveBtn" type="button" style="width:20% !important;" value="취소"/>&nbsp;&nbsp;&nbsp;&nbsp;
+					<input id="escapeBtn" class="saveBtn" type="button" style="width:20% !important;" value="회원탈퇴"/>
 				</div>
 				
 				<!-- <div>

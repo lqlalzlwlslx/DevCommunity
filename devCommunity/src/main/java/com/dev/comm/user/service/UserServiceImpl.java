@@ -1,8 +1,11 @@
 package com.dev.comm.user.service;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dev.comm.common.vo.Conf;
 import com.dev.comm.user.dao.UserDao;
 import com.dev.comm.user.vo.User;
 
@@ -70,6 +73,21 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String getLoginIdAsIdx(int manager_idx) throws Exception {
 		return userDao.getLoginIdAsIdx(manager_idx);
+	}
+
+	@Override
+	public ArrayList<User> selectBlackListUser() throws Exception {
+		return userDao.selectBlackListUser();
+	}
+
+	@Override
+	public ArrayList<User> selectAllUserList() throws Exception {
+		return userDao.selectAllUserList();
+	}
+
+	@Override
+	public ArrayList<Conf> selectConfAsBlackListScope() throws Exception {
+		return userDao.selectConfAsBlackListScope();
 	}
 
 	

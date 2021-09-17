@@ -8,7 +8,7 @@ public class Conf {
 	private String conf_type;
 	private String conf_type_cd;
 	private String conf_name;
-	private String etc;
+	private String conf_etc;
 	
 	public String getConf_type() {
 		return conf_type;
@@ -28,16 +28,16 @@ public class Conf {
 	public void setConf_name(String conf_name) {
 		this.conf_name = conf_name;
 	}
-	public String getEtc() {
-		return etc;
+	public String getConf_etc() {
+		return conf_etc;
 	}
-	public void setEtc(String etc) {
-		this.etc = etc;
+	public void setConf_etc(String conf_etc) {
+		this.conf_etc = conf_etc;
 	}
 	@Override
 	public String toString() {
-		return "Conf [conf_type=" + conf_type + ", conf_type_cd=" + conf_type_cd + ", conf_name=" + conf_name + ", etc="
-				+ etc + "]";
+		return "Conf [conf_type=" + conf_type + ", conf_type_cd=" + conf_type_cd + ", conf_name=" + conf_name + ", conf_etc="
+				+ conf_etc + "]";
 	}
 	
 

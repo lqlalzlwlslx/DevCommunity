@@ -21,7 +21,7 @@
 </style>
 <script type="text/javascript">
 	<c:if test="${empty adminBean}">
-		location.href="<%=request.getContextPath()%>/logout.do";
+		location.href="<%=request.getContextPath()%>/console/logout.do";
 	</c:if>
 	
 	window.onload = function(){
@@ -58,12 +58,19 @@
 		}
 	}
 	
+	function closureCommunity(cIdx, cname, mIdx){
+		/* if(confirm(cname + "커뮤니티 강제폐쇄를 진행하시겠습니까?\n")){
+			
+		} */
+		
+	}
+	
 	
 	function pageHandler(value){
 		if(value == "communityStatus"){ //communityStatus.
 			location.href="<%=request.getContextPath()%>/console/mainAdmin.do";
 		} else if(value == "userStatus"){ //userStatus.
-			
+			location.href="<%=request.getContextPath()%>/console/user/userManage.do";
 		} else { //communityManage.
 			//current page. nothing.
 		}
@@ -84,7 +91,7 @@
 		<c:if test="${not empty adminBean.profile_src }">
 			<span class="image avatar"><img src="${contextPath}${userBean.profile_src}" alt="" /></span>
 		</c:if>
-		<h1 id="logo"><span id="loginbtn">${adminBean.nick_name} 님</span></h1><br />
+		<h1 id="logo"><span id="loginbtn">${adminBean.nick_name}</span></h1><br />
 		<div style="display:flex;" align="center">
 			<p></p>
 		</div>
@@ -165,6 +172,11 @@
 									<td>${commList.comm_type_nm}</td>
 									<td>${commList.comm_stat_nm}</td>
 									<td>${commList.reg_date}</td>
+								<!-- <td>
+										<span>
+											<a href="#" onclick="closureCommunity(${commList.comm_idx}, ${commList.comm_name}, ${commList.manager_idx});">강제폐쇄</a>
+										</span>
+									</td> -->
 								</tr>
 							</c:forEach>
 						</tbody>

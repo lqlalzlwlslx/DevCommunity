@@ -141,7 +141,7 @@ public class CommunityController {
 	public String communityStatus(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.info("=== admin communityStatus ===");
 		User admin = SessionManager.getAdminSession(request);
-		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
 		
 		JsonObject obj = new JsonObject();
 		
@@ -160,10 +160,10 @@ public class CommunityController {
 	}
 	
 	@RequestMapping(value = "/console/community/communityManage", method = RequestMethod.GET)
-	public ModelAndView communityManage(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+	public ModelAndView adminCommunityManage(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		log.info("=== admin communityManage ===");
 		User admin = SessionManager.getAdminSession(request);
-		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
 		
 		ArrayList<Community> communityList = new ArrayList<Community>();
 		ArrayList<Community> communityConfirmList = new ArrayList<Community>();
@@ -182,7 +182,7 @@ public class CommunityController {
 	public String communityApproval(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
 		log.info("=== communityApproval ===");
 		User admin = SessionManager.getAdminSession(request);
-		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
 //		ModelMap mp = new ModelMap();
 		JsonObject obj = new JsonObject();
 		JsonParser parser = new JsonParser();

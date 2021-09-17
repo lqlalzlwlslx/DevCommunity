@@ -29,6 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dev.comm.common.base.Email;
 import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.common.service.UserAccessLogService;
+import com.dev.comm.common.vo.Conf;
 import com.dev.comm.common.vo.UserAccessLog;
 import com.dev.comm.community.service.CommunityService;
 import com.dev.comm.community.vo.Community;
@@ -394,6 +395,76 @@ public class UserController {
 			mp.addAttribute("result", true);
 			mp.addAttribute("msg", "사용가능한 닉네임입니다.");
 		}
+		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/console/user/userManage", method = RequestMethod.GET)
+	public ModelAndView adminUserManage(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		log.info("=== adminUserManage ===");
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		// userList. blackList. 또 있나?
+		ArrayList<User> userList = new ArrayList<User>();
+		ArrayList<User> blackList = new ArrayList<User>();
+		ArrayList<Conf> bScope = new ArrayList<Conf>();
+		
+		blackList = userService.selectBlackListUser();
+		userList = userService.selectAllUserList();
+		bScope = userService.selectConfAsBlackListScope();
+		
+		if(blackList != null) model.addAttribute("blackList", blackList);
+		if(userList != null) model.addAttribute("userList", userList);
+		if(bScope != null) model.addAttribute("bScope", bScope);
+		
+		
+		return new ModelAndView("console/userManage");
+	}
+	
+	@RequestMapping(value = "/console/user/userDetailView", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap adminUserDetailView(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		log.info("=== adminUserDetailView ===");
+		ModelMap mp = new ModelMap();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		int user_idx = -1; 
+		try {
+			user_idx = Integer.parseInt(request.getParameter("idx"));
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("IDX VALUE PARSING ERROR !!");
+			mp.addAttribute("result", false);
+			return mp;
+		}
+		
+		User userInfo = userService.selectUserInfoAsIdx(user_idx);
+		ArrayList<Conf> blackListScope = userService.selectConfAsBlackListScope();
+		if(userInfo != null) mp.addAttribute("userInfo", userInfo);
+		if(blackListScope != null) mp.addAttribute("bScope", blackListScope);
+		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/user/userEscape", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap userEscape(HttpServletRequest request) throws Exception {
+		ModelMap mp = new ModelMap();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			mp.addAttribute("result", false);
+			mp.addAttribute("msg", "세션이 만료되어 처리에 실패했습니다.");
+		}
+		int user_idx = -1;
+		try {
+			user_idx = Integer.parseInt(request.getParameter("idx"));
+		}catch(Exception e) {
+			log.error("IDX VALUE PARSING ERROR.");
+		}
+		
+		// 회원탈퇴 구현하기.
 		
 		return mp;
 	}
