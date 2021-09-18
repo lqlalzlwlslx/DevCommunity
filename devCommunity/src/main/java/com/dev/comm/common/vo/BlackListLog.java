@@ -3,14 +3,21 @@ package com.dev.comm.common.vo;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class BlackList {
+public class BlackListLog {
 	
+	private int bl_log_idx;
 	private int bl_idx;
 	private int user_idx;
 	private String bl_cont;
 	private String start_date;
 	private String end_date;
-	
+	private String release_date;
+	public int getBl_log_idx() {
+		return bl_log_idx;
+	}
+	public void setBl_log_idx(int bl_log_idx) {
+		this.bl_log_idx = bl_log_idx;
+	}
 	public int getBl_idx() {
 		return bl_idx;
 	}
@@ -41,10 +48,17 @@ public class BlackList {
 	public void setEnd_date(String end_date) {
 		this.end_date = end_date;
 	}
+	public String getRelease_date() {
+		return release_date;
+	}
+	public void setRelease_date(String release_date) {
+		this.release_date = release_date;
+	}
 	@Override
 	public String toString() {
-		return "BlackList [bl_idx=" + bl_idx + ", user_idx=" + user_idx + ", bl_cont=" + bl_cont + ", start_date="
-				+ start_date + ", end_date=" + end_date + "]";
+		return "BlackListLog [bl_log_idx=" + bl_log_idx + ", bl_idx=" + bl_idx + ", user_idx=" + user_idx + ", bl_cont="
+				+ bl_cont + ", start_date=" + start_date + ", end_date=" + end_date + ", release_date=" + release_date
+				+ "]";
 	}
 	
 	

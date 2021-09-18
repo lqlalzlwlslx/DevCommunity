@@ -30,6 +30,7 @@
 		-o-transform:scale(5);
 		transform:scale(5);
 	}
+	#userDetail:hover, #userRelease:hover{cursor:pointer;}
 	.umTd{vertical-align:middle; padding: 0.25em 0.25em;}
 </style>
 <script type="text/javascript">
@@ -38,7 +39,7 @@
 	</c:if>
 	
 	window.onload = function(){
-
+		
 	}
 	
 	
@@ -98,25 +99,29 @@
 					<table>
 						<thead>
 							<tr>
-								<th>신청자</th>
-								<th>커뮤니티명</th>
-								<th>커뮤니티 타입</th>
-								<th>신청사유</th>
-								<th>신청일</th>
-								<th></th>
+								<th>프로필이미지</th>
+								<th>아이디</th>
+								<th>닉네임</th>
+								<th>가입일</th>
+								<th>상태</th>
+								<th>최근 로그인 일시</th>
+								<th>차단 시작일</th>
+								<th>차단 종료일</th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach items="${blackList}" var="bList" varStatus="status">
 								<tr>
-									<td class="umTd"></td>
-									<td class="umTd"></td>
-									<td class="umTd"></td>
-									<td class="umTd"></td>
-									<td class="umTd"></td>
-									<td class="umTd"></td>
-									<td class="umTd"></td>
+									<td class="umTd"><img class="uList_img" src="${bList.profile_src}" alt="" /></td>
+									<td class="umTd">${bList.login_id}</td>
+									<td class="umTd">${bList.nick_name}</td>
+									<td class="umTd">${bList.reg_date}</td>
+									<td class="umTd">${bList.user_stat_nm}</td>
+									<td class="umTd">${bList.login_date}</td>
+									<td class="umTd">${bList.black_sdate}</td>
+									<td class="umTd">${bList.black_edate}</td>
+									<td class="umTd" id="userRelease"><span onclick="userBlackListRelease(${bList.user_idx})">차단 즉시해제</span></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -151,7 +156,7 @@
 									<td class="umTd">${uList.reg_date}</td>
 									<td class="umTd">${uList.user_stat_nm}</td>
 									<td class="umTd">${uList.login_date}</td>
-									<td class="umTd"><span onclick="userDetailView('${uList.user_idx}');" data-bs-toggle="modal" data-bs-target="#userView">정보보기</span></td>
+									<td class="umTd" id="userDetail"><span onclick="userDetailView('${uList.user_idx}');" data-bs-toggle="modal" data-bs-target="#userView">정보보기</span></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -182,6 +187,10 @@
 								<td id="userNickField"></td>
 							</tr>
 							<tr>
+								<td style="vertical-align:middle;">가입된 커뮤니티
+								<td id="userCommunityInfo"></td>
+							</tr>
+							<tr>
 								<td style="vertical-align:middle;">프로필이미지</td>
 								<td id="userProfileField"></td>
 							</tr>
@@ -197,10 +206,16 @@
 								<td colspan="2" style="display:none; vertical-align:middle;" id="showBScope" align="right">
 									<c:if test="${not empty bScope}">
 									<c:forEach items="${bScope}" var="bScope" varStatus="status">
-										<input type="radio" id="blackScope_${bScope.conf_type_cd}" name="bScopes" value="${bScope.conf_name}">
+										<input type="radio" id="blackScope_${bScope.conf_type_cd}" name="bScopes" value="${bScope.conf_type_cd}">
 										<label for="blackScope_${bScope.conf_type_cd}">${bScope.conf_name}</label>
 									</c:forEach>
 									</c:if>
+								</td>
+							</tr>
+							<tr style="display:none;" id="showBcont">
+								<td style="vertical-align:middle;">사유입력</td>
+								<td>
+									<textarea style="resize:none;" id="bl_cont"></textarea>
 								</td>
 							</tr>
 						</tbody>
@@ -208,7 +223,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closureModal();">닫기</button>
-					<button type="button" class="btn btn-primary" onclick="saveUserInfo();">저장</button>
+					<button type="button" class="btn btn-primary" id="userInfoSvaeBtn">저장</button>
 				</div>
 			</div>
 		</div>
@@ -225,6 +240,7 @@
 		
 		function showWinUser(res){
 			var ui = res.userInfo;
+			var ucList = res.ucList;
 			
 			var prosrc = "<img src='"+ui.profile_src+"' style='width:150px; height:150px;' alt='' />";
 			
@@ -233,19 +249,39 @@
 			document.getElementById("userNickField").innerHTML = ui.nick_name;
 			document.getElementById("userProfileField").innerHTML = prosrc;
 			
+			document.getElementById("userInfoSvaeBtn").setAttribute("onclick","saveUserInfo("+ui.user_idx+");");
+			
 			var userStats = document.getElementsByName("userStat");
 			for(var i = 0; i < userStats.length; i++){
 				if(userStats[i].getAttribute('value') == ui.user_stat_cd){
 					userStats[i].checked = true;
 				}
+				if(ui.user_stat_cd == "I"){
+					document.getElementById("Active").disabled = true;
+					document.getElementById("Black").disabled = true;
+				}else{
+					document.getElementById("Active").disabled = false;
+					document.getElementById("Black").disabled = false;
+				}
 			}
+			
+			if(ucList.length > 0){
+				for(var i = 0; i < ucList.length; i++){
+					document.getElementById("userCommunityInfo").innerHTML += ucList[i].comm_name;
+					if(i < ucList.length - 1) document.getElementById("userCommunityInfo").innerHTML += "<br />";
+					
+				}
+			}else{
+				document.getElementById("userCommunityInfo").innerHTML = "가입된 커뮤니티 없음";
+			}
+			
 		}
 		var scopesName ;
 		function showBlackListScope(value){
 			//....
-			console.log(value);
 			if(value == "A"){
 				document.querySelector("#showBScope").style.display = "none";
+				document.querySelector("#showBcont").style.display = "none";
 				scopesName = document.getElementsByName("bScopes");
 				for(var i = 0; i < scopesName.length; i++){
 					if(scopesName[i].getAttribute('type') === 'radio'){
@@ -255,18 +291,61 @@
 			}
 			if(value == "B"){
 				document.querySelector("#showBScope").style.display = "";
+				document.querySelector("#showBcont").style.display = "";
 			}
-			
 		}
 		
 		function closureModal(){
 			document.querySelector("#showBScope").style.display = "none";
+			document.querySelector("#showBcont").style.display = "none";
+			document.querySelector("#bl_cont").value = "";
+			document.querySelector("#userCommunityInfo").innerHTML = "";
 			scopesName = document.getElementsByName("bScopes");
 			for(var i = 0; i < scopesName.length; i++){
 				if(scopesName[i].getAttribute('type') === 'radio'){
 					scopesName[i].checked = false;
 				}
 			}
+		}
+		
+		function saveUserInfo(uid){
+			var blacklistScope = null;
+			var blacklstCont;
+			
+			if(document.querySelector("#Black").checked == true){
+				scopesName = document.getElementsByName("bScopes");
+				for(var i = 0; i < scopesName.length; i++){
+					if(scopesName[i].checked == true){
+						blacklistScope = scopesName[i].value;
+						blacklistCont = document.querySelector("#bl_cont").value;
+					}
+				}
+				if(blacklistScope == null) { alert("차단 기간을 설정해주세요."); return; }
+				if(!blacklistCont) { alert("차단 사유를 작성해주세요."); document.querySelector("#bl_cont").focus(); return; }
+				
+				if(confirm("해당 사용자를 " + blacklistScope + "일 기간만큼 차단히겠습니까?\n차단 설정 후 사용자에게 이메일로 사유가 발송됩니다.")){
+					const blackData = {
+							method: "POST",
+							headers: {"Content-Type": "application/json"},
+							body: JSON.stringify({uid, blacklistScope, blacklistCont})
+					};
+					fetch("/console/user/insertBlackListUser", blackData)
+						.then(res => res.json())
+						.then((data) => {
+							if(data.result == true){
+								alert(data.msg);
+								<% try{Thread.sleep(100L);}catch(InterruptedException e){} %>
+								location.reload();
+							}else{
+								alert(data.msg);
+							}
+						});
+				}
+				
+			}else{
+				//차단이 아닌 경우는 그냥 닫아도 되지 않을까..?
+			}
+			
 		}
 	
 	

@@ -1,7 +1,9 @@
 package com.dev.comm.user.controller;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 import java.util.UUID;
 
@@ -29,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dev.comm.common.base.Email;
 import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.common.service.UserAccessLogService;
+import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
 import com.dev.comm.common.vo.UserAccessLog;
 import com.dev.comm.community.service.CommunityService;
@@ -442,6 +445,9 @@ public class UserController {
 		
 		User userInfo = userService.selectUserInfoAsIdx(user_idx);
 		ArrayList<Conf> blackListScope = userService.selectConfAsBlackListScope();
+		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(userInfo);
+		
+		if(userCommunityList != null) mp.addAttribute("ucList", userCommunityList);
 		if(userInfo != null) mp.addAttribute("userInfo", userInfo);
 		if(blackListScope != null) mp.addAttribute("bScope", blackListScope);
 		
@@ -465,8 +471,92 @@ public class UserController {
 		}
 		
 		// 회원탈퇴 구현하기.
+		try {
+			int success = userService.updateUserEscapeAsIdx(user_idx);
+			if(success > 0) {
+				mp.addAttribute("result", true);
+				mp.addAttribute("msg", "성공했습니다.");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error(e);
+			mp.addAttribute("result", false);
+			mp.addAttribute("msg", "처리에 실패했습니다.");
+		}
+		
 		
 		return mp;
+	}
+	
+	@RequestMapping(value = "console/user/insertBlackListUser", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String insertBlackListUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("===admin insertBlackList===");
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int user_idx = element.getAsJsonObject().get("uid").getAsInt();
+			int blScope = element.getAsJsonObject().get("blacklistScope").getAsInt();
+			String blCont = element.getAsJsonObject().get("blacklistCont").getAsString();
+			
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String endDate = "";
+			if(blScope == 7) {
+				cal.add(Calendar.DATE, blScope);
+				endDate = sdf.format(cal.getTime());
+			}else if(blScope == 15) {
+				cal.add(Calendar.DATE, blScope);
+				endDate = sdf.format(cal.getTime());
+			}else if(blScope == 30) {
+				cal.add(Calendar.DATE, blScope);
+				endDate = sdf.format(cal.getTime());
+			}else {
+				endDate = "9999-12-31 23:59:59";
+			}
+			
+			BlackList bl = new BlackList();
+			bl.setUser_idx(user_idx);
+			bl.setEnd_date(endDate);
+			bl.setBl_cont(blCont);
+			
+			bl = userService.insertBlackListuser(bl);
+			
+			if(bl != null) {
+				
+				userService.updateUserBlackListStatus(user_idx);
+				userService.insertBlackListUserLog(bl);
+				
+				mailFrom = "devcomm00@gmail.com";
+				mailTo = userService.getLoginIdAsIdx(user_idx);
+				mailSubject = "[DevCommunity] 활동정지 알림";
+				mailContent = "안녕하세요.<br />";
+				mailContent += "DevCommunity 관리자입니다.";
+				mailContent += "<br />";
+				mailContent += "활동 규칙에 의해 현재 시간부터";
+				mailContent += endDate +" 기간까지 활동정지 되었습니다.";
+				mailContent += "<br />";
+				mailContent += "감사합니다.";
+				
+				mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다.");
+				return obj.toString();
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error(e);
+		}
+		obj.addProperty("result", false);
+		obj.addProperty("msg", "실패했습니다.");
+		
+		return obj.toString();
 	}
 	
 	/*

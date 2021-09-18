@@ -177,6 +177,51 @@
 	]]>
 	</select>
 	
+	<update id="updateUserEscapeAsIdx" parameterType="_int">
+	<![CDATA[
+		UPDATE dec_user
+		SET user_stat_cd = 'I'
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<insert id="insertBlackListUser" parameterType="blackList">
+		<selectKey keyProperty="bl_idx" order="AFTER" resultType="_int">
+			<![CDATA[SELECT bl_idx FROM dec_blacklist]]>
+		</selectKey>
+	<![CDATA[
+		INSERT dec_blacklist(user_idx, bl_cont, start_date, end_date)
+		VALUES(#{user_idx}, #{bl_cont}, NOW(), #{end_date})
+	]]>
+	</insert>
+	
+	<select id="selectOneBlackListForLog" parameterType="blackList" resultType="blackList">
+	<![CDATA[
+		SELECT bl_idx,
+			user_idx,
+			bl_cont,
+			start_date,
+			end_date
+		FROM dec_blacklist
+		WHERE bl_idx = #{bl_idx}
+	]]>
+	</select>
+	
+	<update id="updateUserBlackListStatus" parameterType="_int">
+	<![CDATA[
+		UPDATE dec_user
+		SET user_stat_cd = 'B'
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<insert id="insertBlackListUserLog" parameterType="blackListLog">
+	<![CDATA[
+		INSERT INTO dec_blacklist_log(bl_idx, user_idx, bl_cont, start_date, end_date, release_date)
+		VALUES(#{bl_idx}, #{user_idx}, #{bl_cont}, #{start_date}, #{end_date}, NULL)
+	]]>
+	</insert>
+	
 	
 	
 	

@@ -57,7 +57,12 @@
 				fetch("/user/userEscape.do?idx="+${userBean.user_idx})
 					.then(res => res.json())
 					.then((data) => {
-						
+						if(data.result == true){
+							alert(data.msg);
+							location.href="<%=request.getContextPath()%>/logout.do";
+						}else{
+							alert(data.msg);
+						}
 					});
 			}
 		});

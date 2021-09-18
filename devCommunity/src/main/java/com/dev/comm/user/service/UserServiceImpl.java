@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
 import com.dev.comm.user.dao.UserDao;
 import com.dev.comm.user.vo.User;
@@ -88,6 +89,26 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public ArrayList<Conf> selectConfAsBlackListScope() throws Exception {
 		return userDao.selectConfAsBlackListScope();
+	}
+
+	@Override
+	public int updateUserEscapeAsIdx(int user_idx) throws Exception {
+		return userDao.updateUserEscapeAsIdx(user_idx);
+	}
+
+	@Override
+	public BlackList insertBlackListuser(BlackList bl) throws Exception {
+		return userDao.insertBlackListuser(bl);
+	}
+
+	@Override
+	public void updateUserBlackListStatus(int user_idx) throws Exception {
+		userDao.updateUserBlackListStatus(user_idx);
+	}
+
+	@Override
+	public void insertBlackListUserLog(BlackList bl) throws Exception {
+		userDao.insertBlackListUserLog(bl);
 	}
 
 	

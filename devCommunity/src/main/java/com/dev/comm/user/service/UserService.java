@@ -2,6 +2,7 @@ package com.dev.comm.user.service;
 
 import java.util.ArrayList;
 
+import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
 import com.dev.comm.user.vo.User;
 
@@ -36,5 +37,13 @@ public interface UserService {
 	ArrayList<User> selectAllUserList() throws Exception;
 
 	ArrayList<Conf> selectConfAsBlackListScope() throws Exception;
+
+	int updateUserEscapeAsIdx(int user_idx) throws Exception;
+
+	BlackList insertBlackListuser(BlackList bl) throws Exception;
+
+	void updateUserBlackListStatus(int user_idx) throws Exception;
+
+	void insertBlackListUserLog(BlackList bl) throws Exception;
 
 }

@@ -20,6 +20,7 @@
 		<typeAlias alias="communityBlackList" type="com.dev.comm.community.vo.CommunityBlackList" />
 		<typeAlias alias="communityUser" type="com.dev.comm.community.vo.CommunityUser" />
 		<typeAlias alias="userAccessLog" type="com.dev.comm.common.vo.UserAccessLog" />
+		<typeAlias alias="blackListLog" type="com.dev.comm.common.vo.BlackListLog" />
 	</typeAliases>
 	
 	<mappers>

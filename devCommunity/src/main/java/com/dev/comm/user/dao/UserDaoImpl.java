@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
 
+import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
 import com.dev.comm.user.vo.User;
 
@@ -93,6 +94,29 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public ArrayList<Conf> selectConfAsBlackListScope() throws Exception {
 		return (ArrayList)sqlSession.selectList("user.selectConfAsBlackListScope");
+	}
+
+	@Override
+	public int updateUserEscapeAsIdx(int user_idx) throws Exception {
+		return sqlSession.update("user.updateUserEscapeAsIdx", user_idx);
+	}
+
+	@Override
+	public BlackList insertBlackListuser(BlackList bl) throws Exception {
+		sqlSession.insert("user.insertBlackListUser", bl);
+		BlackList blackList = new BlackList();
+		blackList = sqlSession.selectOne("user.selectOneBlackListForLog", bl);
+		return blackList;
+	}
+
+	@Override
+	public void updateUserBlackListStatus(int user_idx) throws Exception {
+		sqlSession.update("user.updateUserBlackListStatus", user_idx);
+	}
+
+	@Override
+	public void insertBlackListUserLog(BlackList bl) throws Exception {
+		sqlSession.insert("user.insertBlackListUserLog", bl);
 	}
 
 	
