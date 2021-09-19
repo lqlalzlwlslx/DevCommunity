@@ -19,6 +19,8 @@
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
 	input[type="radio"] + label{padding-right:2em !important;}
+	.container{padding:0 !important;}
+	.container-solid{border-top:solid 6px #f4f4f4;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
@@ -111,10 +113,11 @@
 			}
 		}
 		const comm_reg_cont = document.querySelector("#communityRegCont").value;
+		const comm_intro = document.querySelector("#communityIntro").value;
 		const communityData = {
 				method: "POST",
 				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({comm_name, comm_category, comm_reg_cont})
+				body: JSON.stringify({comm_name, comm_category, comm_reg_cont, comm_intro})
 		};
 		
 		fetch("/community/insertCommunity", communityData)
@@ -200,20 +203,20 @@
 								<div class="image main" data-position="center">
 									<!-- <img src="/resources/images/banner.jpg" alt="" /> -->
 									<div style="width:10%;"></div>
-									<c:if test="${not empty ucList}">
+									<!-- <c:if test="${not empty ucList}">
 									<div style="width:20%; margin:auto;">
 									<select id="searchScopeTxt">
-											<option value="0">------------------</option>
+											<option value="0">=== 선택 ===</option>
 											<c:forEach items="${ucList}" var="ucList" varStatus="status">
 												<option value="${ucList.comm_name}">${ucList.comm_name}</option>
 											</c:forEach>
 										</select>
 									</div>
-									</c:if>
+									</c:if> -->
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
 										<select id="searchTxt">
-											<option value="0">------------------</option>
+											<option value="0">=== 선택 ===</option>
 											<option value="content">내용</option>
 											<option value="title">제목</option>
 											<option value="writer">작성자</option>
@@ -226,7 +229,7 @@
 									</div>
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
-										<input type="button" id="searchBtn" value="검색" />
+										<input type="button" id="searchBtn" onclick="searchCondition();" value="검색" />
 									</div>
 								</div>
 								<div class="container">
@@ -238,9 +241,18 @@
 									<p>공지사항 블라블라<br />이용수칙 블라블라<br /></p>
 								</div>
 							</section>
+							
+							<div class="container container-solid">
+								<header class="major">
+									<h2>board_title</h2>
+									<!-- <p>DevCoummunity에 오신 것을 환영합니다.<br />
+									이용 수칙에 관해 잘 읽어주시고 활동해주세요.</p> -->
+								</header>
+								<p>board_content</p>
+							</div>
 
 						<!-- Two -->
-							<section id="two">
+							<!-- <section id="two">
 								<div class="container">
 									<h3>Things I Can Do</h3>
 									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer lorem ipsum dolor sit amet.</p>
@@ -253,10 +265,10 @@
 										<li class="icon solid fa-users">Shadow clone technique</li>
 									</ul>
 								</div>
-							</section>
+							</section> -->
 
 						<!-- Three -->
-							<section id="three">
+							<!-- <section id="three">
 								<div class="container">
 									<h3>A Few Accomplishments</h3>
 									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer. Integer eu ante ornare amet commetus.</p>
@@ -284,10 +296,10 @@
 										</article>
 									</div>
 								</div>
-							</section>
+							</section> -->
 
 						<!-- Four -->
-							<section id="four">
+							<!-- <section id="four">
 								<div class="container">
 									<h3>Contact Me</h3>
 									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer. Integer eu ante ornare amet commetus.</p>
@@ -306,7 +318,7 @@
 										</div>
 									</form>
 								</div>
-							</section>
+							</section> -->
 							
 
 						<!-- Five -->
@@ -702,7 +714,12 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 						<tr>
 							<td><input type="button" value="커뮤니티 개설사유" /></td>
 							<td></td>
-							<td colspan="3"><textarea style="resize: none;" rows="5" id="communityRegCont" placeholder="사유를 입력해주세요."></textarea></td>
+							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityRegCont" placeholder="사유를 입력해주세요."></textarea></td>
+						</tr>
+						<tr>
+							<td><input type="button" value="커뮤니티 소개글" /></td>
+							<td></td>
+							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요."></textarea></td>
 						</tr>
 					</tbody>
 				</table>

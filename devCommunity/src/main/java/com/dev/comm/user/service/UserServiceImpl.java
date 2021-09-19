@@ -111,5 +111,20 @@ public class UserServiceImpl implements UserService {
 		userDao.insertBlackListUserLog(bl);
 	}
 
+	@Override
+	public BlackList deleteUserBlackList(int user_idx) throws Exception {
+		return userDao.deleteUserBlackList(user_idx);
+	}
+
+	@Override
+	public void updateUserBlackListLogRelease(BlackList blackList) throws Exception {
+		userDao.updateUserBlackListLogRelease(blackList);
+	}
+
+	@Override
+	public void updateUserBlackListReleaseStatus(int user_idx) throws Exception {
+		userDao.updateUserBlackListReleaseStatus(user_idx);
+	}
+
 	
 }

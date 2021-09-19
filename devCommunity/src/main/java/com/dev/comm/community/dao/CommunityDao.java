@@ -24,4 +24,8 @@ public interface CommunityDao {
 
 	void insertCommunityManager(HashMap<String, Integer> map) throws Exception;
 
+	ArrayList<Community> selectCommunityListAsSearchValues(String value) throws Exception;
+
+	int selectCountCommunityUser(Community comm) throws Exception;
+
 }

@@ -55,5 +55,15 @@ public class CommunityServiceImpl implements CommunityService {
 	public void insertCoummunityManager(HashMap<String, Integer> map) throws Exception {
 		communityDao.insertCommunityManager(map);
 	}
+
+	@Override
+	public ArrayList<Community> selectCommunityListAsSearchValues(String value) throws Exception {
+		return communityDao.selectCommunityListAsSearchValues(value);
+	}
+
+	@Override
+	public int selectCountCommunityUser(Community comm) throws Exception {
+		return communityDao.selectCountCommunityUser(comm);
+	}
 	
 }

@@ -119,5 +119,23 @@ public class UserDaoImpl implements UserDao {
 		sqlSession.insert("user.insertBlackListUserLog", bl);
 	}
 
+	@Override
+	public BlackList deleteUserBlackList(int user_idx) throws Exception {
+		BlackList bl = new BlackList();
+		bl = sqlSession.selectOne("user.selectOneUserBlackListInfo", user_idx);
+		sqlSession.delete("user.deleteUserBlackList", bl);
+		return bl;
+	}
+
+	@Override
+	public void updateUserBlackListLogRelease(BlackList blackList) throws Exception {
+		sqlSession.update("user.updateUserBlackListLogRelease", blackList);
+	}
+
+	@Override
+	public void updateUserBlackListReleaseStatus(int user_idx) throws Exception {
+		sqlSession.update("user.updateUserBlackListReleaseStatus", user_idx);
+	}
+
 	
 }

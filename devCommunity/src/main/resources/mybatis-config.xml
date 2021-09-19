@@ -5,9 +5,9 @@
 	
 	<!-- <properties resource="classpath:db.properties" /> -->
 	
-	<settings>
+	<!-- <settings>
 		<setting name="jdbcTypeForNull" value="NULL" />
-	</settings>
+	</settings> -->
 	
 	<typeAliases>
 		<typeAlias alias="user" type="com.dev.comm.user.vo.User" />

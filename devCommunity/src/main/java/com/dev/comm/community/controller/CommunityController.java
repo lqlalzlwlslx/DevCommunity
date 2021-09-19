@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dev.comm.board.service.BoardService;
+import com.dev.comm.board.vo.Board;
 import com.dev.comm.common.base.Email;
 import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.community.service.CommunityService;
@@ -42,6 +44,9 @@ public class CommunityController {
 	
 	@Autowired
 	private UserService userService;
+	
+//	@Autowired
+//	private BoardService boardService;
 	
 	private String mailFrom;
 	private String mailTo;
@@ -100,6 +105,7 @@ public class CommunityController {
 		String comm_name = element.getAsJsonObject().get("comm_name").getAsString();
 		String comm_type = element.getAsJsonObject().get("comm_category").getAsString();
 		String comm_reg_cont = element.getAsJsonObject().get("comm_reg_cont").getAsString();
+		String comm_intro = element.getAsJsonObject().get("comm_intro").getAsString();
 		
 		Community community = new Community();
 		community.setComm_name(comm_name);
@@ -107,6 +113,7 @@ public class CommunityController {
 		community.setManager_name(user.getNick_name());
 		community.setComm_type_cd(comm_type);
 		community.setComm_reg_cont(comm_reg_cont);
+		community.setComm_intro(comm_intro);
 		community.setComm_stat_cd("I"); //신청할 때 비활성으로 insert. 관리자 승인 후 활성시키는 걸로..
 		
 		if(communityService.insertCommunity(community) > 0) {
@@ -251,4 +258,80 @@ public class CommunityController {
 		return mp;
 	}
 	
+	@RequestMapping(value = "/community/searchAsValues", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap communitySearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		
+		String condition = request.getParameter("condition");
+		String searchTxt = request.getParameter("searchValue");
+		
+		condition = condition.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+		searchTxt = searchTxt.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+		
+		log.debug("condition: " + condition);
+		log.debug("searchValue: " + searchTxt);
+		
+		ArrayList<Community> searchValues = null;
+		ArrayList<Board> boardValues = null;
+		
+		ArrayList<Community> resultValue = null;
+		
+		if(condition.equals("community")) { //커뮤니티 검색. condition: community
+			searchValues = new ArrayList<Community>();
+			searchValues = communityService.selectCommunityListAsSearchValues(searchTxt);
+			
+			if(searchValues.size() > 0) { //여기서 토탈 회원 가공하는 걸 추가적으로 하면 될듯...
+				Community comm = null;
+				resultValue = new ArrayList<Community>();
+				for(int i = 0; i < searchValues.size(); i++) {
+					comm = searchValues.get(i);
+					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
+					resultValue.add(comm);
+				}
+				mp.addAttribute("result", true);
+				mp.addAttribute("searchDataList", resultValue);
+			}else {//결과가 없을때.
+				mp.addAttribute("result", false);
+				mp.addAttribute("msg", "검색 결과가 없습니다.");
+			}
+			
+		}else { // 글 검색. condition: content or title, writer 
+			boardValues = new ArrayList<Board>();
+			//boardValues = boardService.selectBoardListAsSearchValues(searchTxt);
+		}
+		
+		return mp;
+	}
+	
+	/*
+	@RequestMapping(value = "/community/userSearchAsValues", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap communityUserSearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		
+		String bCondition = request.getParameter("bCondition");
+		String condition = request.getParameter("condition");
+		String searchValue = request.getParameter("searchValue");
+		
+		log.debug("bCondition: " + bCondition);
+		log.debug("condition: " + condition);
+		log.debug("searchValue: " + searchValue);
+		
+		ArrayList<Community> communityValues = null;
+		ArrayList<Board> boardValues = null;
+		
+		if(!bCondition.equals("0")) {
+			if(condition.equals("community")) {
+				mp.addAttribute("result", false);
+				mp.addAttribute("msg", "커뮤니티를 선택하신 경우 제목, 내용, 작성자로만 검색이 가능합니다.");
+				return mp;
+			}
+		}
+		
+		
+		
+		return mp;
+	}
+	*/
 }

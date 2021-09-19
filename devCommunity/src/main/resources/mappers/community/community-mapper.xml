@@ -13,7 +13,8 @@
 			dcu.comm_role_cd,
 			dc.comm_stat_cd,
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = dc.comm_stat_cd) as comm_stat_nm,
-			dc.reg_date
+			dc.reg_date,
+			dc.comm_intro
 		FROM dec_community dc, dec_community_user dcu
 		WHERE dc.comm_idx = dcu.comm_idx
 		AND dcu.comm_role_cd IN (7, 9)
@@ -32,8 +33,8 @@
 	
 	<insert id="insertCommunity" parameterType="community">
 	<![CDATA[
-		INSERT INTO dec_community(comm_name, manager_idx, manager_name, comm_type_cd, comm_stat_cd, comm_reg_cont, reg_date)
-		VALUES(#{comm_name}, #{manager_idx}, #{manager_name}, #{comm_type_cd}, #{comm_stat_cd}, #{comm_reg_cont}, NOW())
+		INSERT INTO dec_community(comm_name, manager_idx, manager_name, comm_type_cd, comm_stat_cd, comm_reg_cont, comm_intro, reg_date)
+		VALUES(#{comm_name}, #{manager_idx}, #{manager_name}, #{comm_type_cd}, #{comm_stat_cd}, #{comm_reg_cont}, #{comm_intro}, NOW())
 	]]>
 	</insert>
 	
@@ -56,6 +57,7 @@
 			comm_stat_cd,
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
 			comm_reg_cont,
+			comm_intro,
 			reg_date
 		FROM dec_community
 		WHERE comm_stat_cd <> 'I'
@@ -73,6 +75,7 @@
 			comm_stat_cd,
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
 			comm_reg_cont,
+			comm_intro,
 			reg_date
 		FROM dec_community
 		WHERE comm_stat_cd = 'I'
@@ -96,6 +99,33 @@
 		VALUES(#{comm_idx}, #{manager_idx}, 9, 'A', NOW(), NULL)
 	]]>
 	</insert>
+	
+	<select id="selectCommunityListAsSearchValues" parameterType="java.lang.String" resultType="community">
+	<![CDATA[
+		SELECT comm_idx,
+			comm_name,
+			manager_idx,
+			manager_name,
+			comm_type_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_TYPE' AND conf_type_cd = comm_type_cd) as comm_type_nm,
+			comm_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
+			comm_reg_cont,
+			comm_intro,
+			reg_date
+		FROM dec_community
+		WHERE comm_name LIKE '%${value}%'
+	]]>
+	</select>
+	
+	<select id="selectCountCommunityUser" parameterType="community" resultType="_int">
+	<![CDATA[
+		SELECT count(*)
+		FROM dec_community c, dec_community_user cu
+		WHERE c.comm_idx = cu.comm_idx
+		AND c.comm_idx = #{comm_idx}
+	]]>
+	</select>
 
 
 

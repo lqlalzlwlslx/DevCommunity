@@ -559,6 +559,48 @@ public class UserController {
 		return obj.toString();
 	}
 	
+	@RequestMapping(value = "/console/user/userBlackListRelease", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap adminUserBlackListRelease(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		int user_idx = -1;
+		try {
+			user_idx = Integer.parseInt(request.getParameter("idx"));
+			
+			BlackList blackList = userService.deleteUserBlackList(user_idx);
+			if(blackList != null) {
+				userService.updateUserBlackListLogRelease(blackList);
+				userService.updateUserBlackListReleaseStatus(user_idx);
+				
+				mailFrom = "devcomm00@gmail.com";
+				mailTo = userService.getLoginIdAsIdx(user_idx);
+				mailSubject = "[DevCommunity] 활동정지 해제 알림";
+				mailContent = "안녕하세요.<br />";
+				mailContent += "DevCommunity 관리자입니다.";
+				mailContent += "<br />";
+				mailContent += "현재 시간부터";
+				mailContent += "활동정지 해제가 되었음을 알려드립니다.";
+				mailContent += "<br />";
+				mailContent += "감사합니다.";
+				
+				mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+			}
+			mp.addAttribute("result", true);
+			mp.addAttribute("msg", "성공했습니다.");
+			return mp;
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error(e);
+		}
+		mp.addAttribute("result", false);
+		mp.addAttribute("msg", "실패했습니다.");
+		return mp;
+	}
+	
 	/*
 	@RequestMapping(value = "/user/mainUser", method = RequestMethod.GET)
 	public ModelAndView mainUser(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {

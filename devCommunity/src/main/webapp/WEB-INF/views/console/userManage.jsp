@@ -53,6 +53,7 @@
 			location.href="<%=request.getContextPath()%>/console/community/communityManage.do";
 		}
 	}
+	
 </script>
 </head>
 <body>
@@ -346,6 +347,22 @@
 				//차단이 아닌 경우는 그냥 닫아도 되지 않을까..?
 			}
 			
+		}
+		
+		function userBlackListRelease(uid){
+			if(confirm("차단을 즉시 해제하시겠습니까?")){
+				fetch("/console/user/userBlackListRelease.do?idx="+uid)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result == true){
+							alert(data.msg);
+							<% try{Thread.sleep(100L);}catch(InterruptedException e){} %>
+							location.relead();
+						}else{
+							alert(data.msg);
+						}
+					});
+			}
 		}
 	
 	

@@ -46,4 +46,10 @@ public interface UserService {
 
 	void insertBlackListUserLog(BlackList bl) throws Exception;
 
+	BlackList deleteUserBlackList(int user_idx) throws Exception;
+
+	void updateUserBlackListLogRelease(BlackList blackList) throws Exception;
+
+	void updateUserBlackListReleaseStatus(int user_idx) throws Exception;
+
 }

@@ -11,6 +11,8 @@
 		top: 0;
 		display:flex;
 	}
+	.container{padding:0 !important;}
+	.container-solid{border-top:solid 6px #f4f4f4;}
 </style>
 
 </head>
@@ -82,7 +84,7 @@
 									<div style="width:15%;"></div>
 									<div style="width:25%; margin:auto;">
 										<select id="searchTxt">
-											<option value="0">--------------------------</option>
+											<option value="0">=== 선택 ===</option>
 											<option value="content">내용</option>
 											<option value="title">제목</option>
 											<option value="writer">작성자</option>
@@ -107,9 +109,18 @@
 									<p>공지사항 블라블라<br />이용수칙 블라블라<br /></p>
 								</div>
 							</section>
+							
+							<div class="container container-solid">
+								<header class="major">
+									<h2>board_title</h2>
+									<!-- <p>DevCoummunity에 오신 것을 환영합니다.<br />
+									이용 수칙에 관해 잘 읽어주시고 활동해주세요.</p> -->
+								</header>
+								<p>board_content</p>
+							</div>
 
 						<!-- Two -->
-							<section id="two">
+							<!-- <section id="two">
 								<div class="container">
 									<h3>Things I Can Do</h3>
 									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer lorem ipsum dolor sit amet.</p>
@@ -122,10 +133,10 @@
 										<li class="icon solid fa-users">Shadow clone technique</li>
 									</ul>
 								</div>
-							</section>
+							</section> -->
 
 						<!-- Three -->
-							<section id="three">
+							<!-- <section id="three">
 								<div class="container">
 									<h3>A Few Accomplishments</h3>
 									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer. Integer eu ante ornare amet commetus.</p>
@@ -153,10 +164,10 @@
 										</article>
 									</div>
 								</div>
-							</section>
+							</section> -->
 
 						<!-- Four -->
-							<section id="four">
+							<!-- <section id="four">
 								<div class="container">
 									<h3>Contact Me</h3>
 									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer. Integer eu ante ornare amet commetus.</p>
@@ -175,7 +186,7 @@
 										</div>
 									</form>
 								</div>
-							</section>
+							</section> -->
 							
 
 						<!-- Five -->

@@ -54,12 +54,21 @@
 	}
 	
 	function searchCondition(){
-		//console.log("header in searchCondition!");
+		
 		const sBox = document.querySelector("#searchTxt");
 		const condition = sBox.options[sBox.selectedIndex].value;
 		const searchValue = document.querySelector("#searchInputTxt").value;
-		console.log(condition);
-		console.log(searchValue);
+		
+		if(condition == "0"){ alert("검색할 항목을 선택해주세요."); return; }
+		if(!searchValue){ alert("검색할 단어를 입력해주세요."); return; }
+		
+		fetch("/community/searchAsValues.do?condition="+condition+"&searchValue="+searchValue)
+			.then(res => res.json())
+			.then((data) => {
+				//....
+				console.log(data);
+			});
+		
 	}
 	
 	function logout(){

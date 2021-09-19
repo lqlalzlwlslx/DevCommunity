@@ -24,4 +24,8 @@ public interface CommunityService {
 
 	void insertCoummunityManager(HashMap<String, Integer> map) throws Exception;
 
+	ArrayList<Community> selectCommunityListAsSearchValues(String searchTxt) throws Exception;
+
+	int selectCountCommunityUser(Community comm) throws Exception;
+
 }

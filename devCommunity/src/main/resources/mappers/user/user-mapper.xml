@@ -222,6 +222,41 @@
 	]]>
 	</insert>
 	
+	<select id="selectOneUserBlackListInfo" parameterType="_int" resultType="blackList">
+	<![CDATA[   
+		SELECT bl_idx,
+			user_idx,
+			bl_cont,
+			start_date,
+			end_date
+		FROM dec_blacklist
+		WHERE user_idx = #{user_idx}
+	]]>
+	</select>
+	
+	<delete id="deleteUserBlackList" parameterType="blackList">
+	<![CDATA[
+		DELETE FROM dec_blacklist
+		WHERE bl_idx = #{bl_idx}
+	]]>
+	</delete>
+	
+	<update id="updateUserBlackListLogRelease" parameterType="blackList">
+	<![CDATA[
+		UPDATE dec_blacklist_log
+		SET release_date = NOW()
+		WHERE bl_idx = #{bl_idx}
+	]]>
+	</update>
+	
+	<update id="updateUserBlackListReleaseStatus" parameterType="_int">
+	<![CDATA[
+		UPDATE dec_user
+		SET user_stat_cd = 'A'
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
 	
 	
 	

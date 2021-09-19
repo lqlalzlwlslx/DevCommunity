@@ -66,5 +66,15 @@ public class CommunityDaoImpl implements CommunityDao {
 	public void insertCommunityManager(HashMap<String, Integer> map) throws Exception {
 		sqlSession.insert("community.insertCommunityManager", map);
 	}
+
+	@Override
+	public ArrayList<Community> selectCommunityListAsSearchValues(String value) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectCommunityListAsSearchValues", value);
+	}
+
+	@Override
+	public int selectCountCommunityUser(Community comm) throws Exception {
+		return sqlSession.selectOne("community.selectCountCommunityUser", comm);
+	}
 	
 }

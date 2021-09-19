@@ -18,6 +18,7 @@
 		overflow: auto;
 		padding: 2% 0 2% 4%;
 	}
+	#detailCommunity:hover, #closureCommunity:hover{cursor:pointer;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty adminBean}">
@@ -126,6 +127,7 @@
 								<th>커뮤니티명</th>
 								<th>커뮤니티 타입</th>
 								<th>신청사유</th>
+								<th>커뮤니티 소개</th>
 								<th>신청일</th>
 								<th></th>
 								<th></th>
@@ -138,6 +140,7 @@
 									<td>${ccList.comm_name}</td>
 									<td>${ccList.comm_type_nm}</td>
 									<td>${ccList.comm_reg_cont}</td>
+									<td>${ccList.comm_intro}</td>
 									<td>${ccList.reg_date}</td>
 									<td><span><a href="#" onclick="approval('settle', ${ccList.manager_idx}, ${ccList.comm_idx});">승인</a></span></td>
 									<td><span><a href="#" onclick="approval('reject', ${ccList.manager_idx}, ${ccList.comm_idx});">반려</a></span></td>
@@ -161,7 +164,10 @@
 								<th>커뮤니티 관리자</th>
 								<th>커뮤니티 타입</th>
 								<th>커뮤니티 상태</th>
+								<th>커뮤니티 소개</th>
 								<th>커뮤니티 개설일<th>
+								<th></th>
+								<th></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -171,12 +177,10 @@
 									<td>${commList.manager_name}</td>
 									<td>${commList.comm_type_nm}</td>
 									<td>${commList.comm_stat_nm}</td>
+									<td>${commList.comm_intro}</td>
 									<td>${commList.reg_date}</td>
-								<!-- <td>
-										<span>
-											<a href="#" onclick="closureCommunity(${commList.comm_idx}, ${commList.comm_name}, ${commList.manager_idx});">강제폐쇄</a>
-										</span>
-									</td> -->
+									<td id="detailCommunity"><span onclick="communityDetailView(${commList.comm_idx});" data-bs-toggle="modal" data-bs-target="#communityView">상세정보</span></td>
+									<td id="closureCommunity"><span onclick="closureCommunity(${commList.comm_idx})" data-bs-toggle="modal" data-bs-target="#communityView">강제폐쇄</span></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -187,5 +191,11 @@
 		</div>
 	
 	</div>
+	
+	
+	<script type="text/javascript">
+		//커뮤니티 상세정보, 강제폐쇄 구현필요...
+	</script>
+	
 </body>
 </html>
