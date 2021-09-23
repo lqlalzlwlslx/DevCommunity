@@ -21,6 +21,7 @@
 	input[type="radio"] + label{padding-right:2em !important;}
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
+	.signUpCommunity:hover{cursor:pointer;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
@@ -46,9 +47,6 @@
 			document.querySelector(".modal-open").style.overflow = "auto";
 		});
 		
-		document.querySelector("#dupleCheckBtn").addEventListener("click", function(){
-			dupleCheckCommunity();
-		});
 	}		
 	
 	function ucListview(){
@@ -172,9 +170,7 @@
 						</c:if>
 						<li id="communityFrm"><a href="#">커뮤니티 개설</a></li>
 						<li style="display:none;"><!-- <button id="commBtn" data-toggle="modal" data-target="#myModal"></button> -->
-						<button type="button" id="commBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button></li>
+						<button type="button" id="commBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"></button></li>
 						<li><a href="#" onclick="logout();">로그아웃</a></li>
 					</ul>
 				</nav>
@@ -225,7 +221,7 @@
 									</div>
 									<div style="width:2%;"></div>
 									<div style="width:40%; margin:auto;">
-										<input type="text" id="searchInputTxt" placeholder="검색할 단어를 입력하세요." />
+										<input type="text" id="searchInputTxt" onKeyPress="if(event.keyCode==13) searchCondition();" placeholder="검색할 단어를 입력하세요." />
 									</div>
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
@@ -241,7 +237,7 @@
 									<p>공지사항 블라블라<br />이용수칙 블라블라<br /></p>
 								</div>
 							</section>
-							
+						<div class="main-content-area">	
 							<div class="container container-solid">
 								<header class="major">
 									<h2>board_title</h2>
@@ -250,7 +246,7 @@
 								</header>
 								<p>board_content</p>
 							</div>
-
+						</div>
 						<!-- Two -->
 							<!-- <section id="two">
 								<div class="container">
@@ -699,7 +695,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 							<td></td>
 							<td><input type="text" id="communityNameValue" placeholder="커뮤니티 이름을 입력하세요." /></td>
 							<td></td>
-							<td style="cursor:pointer;"><input type="button" id="dupleCheckBtn" value="중복체크" style="width:70%;"/></td>
+							<td style="cursor:pointer;" onclick="dupleCheckCommunity();"><input type="button" value="중복체크" style="width:70%;"/></td>
 						</tr>
 						<tr>
 							<td><input type="button" value="카테고리 선택" /></td>
@@ -790,7 +786,45 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 		</div>
 	</div>
 </div> --%>
-
+	<script type="text/javascript">
+		function uSearch(list){
+			var contentArea = document.querySelector(".main-content-area");
+			contentArea.innerHTML = "";
+			var output;
+			var reqDate;
+			<c:if test="${not empty ucList}">
+			var ucIdxs = "";
+			<c:forEach items="${ucList}" var="ucLists" varStatus="status">
+				if(ucIdxs.trim() == "") {}
+				else {ucIdxs += ",";}
+				ucIdxs += "${ucLists.comm_idx}";
+			</c:forEach>
+			</c:if>
+			for(var i = 0; i < list.length; i++){
+				reqDate = list[i].reg_date.split(" ")[0];
+				output = "";
+				output += "<div class='container container-solid'>";
+				output += "<header class='major'>";
+				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
+				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
+					output += "";
+				}else{
+					output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
+				}
+				output += "</header><br />";
+				//output += "<p>소개글 : "+list[i].comm_intro+"</p>";
+				output += "<table><tbody>"
+				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
+				output += "<td>개설일</td><td>"+reqDate+"</td>";
+				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
+				output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
+				output += "</tbody></table>";
+				output += "</div>";
+				contentArea.innerHTML += output;
+			}
+			
+		}
+	</script>
 
 
 </body>

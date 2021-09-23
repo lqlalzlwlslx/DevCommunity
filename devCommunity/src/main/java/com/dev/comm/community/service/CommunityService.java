@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
 public interface CommunityService {
@@ -27,5 +28,9 @@ public interface CommunityService {
 	ArrayList<Community> selectCommunityListAsSearchValues(String searchTxt) throws Exception;
 
 	int selectCountCommunityUser(Community comm) throws Exception;
+
+	void insertCommunityUser(CommunityUser cu) throws Exception;
+
+	int selectCountCommunityBoard(Community comm) throws Exception;
 
 }

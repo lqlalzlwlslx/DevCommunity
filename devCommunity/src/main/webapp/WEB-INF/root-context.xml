@@ -14,7 +14,24 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
-	<context:property-placeholder location="classpath:config.properties"/>
+	<!-- <context:property-placeholder location="classpath:config.properties"/> -->
+	<bean id="encryptorConfig" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+		<property name="algorithm" value="PBEWIthMD5AndDES" />
+		<property name="password"><value><![CDATA[devCommunity]]></value></property>
+	</bean>
+	
+	<bean id="encryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+		<property name="config" ref="encryptorConfig" />
+	</bean>
+	
+	<bean id="propertyConfigurer" class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
+		<constructor-arg ref="encryptor" />
+		<property name="locations" >
+			<list>
+				<value><![CDATA[classpath:config.properties]]></value>
+			</list>
+		</property>
+	</bean>
 	
 	<!-- 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

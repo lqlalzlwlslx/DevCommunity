@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.dev.comm.community.dao.CommunityDao;
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
 @Service
@@ -64,6 +65,16 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	public int selectCountCommunityUser(Community comm) throws Exception {
 		return communityDao.selectCountCommunityUser(comm);
+	}
+
+	@Override
+	public void insertCommunityUser(CommunityUser cu) throws Exception {
+		communityDao.insertCommunityUser(cu);
+	}
+
+	@Override
+	public int selectCountCommunityBoard(Community comm) throws Exception {
+		return communityDao.selectCountCommunityBoard(comm);
 	}
 	
 }

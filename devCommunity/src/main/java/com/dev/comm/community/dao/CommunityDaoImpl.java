@@ -11,6 +11,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
 
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
 @Repository
@@ -75,6 +76,16 @@ public class CommunityDaoImpl implements CommunityDao {
 	@Override
 	public int selectCountCommunityUser(Community comm) throws Exception {
 		return sqlSession.selectOne("community.selectCountCommunityUser", comm);
+	}
+
+	@Override
+	public void insertCommunityUser(CommunityUser cu) throws Exception {
+		sqlSession.insert("community.insertCommunityUser", cu);
+	}
+
+	@Override
+	public int selectCountCommunityBoard(Community comm) throws Exception {
+		return sqlSession.selectOne("community.selectCountCommunityBoard", comm);
 	}
 	
 }

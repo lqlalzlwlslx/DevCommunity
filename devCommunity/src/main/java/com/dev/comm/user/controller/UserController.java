@@ -36,6 +36,7 @@ import com.dev.comm.common.vo.Conf;
 import com.dev.comm.common.vo.UserAccessLog;
 import com.dev.comm.community.service.CommunityService;
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.service.UserService;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.Constants;
@@ -599,6 +600,40 @@ public class UserController {
 		mp.addAttribute("result", false);
 		mp.addAttribute("msg", "실패했습니다.");
 		return mp;
+	}
+	
+	@RequestMapping(value = "/user/communitySignUp", method = RequestMethod.POST, produces="text/plain;charset=UTF-8")
+	@ResponseBody
+	public String userCommunitySignUp(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== user CommunitySignUp ===");
+		User user = SessionManager.getUserSession(request);
+		JsonObject obj = new JsonObject();
+		if(user == null) {
+			obj.addProperty("result",  false);
+			obj.addProperty("msg", "세션이 만료되어 처리에 실패했습니다.");
+			return obj.toString();
+		}
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		int user_idx = element.getAsJsonObject().get("uid").getAsInt();
+		int comm_idx = element.getAsJsonObject().get("comm_idx").getAsInt();
+		
+		CommunityUser cu = new CommunityUser();
+		cu.setComm_idx(comm_idx);
+		cu.setUser_idx(user_idx);
+		cu.setComm_user_stat_cd("R"); //Request..신청상태
+		
+		try {
+			communityService.insertCommunityUser(cu);
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error(e);
+		}
+		return obj.toString();
 	}
 	
 	/*

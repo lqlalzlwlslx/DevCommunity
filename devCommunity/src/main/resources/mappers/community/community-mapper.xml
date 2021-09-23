@@ -114,7 +114,7 @@
 			comm_intro,
 			reg_date
 		FROM dec_community
-		WHERE comm_name LIKE '%${value}%'
+		WHERE comm_name LIKE CONCAT('%', #{value}, '%')
 	]]>
 	</select>
 	
@@ -126,6 +126,22 @@
 		AND c.comm_idx = #{comm_idx}
 	]]>
 	</select>
+	
+	<select id="selectCountCommunityBoard" parameterType="community" resultType="_int">
+	<![CDATA[
+		SELECT count(*)
+		FROM dec_community c, dec_community_board cb
+		WHERE c.comm_idx = cb.comm_idx
+		AND c.comm_idx = #{comm_idx}
+	]]>
+	</select>
+	
+	<insert id="insertCommunityUser" parameterType="communityUser">
+	<![CDATA[
+		INSERT INTO dec_community_user(comm_idx, user_idx, comm_user_stat_cd, reg_date)
+		VALUES(#{comm_idx}, #{user_idx}, #{comm_user_stat_cd}, #{reg_date})
+	]]>
+	</insert>
 
 
 

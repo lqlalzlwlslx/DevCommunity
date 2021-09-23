@@ -240,6 +240,9 @@ public class CommunityController {
 	public ModelMap insertCommunityManager(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelMap mp = new ModelMap();
 		
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
 		int comm_idx = Integer.parseInt(request.getParameter("comm_idx"));
 		int manager_idx = Integer.parseInt(request.getParameter("manager_idx"));
 		
@@ -287,6 +290,7 @@ public class CommunityController {
 				for(int i = 0; i < searchValues.size(); i++) {
 					comm = searchValues.get(i);
 					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
+					comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
 					resultValue.add(comm);
 				}
 				mp.addAttribute("result", true);

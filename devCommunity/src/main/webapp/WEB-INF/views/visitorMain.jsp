@@ -5,14 +5,14 @@
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
 	
 <style>
-	#loginbtn:hover{cursor:pointer;}
+	#loginbtn:hover, .signUpCommunity:hover{cursor:pointer;}
 	div.image.main{
 		background-image: url(../../resources/images/banner.jpg);
 		top: 0;
 		display:flex;
 	}
 	.container{padding:0 !important;}
-	.container-solid{border-top:solid 6px #f4f4f4;}
+	.container-solid{border-top:solid 6px #f4f4f4; vertical-align:middle;}
 </style>
 
 </head>
@@ -29,8 +29,7 @@
 		});
 		
 		const searchButton = document.querySelector("#searchBtn");
-		searchButton.addEventListener("click", () => {
-			// search button click fetch resource to-do..
+		searchButton.addEventListener("click", function(){
 			searchCondition();
 		});
 	}
@@ -93,7 +92,7 @@
 									</div>
 									<div style="width:2%;"></div>
 									<div style="width:40%; margin:auto;">
-										<input type="text" id="searchInputTxt" placeholder="검색할 단어를 입력하세요." />
+										<input type="text" id="searchInputTxt" onKeyPress="if(event.keyCode==13) searchCondition();" placeholder="검색할 단어를 입력하세요." />
 									</div>
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
@@ -109,7 +108,7 @@
 									<p>공지사항 블라블라<br />이용수칙 블라블라<br /></p>
 								</div>
 							</section>
-							
+						<div class="main-content-area">	
 							<div class="container container-solid">
 								<header class="major">
 									<h2>board_title</h2>
@@ -118,7 +117,7 @@
 								</header>
 								<p>board_content</p>
 							</div>
-
+						</div>
 						<!-- Two -->
 							<!-- <section id="two">
 								<div class="container">
@@ -531,5 +530,33 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					</div>
 				</section>
 			</div>
+			
+	<script type="text/javascript">
+		function vSearch(list){
+			var contentArea = document.querySelector(".main-content-area");
+			var output;
+			var reqDate;
+			contentArea.innerHTML = "";
+			for(var i = 0; i < list.length; i++){
+				reqDate = list[i].reg_date.split(" ")[0];
+				output = "";
+				output += "<div class='container container-solid'>";
+				output += "<header class='major'>";
+				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
+				output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
+				output += "</header><br />";
+				//output += "<p>소개글 : "+list[i].comm_intro+"</p>";
+				output += "<table><tbody>"
+				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
+				output += "<td>개설일</td><td>"+reqDate+"</td>";
+				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
+				output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
+				output += "</tbody></table>";
+				output += "</div>";
+				contentArea.innerHTML += output;
+			}
+			
+		}
+	</script>
 </body>
 </html>

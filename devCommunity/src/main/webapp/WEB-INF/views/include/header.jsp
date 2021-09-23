@@ -64,12 +64,48 @@
 		
 		fetch("/community/searchAsValues.do?condition="+condition+"&searchValue="+searchValue)
 			.then(res => res.json())
-			.then((data) => {
-				//....
-				console.log(data);
-			});
-		
+			.then(data => drawSearchResult(data));
 	}
+	
+	function drawSearchResult(data){
+		if(data.result == true){
+			<c:if test="${empty userBean}">
+				console.log('userBean is empty');
+				vSearch(data.searchDataList);
+			</c:if>
+			<c:if test="${not empty userBean}">
+				console.log("userBean is not empty");
+				uSearch(data.searchDataList);
+			</c:if>
+		}else{
+			alert('검색 결과가 없습니다.');
+		}
+	}
+	
+	function signUpCommunity(idx){
+		<c:if test="${empty userBean}">
+			if(confirm("커뮤니티 가입은 회원전용 서비스입니다.\n회원가입창으로 이동하시겠습니까?")){
+				location.href="<%=request.getContextPath()%>/signUpFrm.do";
+			}
+		</c:if>
+		// not empty userBean resource...
+		<c:if test="${not empty userBean}">
+			if(confirm(name +" 커뮤니티에 가입신청 하시겠습니까?")){
+				const uid = "${userBean.user_idx}";
+				const comm_idx = idx;
+				const commSignData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({uid, comm_idx})
+				};
+				fetch("/user/communitySignUp", commSignData)
+					.then(res => res.json())
+					.then(data => console.log(data));
+				
+			}
+		</c:if>
+	}
+	
 	
 	function logout(){
 		location.href="<%=request.getContextPath()%>/logout.do";

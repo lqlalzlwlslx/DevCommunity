@@ -209,6 +209,13 @@
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
 		</dependency>
+		
+		<!-- jasypt. -->
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt-spring31</artifactId>
+			<version>1.9.2</version>
+		</dependency>
       
 		<!-- ADD FIELD END -->
 
