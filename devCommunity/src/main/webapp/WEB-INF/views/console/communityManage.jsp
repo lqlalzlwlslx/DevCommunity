@@ -46,7 +46,6 @@
 	}
 	
 	function updateStatus(res){
-		console.log(res);
 		if(res.result == true){
 			if(res.status == "settle"){
 				fetch("/console/insertCommunityManager.do?comm_idx="+res.comm_idx+"&manager_idx="+res.manager_idx);
@@ -58,14 +57,6 @@
 			}
 		}
 	}
-	
-	function closureCommunity(cIdx, cname, mIdx){
-		/* if(confirm(cname + "커뮤니티 강제폐쇄를 진행하시겠습니까?\n")){
-			
-		} */
-		
-	}
-	
 	
 	function pageHandler(value){
 		if(value == "communityStatus"){ //communityStatus.
@@ -192,9 +183,95 @@
 	
 	</div>
 	
+	<div class="modal fade" id="communityView" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="titleField"></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table>
+						<tbody>
+							<tr>
+								<td>커뮤니티명</td>
+								<td id="communityNameField"></td>
+							</tr>
+							<tr>
+								<td>커뮤니티 관리자</td>
+								<td id="communityManagerField"></td>
+							</tr>
+							<tr>
+								<td>커뮤니티 타입</td>
+								<td id="communityTypeField"></td>
+							</tr>
+							<tr>
+								<td>커뮤니티 상태</td>
+								<td id="communityStatusField"></td>
+							</tr>
+							<tr>
+								<td>커뮤니티 개설일</td>
+								<td id="communityRegDateField"></td>
+							</tr>
+							<tr>
+								<td>커뮤니티 소개글</td>
+								<td id="communityIntroField"></td>
+							</tr>
+							<tr>
+								<td>회원수</td>
+								<td id="communityTotalMember"></td>
+							</tr>
+							<tr>
+								<td>게시글 수</td>
+								<td id="communityTotalBoard"></td>
+							</tr>
+						</tbody>
+					</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+			</div>
+		</div>
+	</div>
+</div>
+	
 	
 	<script type="text/javascript">
 		//커뮤니티 상세정보, 강제폐쇄 구현필요...
+		function communityDetailView(value){
+			document.querySelector(".modal-open").style.paddingRight = "0px";
+			document.querySelector(".modal-open").style.overflow = "auto";
+			fetch("/console/community/communityDetail.do?value="+value)
+				.then(response => response.json())
+				.then(data => showWinCommunity(data));
+		}
+		
+		function showWinCommunity(res){
+			console.log(res);
+			let community = res.community;
+			if(res.result == true){
+				document.querySelector("#titleField").innerHTML = "커뮤니티 상세조회";
+				document.querySelector("#communityNameField").innerHTML = community.comm_name;
+				document.querySelector("#communityManagerField").innerHTML = community.manager_name;
+				document.querySelector("#communityTypeField").innerHTML = community.comm_type_nm;
+				document.querySelector("#communityStatusField").innerHTML = community.comm_stat_nm;
+				document.querySelector("#communityRegDateField").innerHTML = community.reg_date.split(" ")[0];
+				document.querySelector("#communityIntroField").innerHTML = community.comm_intro;
+				document.querySelector("#communityTotalMember").innerHTML = community.total_member + " 명";
+				document.querySelector("#communityTotalBoard").innerHTML = community.total_board + " 개";
+				
+			}
+		}
+		
+		function closureCommunity(cIdx, cname, mIdx){
+			/* if(confirm(cname + "커뮤니티 강제폐쇄를 진행하시겠습니까?\n")){
+				
+			} */
+			
+		}
+		
+		
 	</script>
 	
 </body>

@@ -87,5 +87,10 @@ public class CommunityDaoImpl implements CommunityDao {
 	public int selectCountCommunityBoard(Community comm) throws Exception {
 		return sqlSession.selectOne("community.selectCountCommunityBoard", comm);
 	}
+
+	@Override
+	public Community selectCommunityDetailView(int comm_idx) throws Exception {
+		return sqlSession.selectOne("community.selectCommunityDetailView", comm_idx);
+	}
 	
 }

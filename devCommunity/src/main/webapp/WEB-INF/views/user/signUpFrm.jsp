@@ -10,7 +10,7 @@
 	.leftBtn:hover{pointer-events: none !important;}
 	fieldset{
 		border:0px groove !important;
-		width:50%; margin-top:4%;
+		width:60%; margin-top:4%;
 	}
 	span.image.avatar>img{
   		width: 150px;
@@ -50,10 +50,15 @@
 				return;
 			}
 			
+			if(document.querySelector("#authCode").innerHTML != "인증완료"){
+				alert('인증번호가 일치하지 않습니다. 다시 확인해주세요.');
+				return;
+			}
+			const signFlag = "normal";
 			const signData = {
 					method: 'POST',
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({id, nick, pw, prosrc})
+					body: JSON.stringify({id, nick, pw, prosrc, signFlag})
 			};
 			
 			fetch("/user/signUpUser", signData)
@@ -171,12 +176,12 @@
 				<legend align="center" style="font-size:36px;">&nbsp;&nbsp;회원가입&nbsp;&nbsp;</legend>
 				<br /><br />
 				<table>
-				<colgroup>
+				<%-- <colgroup>
 					<col width="20%">
 					<col width="40%">
 					<col width="20%">
 					<col width="20%">
-				</colgroup>
+				</colgroup> --%>
 					<tbody>
 						<tr>
 							<td class="signTd"><input class="leftBtn" type="button" value="아이디"/></td>
@@ -222,6 +227,12 @@
 								<input type="button" id="signUpButton" value="회원가입신청" /><br /></td>
 							<td class="signTd"></td>
 						</tr>
+						<tr>
+							<td class="signTd"></td>
+							<td class="signTd"></td>
+							<td class="signTd" onclick="kakaoLogin('kakaoSign');"><input type="button" value="카카오회원가입" /></td>
+							<td class="signTd"><input type="button" value="카카오회원가입" /></td>
+						</tr>
 					</tbody>
 				</table>
 				<!-- <br /><br />
@@ -260,6 +271,8 @@
 			</fieldset>
 		</form>
 	</div>
+	
+	
 	
 	<!-- <section id="footer" >
 		<div class="container" align="center">

@@ -22,6 +22,11 @@
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
 	.signUpCommunity:hover{cursor:pointer;}
+	.communityList { color: #333; text-decoration: none; display: inline-block; padding: 15px 0; position: relative; }
+	.communityList:after { background: none repeat scroll 0 0 transparent; bottom: 0; content: ""; display: block; height: 2px;
+		left: 50%; position: absolute; background: #b9f; transition: width 0.3s ease 0s, left 0.3s ease 0s; width: 0;
+	}
+	.communityList:hover:after { width: 100%; left: 0; }
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
@@ -165,7 +170,7 @@
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
-						<li id="ucList_${ucList.comm_idx}"class="communityList" style="display:none;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em; background-color:">관리</span></c:if></a></li>
+						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em; background-color:">관리</span></c:if></a></li>
 						</c:forEach>
 						</c:if>
 						<li id="communityFrm"><a href="#">커뮤니티 개설</a></li>
@@ -823,6 +828,15 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				contentArea.innerHTML += output;
 			}
 			
+		}
+		
+		function moveToCommunityView(value){
+			console.log("moveToCommunityView: " + value);
+			fetch("/user/moveToCommunityView.do?idx="+value)
+				.then(response => response.json())
+				.then((data) => {
+					
+				});
 		}
 	</script>
 

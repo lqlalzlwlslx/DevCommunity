@@ -4,10 +4,6 @@
 
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
 <style>
-	input[type="text"], input[type="password"], input[type="button"]{
-		width:80% !important;
-		margin-bottom:2%;
-	}
 	fieldset{
 		border:0px groove !important;
 		width:30%; margin-top:10%;
@@ -25,6 +21,7 @@
 	function loginCheck(){
 		const id = document.querySelector("#id_field").value;
 		const pw = document.querySelector("#pw_field").value;
+		const loginFlag = "normal";
 		
 		if(!id) {
 			alert("아이디를 입력해주세요.");
@@ -34,7 +31,7 @@
 		const loginData = {
 				method: "POST",
 				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({id, pw})
+				body: JSON.stringify({id, pw, loginFlag})
 		};
 		
 		fetch("/user/login", loginData)
@@ -58,14 +55,40 @@
 			<fieldset>
 				<legend align="center" style="font-size:36px;">&nbsp;&nbsp;로그인&nbsp;&nbsp;</legend>
 				<br /><br />
-				<input type="text" id="id_field" placeholder="아이디를 입력하세요." />
-				<input type="password" id="pw_field" placeholder="비밀번호를 입력하세요." onKeyPress="if(event.keyCode==13) loginCheck();" /><br />
+				<table>
+					<tbody>
+						<tr>
+							<td colspan="3"><input type="text" id="id_field" placeholder="아이디를 입력하세요." /></td>
+						</tr>
+						<tr>
+							<td colspan="3"><input type="password" id="pw_field" placeholder="비밀번호를 입력하세요." onKeyPress="if(event.keyCode==13) loginCheck();" /></td>
+						</tr>
+						<tr>
+							<td align="center" onclick="kakaoLogin('kakaoLogin')"><a href="#">카카오 로그인</a></td>
+							<td align="center"><a href="#">카카오 로그인</a></td>
+							<td align="center"><a href="#">카카오 로그인</a></td>
+						</tr>
+						<tr>
+							<td colspan="3"><input type="button" id="loginButton" value="로그인" style="width:100%;"/></td>
+						</tr>
+						<tr>
+							<td colspan="2"><span style="float:left;">비밀번호가 기억이 나지 않으신가요?</span></td>
+							<td><span style="float:right;"><a href="#">비밀번호 찾기</a></span></td>
+						</tr>
+						<tr>
+							<td colspan="2"><span style="float:left;">회원이 아니신가요?</span></td>
+							<td><span style="float:right;"><a href="#" onclick="signUp();">회원가입</a></span></td>
+						</tr>
+					</tbody>
+				</table>
 				
-				<input type="button" id="loginButton" value="로그인" /><br />
-				<div>
+				
+				
+				
+				<!-- <div>
 					<span style="float:left; margin-left:10%;">비밀번호가 기억이 나지 않으신가요?</span><span style="float:right; margin-right:10%;"><a href="#">비밀번호 찾기</a></span><br />
 					<span style="float:left; margin-left:10%;">회원이 아니신가요?</span><span style="float:right; margin-right:10%;"><a href="#" onclick="signUp();">회원가입</a></span><br /><br />
-				</div>
+				</div> -->
 				
 				<br />
 			</fieldset>

@@ -85,10 +85,15 @@ public class UserController {
 		
 		String login_id = element.getAsJsonObject().get("id").getAsString();
 		String password = element.getAsJsonObject().get("pw").getAsString();
+		String loginFlag = element.getAsJsonObject().get("loginFlag").getAsString();
 		
-		if(login_id == null || password == null) {
+		if((login_id == null || password == null) && loginFlag.equals("normal")) {
 			obj.addProperty("result", false);
 			return obj.toString();
+		}else {
+			if(loginFlag.equals("kakao")) {
+				password = Constants.USER_KAKAO_LOGIN_PWD;
+			}
 		}
 		
 		User user = new User();
@@ -178,7 +183,14 @@ public class UserController {
 		String nick_name = element.getAsJsonObject().get("nick").getAsString();
 		String password = element.getAsJsonObject().get("pw").getAsString();
 		String profile_src = element.getAsJsonObject().get("prosrc").getAsString();
-		profile_src = profile_src.substring(profile_src.indexOf("/resources"));
+		String signFlag = element.getAsJsonObject().get("signFlag").getAsString();
+		
+		
+		if(signFlag.equals("kakao")) {
+			if(password.equals("")) password = Constants.USER_KAKAO_LOGIN_PWD;
+		}else {
+			if(signFlag.equals("normal")) profile_src = profile_src.substring(profile_src.indexOf("/resources"));
+		}
 		
 		User user = new User();
 		user.setUser_stat_cd("A");

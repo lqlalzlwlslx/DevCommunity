@@ -27,6 +27,7 @@ import com.dev.comm.community.vo.Community;
 import com.dev.comm.user.service.UserService;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.SessionManager;
+import com.dev.comm.util.StringUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -269,9 +270,6 @@ public class CommunityController {
 		String condition = request.getParameter("condition");
 		String searchTxt = request.getParameter("searchValue");
 		
-		condition = condition.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-		searchTxt = searchTxt.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-		
 		log.debug("condition: " + condition);
 		log.debug("searchValue: " + searchTxt);
 		
@@ -305,6 +303,42 @@ public class CommunityController {
 			//boardValues = boardService.selectBoardListAsSearchValues(searchTxt);
 		}
 		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/console/community/communityDetail", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap adminCommunityDetailView(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) {
+			mp.addAttribute("result", false);
+			mp.addAttribute("msg", "session invalid.");
+			return mp;
+		}
+		
+		try {
+			int comm_idx = Integer.parseInt(request.getParameter("value"));
+			if(comm_idx > 0) {
+				Community comm = communityService.selectCommunityDetailView(comm_idx);
+				if(comm != null) {
+					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
+					comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
+					mp.addAttribute("result", true);
+					mp.addAttribute("community", comm);
+				}else {
+					mp.addAttribute("result", false);
+					mp.addAttribute("msg", "조회 결과가 없습니다.");
+				}
+			}else {
+				mp.addAttribute("result", false);
+				mp.addAttribute("msg", "값이 잘못되었습니다.");
+				return mp;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("IDX VALUE PARSING ERROR !!");
+		}
 		return mp;
 	}
 	

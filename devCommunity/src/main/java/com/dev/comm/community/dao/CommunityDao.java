@@ -33,4 +33,6 @@ public interface CommunityDao {
 
 	int selectCountCommunityBoard(Community comm) throws Exception;
 
+	Community selectCommunityDetailView(int comm_idx) throws Exception;
+
 }

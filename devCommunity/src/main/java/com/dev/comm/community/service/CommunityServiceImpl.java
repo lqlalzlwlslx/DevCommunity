@@ -76,5 +76,10 @@ public class CommunityServiceImpl implements CommunityService {
 	public int selectCountCommunityBoard(Community comm) throws Exception {
 		return communityDao.selectCountCommunityBoard(comm);
 	}
+
+	@Override
+	public Community selectCommunityDetailView(int comm_idx) throws Exception {
+		return communityDao.selectCommunityDetailView(comm_idx);
+	}
 	
 }

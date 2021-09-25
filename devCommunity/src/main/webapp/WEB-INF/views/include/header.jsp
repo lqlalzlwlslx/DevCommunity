@@ -24,8 +24,9 @@
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/assets/css/main.css" />
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/chart.min.js"></script>
+
 <script type="text/javascript" src="https://developers.kakao.com/sdk/js/kakao.js" ></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/common.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/common.js"></script>
 
 <!-- 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/assets/css/bootstrap.3.4.1.min.css" />

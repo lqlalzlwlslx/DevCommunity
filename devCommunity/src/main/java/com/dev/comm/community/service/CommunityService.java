@@ -33,4 +33,6 @@ public interface CommunityService {
 
 	int selectCountCommunityBoard(Community comm) throws Exception;
 
+	Community selectCommunityDetailView(int comm_idx) throws Exception;
+
 }

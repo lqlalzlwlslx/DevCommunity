@@ -142,6 +142,24 @@
 		VALUES(#{comm_idx}, #{user_idx}, #{comm_user_stat_cd}, #{reg_date})
 	]]>
 	</insert>
+	
+	<select id="selectCommunityDetailView" parameterType="_int" resultType="community">
+	<![CDATA[
+		SELECT comm_idx,
+			comm_name,
+			manager_idx,
+			manager_name,
+			comm_type_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_TYPE' AND conf_type_cd = comm_type_cd) as comm_type_nm,
+			comm_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
+			comm_reg_cont,
+			comm_intro,
+			reg_date
+		FROM dec_community
+		WHERE comm_idx = #{comm_idx}
+	]]>
+	</select>
 
 
 
