@@ -41,7 +41,8 @@
 					<c:if test="${ empty userBean }">
 					<span class="image avatar"><img src="/resources/images/avatar.jpg" alt="" /></span>
 					<h1 id="logo"><span id="loginbtn">로그인</span></h1><br />
-					<!-- <div><span onclick="kakaoLogin();">카카오로그인</span></div> -->
+					<br />
+					<div onclick="kakaoLogin();" style="cursor:pointer;"><span><img src="<%=request.getContextPath()%>/resources/images/kakao_login_medium_narrow.png" /></span></div>
 					<br />
 					<div style="display:flex;" align="center">
 					<p></p>

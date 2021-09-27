@@ -63,11 +63,11 @@
 						<tr>
 							<td colspan="3"><input type="password" id="pw_field" placeholder="비밀번호를 입력하세요." onKeyPress="if(event.keyCode==13) loginCheck();" /></td>
 						</tr>
-						<tr>
+						<!-- <tr>
 							<td align="center" onclick="kakaoLogin('kakaoLogin')"><a href="#">카카오 로그인</a></td>
 							<td align="center"><a href="#">카카오 로그인</a></td>
 							<td align="center"><a href="#">카카오 로그인</a></td>
-						</tr>
+						</tr> -->
 						<tr>
 							<td colspan="3"><input type="button" id="loginButton" value="로그인" style="width:100%;"/></td>
 						</tr>

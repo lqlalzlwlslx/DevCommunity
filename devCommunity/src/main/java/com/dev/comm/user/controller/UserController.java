@@ -28,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dev.comm.board.service.BoardService;
+import com.dev.comm.board.vo.Board;
 import com.dev.comm.common.base.Email;
 import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.common.service.UserAccessLogService;
@@ -63,6 +65,9 @@ public class UserController {
 	private BCryptPasswordEncoder passwordEncoder;
 	
 	@Autowired
+	private BoardService boardService;
+	
+	@Autowired
 	private Environment env;
 	
 	private String mailFrom;
@@ -87,12 +92,21 @@ public class UserController {
 		String password = element.getAsJsonObject().get("pw").getAsString();
 		String loginFlag = element.getAsJsonObject().get("loginFlag").getAsString();
 		
+		User tmpUser = new User();
+		tmpUser.setLogin_id(login_id);
+		tmpUser = userService.selectUserInfoAsLogin(tmpUser);
+		
 		if((login_id == null || password == null) && loginFlag.equals("normal")) {
 			obj.addProperty("result", false);
 			return obj.toString();
 		}else {
-			if(loginFlag.equals("kakao")) {
-				password = Constants.USER_KAKAO_LOGIN_PWD;
+			log.debug(tmpUser == null ? "true" : "false");
+			if(tmpUser != null && loginFlag.equals("kakao")) {
+				boolean kakaoResult = authentication(request, tmpUser);
+				if(kakaoResult) {
+					obj.addProperty("result", true);
+					return obj.toString();
+				}
 			}
 		}
 		
@@ -145,6 +159,56 @@ public class UserController {
 			obj.addProperty("msg", "아이디 또는 비밀번호를 잘못입력하셨습니다.\n다시 확인해주세요.");
 			return obj.toString();
 		}
+	}
+	
+	@RequestMapping(value = "/userLoginIdCheck", method = RequestMethod.POST)
+	@ResponseBody
+	public String userLoginIdCheck(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		String login_id = element.getAsJsonObject().get("id").getAsString();
+		String pw = null;
+		String nick = null;
+		String prosrc = null;
+		
+		User usr = new User();
+		usr.setLogin_id(login_id);
+		User usr01 = userService.selectUserInfoAsLogin(usr);
+		
+		if(usr01 != null) {
+			obj.addProperty("result", true);
+			return obj.toString();
+		} else {
+			usr01 = new User();
+			pw = element.getAsJsonObject().get("pw").getAsString();
+			nick = element.getAsJsonObject().get("nick").getAsString();
+			prosrc = element.getAsJsonObject().get("prosrc").getAsString();
+			if(pw.equals("")) {
+				pw = Constants.USER_KAKAO_LOGIN_PWD;
+			}
+			usr01.setUser_stat_cd("A");
+			usr01.setLogin_id(login_id);
+			usr01.setUser_name(nick);
+			usr01.setNick_name(nick);
+			usr01.setPassword(passwordEncoder.encode(pw));
+			usr01.setUser_role_cd((short)7);
+			if(!prosrc.equals("")) usr01.setProfile_src(prosrc);
+			else usr01.setProfile_src(null);
+			
+			int check = userService.insertUser(usr01);
+			if(check > 0) {
+				obj.addProperty("result", true);
+				obj.addProperty("id", usr01.getLogin_id());
+			}else {
+				obj.addProperty("result", false);
+			}
+			
+			
+		}
+		
+		return obj.toString();
 	}
 	
 	private boolean authentication(HttpServletRequest request, User user) throws Exception {
@@ -219,8 +283,10 @@ public class UserController {
 		
 		HttpSession session = request.getSession();
 		User user = (User)session.getAttribute(Constants.USER_SESSION_KEY);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
 		
 		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+		//ArrayList<Board> mainBoardList = communityService.selectMainBoardList();
 		if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
 		
 		return new ModelAndView("user/mainUser");
@@ -480,6 +546,7 @@ public class UserController {
 		try {
 			user_idx = Integer.parseInt(request.getParameter("idx"));
 		}catch(Exception e) {
+			e.printStackTrace();
 			log.error("IDX VALUE PARSING ERROR.");
 		}
 		
@@ -646,6 +713,59 @@ public class UserController {
 			log.error(e);
 		}
 		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/user/moveToCommunityView", method = RequestMethod.GET)
+	public ModelAndView userMoveToCommunityView(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = (User)SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		try {
+			long comm_idx = Long.parseLong(request.getParameter("idx"));
+			if(comm_idx > 0) {
+				ArrayList<Board> communityBoardList = boardService.selectAllCommunityBoardList(comm_idx);	//커뮤니티 전체 글 조회
+				ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+				Community commInfo = communityService.selectCommunityDetailView((int)comm_idx);
+				if(communityBoardList != null) model.addAttribute("cbList", communityBoardList);
+				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+				if(commInfo != null) model.addAttribute("commInfo", commInfo);
+				
+				return new ModelAndView("community/communityMain");
+				
+			}else {
+				log.error("IDX PARSING VALUE CANNOT BE LESS THAN 0");
+				return new ModelAndView("error");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("IDX VALUE PARSING ERROR.");
+			return new ModelAndView("error");
+		}
+	}
+	
+	@RequestMapping(value = "/user/communityBoard", method = RequestMethod.GET)
+	public ModelAndView userCommunityBoard(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) return new ModelAndView("redirect:/");
+		
+		int cidx = 0;
+		try {
+			cidx = Integer.parseInt(request.getParameter("cidx"));
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("CIDX PARSING ERROR.");
+		}
+		
+		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+		if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+		if(cidx > 0) model.addAttribute("comm_idx", cidx);
+		else {
+			return new ModelAndView("error");
+		}
+		model.addAttribute("userInfo", user);
+		
+		return new ModelAndView("/community/communityBoardWrite");
 	}
 	
 	/*

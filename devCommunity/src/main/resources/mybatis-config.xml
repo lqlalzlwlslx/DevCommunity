@@ -27,6 +27,7 @@
 		<mapper resource="mappers/user/user-mapper.xml" />
 		<mapper resource="mappers/community/community-mapper.xml" />
 		<mapper resource="mappers/userAccessLog/userAccessLog-mapper.xml" />
+		<mapper resource="mappers/board/board-mapper.xml" />
 		
 	</mappers>
 	

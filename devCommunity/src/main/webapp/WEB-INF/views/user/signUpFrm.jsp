@@ -10,7 +10,7 @@
 	.leftBtn:hover{pointer-events: none !important;}
 	fieldset{
 		border:0px groove !important;
-		width:60%; margin-top:4%;
+		width:55%; margin-top:4%;
 	}
 	span.image.avatar>img{
   		width: 150px;
@@ -227,12 +227,12 @@
 								<input type="button" id="signUpButton" value="회원가입신청" /><br /></td>
 							<td class="signTd"></td>
 						</tr>
-						<tr>
+						<!-- <tr>
 							<td class="signTd"></td>
 							<td class="signTd"></td>
 							<td class="signTd" onclick="kakaoLogin('kakaoSign');"><input type="button" value="카카오회원가입" /></td>
 							<td class="signTd"><input type="button" value="카카오회원가입" /></td>
-						</tr>
+						</tr> -->
 					</tbody>
 				</table>
 				<!-- <br /><br />

@@ -35,4 +35,6 @@ public interface CommunityDao {
 
 	Community selectCommunityDetailView(int comm_idx) throws Exception;
 
+	String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception;
+
 }

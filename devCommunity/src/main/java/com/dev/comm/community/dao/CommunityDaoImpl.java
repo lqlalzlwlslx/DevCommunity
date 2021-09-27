@@ -92,5 +92,13 @@ public class CommunityDaoImpl implements CommunityDao {
 	public Community selectCommunityDetailView(int comm_idx) throws Exception {
 		return sqlSession.selectOne("community.selectCommunityDetailView", comm_idx);
 	}
+
+	@Override
+	public String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("comm_idx", (int)comm_idx);
+		map.put("user_idx", user_idx);
+		return sqlSession.selectOne("community.selectCommunityUserStatusAsIdx", map);
+	}
 	
 }

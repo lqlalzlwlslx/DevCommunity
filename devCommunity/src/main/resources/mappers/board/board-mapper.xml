@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+
+	<select id="selectAllCommunityBoardList" parameterType="_long" resultType="board">
+	<![CDATA[
+		SELECT board_idx,
+			comm_idx,
+			board_uidx,
+			board_scope,
+			board_title,
+			board_content,
+			reg_date,
+			modify_date,
+			board_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_id,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
+		FROM dec_community_board
+		WHERE comm_idx = #{comm_idx}
+	]]>
+	</select>
+
+
+
+
+</mapper>

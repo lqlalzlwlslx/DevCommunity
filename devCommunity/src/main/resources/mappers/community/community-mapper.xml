@@ -113,7 +113,7 @@
 			comm_reg_cont,
 			comm_intro,
 			reg_date
-		FROM dec_community
+		FROM dec_community c
 		WHERE comm_name LIKE CONCAT('%', #{value}, '%')
 	]]>
 	</select>
@@ -136,10 +136,20 @@
 	]]>
 	</select>
 	
+	<select id="selectCommunityUserStatusAsIdx" parameterType="java.util.HashMap" resultType="java.lang.String">
+	<![CDATA[
+		SELECT comm_user_stat_cd
+		FROM dec_community c, dec_community_user cu
+		WHERE c.comm_idx = cu.comm_idx
+		AND c.comm_idx = #{comm_idx}
+		AND cu.user_idx = #{user_idx}
+	]]>
+	</select>
+	
 	<insert id="insertCommunityUser" parameterType="communityUser">
 	<![CDATA[
 		INSERT INTO dec_community_user(comm_idx, user_idx, comm_user_stat_cd, reg_date)
-		VALUES(#{comm_idx}, #{user_idx}, #{comm_user_stat_cd}, #{reg_date})
+		VALUES(#{comm_idx}, #{user_idx}, #{comm_user_stat_cd}, NOW())
 	]]>
 	</insert>
 	

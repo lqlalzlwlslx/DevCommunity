@@ -3,6 +3,7 @@ package com.dev.comm.community.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
@@ -34,5 +35,7 @@ public interface CommunityService {
 	int selectCountCommunityBoard(Community comm) throws Exception;
 
 	Community selectCommunityDetailView(int comm_idx) throws Exception;
+
+	String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception;
 
 }

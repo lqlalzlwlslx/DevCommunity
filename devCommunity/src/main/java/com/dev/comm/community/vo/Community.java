@@ -37,6 +37,8 @@ public class Community {
 	private int total_member;
 	private int total_board;
 	
+	private String comm_user_stat_cd;
+	
 	public long getComm_idx() {
 		return comm_idx;
 	}
@@ -164,6 +166,12 @@ public class Community {
 	public void setTotal_board(int total_board) {
 		this.total_board = total_board;
 	}
+	public String getComm_user_stat_cd() {
+		return comm_user_stat_cd;
+	}
+	public void setComm_user_stat_cd(String comm_user_stat_cd) {
+		this.comm_user_stat_cd = comm_user_stat_cd;
+	}
 	@Override
 	public String toString() {
 		return "Community [comm_idx=" + comm_idx + ", comm_name=" + comm_name + ", comm_type_cd=" + comm_type_cd
@@ -173,7 +181,7 @@ public class Community {
 				+ ", comm_type_c=" + comm_type_c + ", comm_type_p=" + comm_type_p + ", comm_type_d=" + comm_type_d
 				+ ", manager_idx=" + manager_idx + ", manager_name=" + manager_name + ", status=" + status
 				+ ", comm_intro=" + comm_intro + ", total_member=" + total_member + ", total_board=" + total_board
-				+ "]";
+				+ ", comm_user_stat_cd=" + comm_user_stat_cd + "]";
 	}
 
 }

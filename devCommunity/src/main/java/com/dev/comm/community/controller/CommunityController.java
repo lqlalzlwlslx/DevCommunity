@@ -277,6 +277,7 @@ public class CommunityController {
 		ArrayList<Board> boardValues = null;
 		
 		ArrayList<Community> resultValue = null;
+		User user = SessionManager.getUserSession(request);
 		
 		if(condition.equals("community")) { //커뮤니티 검색. condition: community
 			searchValues = new ArrayList<Community>();
@@ -289,6 +290,9 @@ public class CommunityController {
 					comm = searchValues.get(i);
 					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
 					comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
+					if(user != null){
+						comm.setComm_user_stat_cd(communityService.selectCommunityUserStatusAsIdx(comm.getComm_idx(), user.getUser_idx()));
+					}
 					resultValue.add(comm);
 				}
 				mp.addAttribute("result", true);

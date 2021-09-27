@@ -19,6 +19,9 @@ public class Board {
 	private String board_stat_nm;
 	private List<Reply> replyList;
 	
+	private String writer_id;
+	private String wirter_nick;
+	
 	public long getBoard_idx() {
 		return board_idx;
 	}
@@ -85,15 +88,25 @@ public class Board {
 	public void setReplyList(List<Reply> replyList) {
 		this.replyList = replyList;
 	}
+	public String getWriter_id() {
+		return writer_id;
+	}
+	public void setWriter_id(String writer_id) {
+		this.writer_id = writer_id;
+	}
+	public String getWirter_nick() {
+		return wirter_nick;
+	}
+	public void setWirter_nick(String wirter_nick) {
+		this.wirter_nick = wirter_nick;
+	}
 	@Override
 	public String toString() {
 		return "Board [board_idx=" + board_idx + ", comm_idx=" + comm_idx + ", board_uidx=" + board_uidx
 				+ ", board_scope=" + board_scope + ", board_title=" + board_title + ", board_content=" + board_content
 				+ ", reg_date=" + reg_date + ", modify_date=" + modify_date + ", board_stat_cd=" + board_stat_cd
-				+ ", board_stat_nm=" + board_stat_nm + ", replyList=" + replyList + "]";
+				+ ", board_stat_nm=" + board_stat_nm + ", replyList=" + replyList + ", writer_id=" + writer_id
+				+ ", wirter_nick=" + wirter_nick + "]";
 	}
-	
-	
-	
 
 }

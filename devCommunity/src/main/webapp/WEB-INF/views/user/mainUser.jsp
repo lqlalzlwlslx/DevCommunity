@@ -797,8 +797,8 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			contentArea.innerHTML = "";
 			var output;
 			var reqDate;
-			<c:if test="${not empty ucList}">
 			var ucIdxs = "";
+			<c:if test="${not empty ucList}">
 			<c:forEach items="${ucList}" var="ucLists" varStatus="status">
 				if(ucIdxs.trim() == "") {}
 				else {ucIdxs += ",";}
@@ -813,11 +813,12 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
 				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
 					output += "";
+				}else if(list[i].comm_user_stat_cd == "R"){
+					output += "<span style='float:right; margin-top:2.5em;'>승인 대기 중</span>";
 				}else{
 					output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
 				}
 				output += "</header><br />";
-				//output += "<p>소개글 : "+list[i].comm_intro+"</p>";
 				output += "<table><tbody>"
 				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
 				output += "<td>개설일</td><td>"+reqDate+"</td>";
@@ -831,12 +832,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 		}
 		
 		function moveToCommunityView(value){
-			console.log("moveToCommunityView: " + value);
-			fetch("/user/moveToCommunityView.do?idx="+value)
-				.then(response => response.json())
-				.then((data) => {
-					
-				});
+			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
 	</script>
 

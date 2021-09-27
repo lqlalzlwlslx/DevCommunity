@@ -11,30 +11,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-
-
-<!-- <link rel="stylesheet" src="<%=request.getContextPath()%>/resources/assets/css/bootstrap-5.1.1.min.css" >
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/bootstrap-5.1.1.bundle.min.js" ></script> -->
 
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/assets/css/main.css" />
 <script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/chart.min.js"></script>
 
 <script type="text/javascript" src="https://developers.kakao.com/sdk/js/kakao.js" ></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/common.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/common.js"></script>
 
-<!-- 
-<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/assets/css/bootstrap.3.4.1.min.css" />
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/jquery.3.5.1.min.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/resources/js/bootstrap.3.4.1.min.js" ></script>
- -->
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/summernote/summernote-lite.js" ></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/resources/summernote/lang/summernote-ko-KR.js"></script>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/summernote/summernote-lite.css" />
 
- 
 
  
 
@@ -69,13 +64,12 @@
 	}
 	
 	function drawSearchResult(data){
+		console.log(data);
 		if(data.result == true){
 			<c:if test="${empty userBean}">
-				console.log('userBean is empty');
 				vSearch(data.searchDataList);
 			</c:if>
 			<c:if test="${not empty userBean}">
-				console.log("userBean is not empty");
 				uSearch(data.searchDataList);
 			</c:if>
 		}else{
@@ -101,7 +95,11 @@
 				};
 				fetch("/user/communitySignUp", commSignData)
 					.then(res => res.json())
-					.then(data => console.log(data));
+					.then((data) => {
+						if(data.result == true){
+							alert(data.msg);
+						}
+					});
 				
 			}
 		</c:if>
@@ -110,6 +108,10 @@
 	
 	function logout(){
 		location.href="<%=request.getContextPath()%>/logout.do";
+	}
+	
+	function moveToMain(){
+		top.location.href="<%=request.getContextPath()%>/";
 	}
 </script>
 	
