@@ -52,7 +52,7 @@
 			document.querySelector(".modal-open").style.overflow = "auto";
 		});
 		
-	}		
+	}
 	
 	function ucListview(){
 		<c:if test="${not empty ucList}">
@@ -138,6 +138,10 @@
 		
 	}
 	
+	document.addEventListener("DOMContentLoaded", function(){
+		getMainUserBoardList();
+	});
+	
 </script>
 </head>
 <body>
@@ -163,6 +167,7 @@
 				<c:if test="${not empty userBean }">
 				<nav id="nav">
 					<ul>
+						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
 						<li id="ucLi"><a href="#" id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
@@ -235,7 +240,7 @@
 								</div>
 								<div class="container">
 									<header class="major">
-										<h2>공지사항</h2>
+										<h2 style="font-size:3.5em;">공지사항</h2>
 										<p>DevCoummunity에 오신 것을 환영합니다.<br />
 										이용 수칙에 관해 잘 읽어주시고 활동해주세요.</p>
 									</header>
@@ -720,7 +725,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 						<tr>
 							<td><input type="button" value="커뮤니티 소개글" /></td>
 							<td></td>
-							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요."></textarea></td>
+							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요.&#10;소개글은 커뮤니티 조회 시 노출됩니다."></textarea></td>
 						</tr>
 					</tbody>
 				</table>
@@ -733,64 +738,6 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 	</div>
 </div>
 			
-<!-- Modal Community개설...여기서 처리할까?--><%-- 
-<div class="modal fade" id="myModal" role="dialog" >
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">커뮤니티 개설</h4>
-			</div>
-			<div class="modal-body">
-				<table style="border:1px;">
-					<colgroup>
-						<col width="15%">
-						<col width="5%">
-						<col width="50%">
-						<col width="5%">
-						<col width="30%">
-					</colgroup>
-					<thead>
-						<tr>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><input type="button" value="커뮤니티 이름" /></td>
-							<td></td>
-							<td><input type="text" /></td>
-							<td></td>
-							<td><a><input type="button" value="중복체크" style="width:70%;"/></a></td>
-						</tr>
-						<tr>
-							<td><input type="button" value="카테고리 선택" /></td>
-							<td></td>
-							<td colspan="3">
-								<input type="radio" id="categoryJava" name="communityCategory" value="Java"/><label for="categoryJava">Java</label>
-								<input type="radio" id="categoryC" name="communityCategory" value="C"/><label for="categoryC">C</label>
-								<input type="radio" id="categoryPython" name="communityCategory" value="Python"/><label for="categoryPython">Python</label>
-								<input type="radio" id="categoryDatabase" name="communityCategory" value="Database"/><label for="categoryDatabase">Database</label>
-							</td>
-						</tr>
-						<tr>
-							<td><input type="button" value="커뮤니티 개설사유" /></td>
-							<td></td>
-							<td colspan="3"><textarea style="resize: none;" rows="5" placeholder="사유를 입력해주세요."></textarea></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
-</div> --%>
 	<script type="text/javascript">
 		function uSearch(list){
 			var contentArea = document.querySelector(".main-content-area");
@@ -834,6 +781,62 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 		function moveToCommunityView(value){
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
+		
+		function getMainUserBoardList(){
+			fetch("/board/userMainBoardList.do")
+			.then(res => res.json())
+			.then(data => showMainBoardList(data));
+		}
+		
+		let contentArea = document.querySelector(".main-content-area");
+		contentArea.innerHTML = "";
+		let output = "";
+		function showMainBoardList(res){
+			if(res.result == false) { location.href="<%=request.getContextPath()%>/"; }
+			
+			if(res.result){
+				let ubList = res.ubList;
+				const login_id = "${userBean.login_id}";
+				let board_writerId;
+				//console.log(ubList);
+				for(let i = 0; i < ubList.length; i++){
+					board_writerId = ubList[i].writer_id;
+					output = "";
+					output += "<div class='container container-solid'>";
+					output += "<div class='content_inner' style='display:flex;'>";
+					output += "<div style='width:22em;'>";
+					output += "<header class='major'>";
+					output += "<h2>"+ubList[i].board_title+"</h2>";
+					output += "</header>";
+					output += "</div>";
+					output += "<div style='width:23em;'>";
+					output += "<span style='float:right;'>작성일 &nbsp;&nbsp;"+ubList[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+ubList[i].writer_nick;
+					if(login_id == board_writerId){
+						output += "<span onclick='modifyBoard("+ubList[i].board_idx+")'><a href='#'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>";
+						output += "<span onclick='deleteBoard("+ubList[i].board_idx+")'><a href='#'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>";
+					}
+					output += "</span>";
+					output += "</div>";
+					output += "</div>";
+					output += "<p>"+ubList[i].board_content+"</p>";
+					output += "</div>";
+					contentArea.innerHTML += output;
+				}
+			}
+		}
+		
+		let boardFlag;
+		function modifyBoard(idx){
+			boardFlag = "modify";
+			fetch("/board/userModifyBoard.do?flag="+boardFlag+"&idx="+idx);
+			
+		}
+		
+		function deleteBoard(idx){
+			boardFlag = "delete";
+			fetch("/board/userModifyBoard.do?flag="+boardFlag+"&idx="+idx);
+		}
+		
 	</script>
 
 

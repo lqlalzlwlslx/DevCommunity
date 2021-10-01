@@ -1,5 +1,6 @@
 package com.dev.comm.community.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -18,8 +19,8 @@ public class Community {
 	private String comm_stat_nm;
 	private short comm_role_cd;
 	private String reg_date;
-	private List<Board> boardList;
-	private List<User> userList;
+	private ArrayList<Board> boardList;
+	private ArrayList<User> userList;
 	
 	private String comm_reg_cont;
 	
@@ -87,16 +88,16 @@ public class Community {
 	public void setReg_date(String reg_date) {
 		this.reg_date = reg_date;
 	}
-	public List<Board> getBoardList() {
+	public ArrayList<Board> getBoardList() {
 		return boardList;
 	}
-	public void setBoardList(List<Board> boardList) {
+	public void setBoardList(ArrayList<Board> boardList) {
 		this.boardList = boardList;
 	}
-	public List<User> getUserList() {
+	public ArrayList<User> getUserList() {
 		return userList;
 	}
-	public void setUserList(List<User> userList) {
+	public void setUserList(ArrayList<User> userList) {
 		this.userList = userList;
 	}
 	public String getComm_reg_cont() {

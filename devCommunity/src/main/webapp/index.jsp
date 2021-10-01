@@ -6,6 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>DevCommunity</title>
+<link rel="short icon" href="#">
 </head>
 <body>
 	<c:set var="contextPath" value="${pageContext.servletContext.contextPath}" scope="application" />

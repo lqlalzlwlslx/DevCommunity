@@ -19,9 +19,106 @@
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
 		FROM dec_community_board
 		WHERE comm_idx = #{comm_idx}
+		ORDER BY reg_date DESC
 	]]>
 	</select>
-
+	
+	<select id="selectVisitorMainBoardList" parameterType="board" resultType="board">
+	<![CDATA[
+		SELECT board_idx,
+			comm_idx,
+			board_uidx,
+			board_scope,
+			board_title,
+			board_content,
+			reg_date,
+			modify_date,
+			board_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
+		FROM dec_community_board
+		WHERE board_scope = #{board_scope}
+		ORDER BY reg_date DESC
+	]]>
+	</select>
+	
+	<insert id="insertCommunityBoard" parameterType="board">
+		<selectKey keyProperty="board_idx" resultType="_int" order="AFTER">
+			<![CDATA[
+				SELECT LAST_INSERT_ID()
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO dec_community_board(comm_idx, board_uidx, board_scope, board_title, board_content, reg_date, modify_date, board_stat_cd)
+			VALUES(#{comm_idx}, #{board_uidx}, #{board_scope}, #{board_title}, #{board_content}, NOW(), NULL, 'A')
+		]]>
+	</insert>
+	
+	<select id="selectCommunityBoardInfo" parameterType="board" resultType="board">
+	<![CDATA[
+		SELECT board_idx,
+			comm_idx,
+			board_uidx,
+			board_scope,
+			board_title,
+			board_content,
+			reg_date,
+			modify_date,
+			board_stat_cd
+		FROM dec_community_board
+		WHERE board_idx = #{board_idx}
+	]]>
+	</select>
+	
+	<insert id="insertCommunityBoardFile" parameterType="boardFile">
+	<![CDATA[
+		INSERT INTO dec_community_board_file(board_idx, org_file_name, real_file_path)
+		VALUES(#{board_idx}, #{org_file_name}, #{real_file_path})
+	]]>
+	</insert>
+	
+	<select id="selectUserMainBoardList" parameterType="user" resultType="board">
+	<![CDATA[
+		SELECT *
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				board_uidx,
+				board_scope,
+				board_title,
+				board_content,
+				reg_date,
+				modify_date,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
+			FROM dec_community_board
+			WHERE board_scope = 'A'
+			
+			UNION
+			
+			SELECT board_idx,
+				comm_idx,
+				board_uidx,
+				board_scope,
+				board_title,
+				board_content,
+				reg_date,
+				modify_date,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
+			FROM dec_community_board
+			WHERE board_scope = 'C'
+			AND board_uidx = #{user_idx}
+			AND comm_idx IN (SELECT user_idx FROM dec_community_user cu WHERE comm_idx = cu.comm_idx)
+		) t
+		ORDER BY reg_date DESC
+	]]>
+	</select>
 
 
 

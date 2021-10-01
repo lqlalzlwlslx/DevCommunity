@@ -5,6 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/assets/css/main.css" />
+<link rel="short icon" href="#">
 <style>
 	input[type="text"], input[type="password"], input[type="button"]{
 		width:80% !important;
@@ -27,6 +28,7 @@
 	function authCheck(){
 		const id = document.querySelector("#id_field").value;
 		const pw = document.querySelector("#pw_field").value;
+		const loginFlag = "normal";
 		
 		if(!id){ alert("아이디를 입력해주세요."); document.querySelector("#id_field").focus(); return; }
 		//if(!pw){ alert("비밀번호를 입력해주세요."); document.querySelector("#pw_field").focus(); return; }
@@ -34,7 +36,7 @@
 		const authData = {
 				method: "POST",
 				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({id, pw})
+				body: JSON.stringify({id, pw, loginFlag})
 		};
 		
 		fetch("/user/login", authData)

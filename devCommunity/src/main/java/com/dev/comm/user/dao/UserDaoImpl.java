@@ -137,5 +137,15 @@ public class UserDaoImpl implements UserDao {
 		sqlSession.update("user.updateUserBlackListReleaseStatus", user_idx);
 	}
 
+	@Override
+	public String findLoginIdAsSecondMail(String value) throws Exception {
+		return sqlSession.selectOne("user.findLoginIdAsSecondMail", value);
+	}
+
+	@Override
+	public int changePasswdAsFindNewPasswd(User usr) throws Exception {
+		return sqlSession.update("user.changePasswdAsFineNewPasswd", usr);
+	}
+
 	
 }

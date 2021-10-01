@@ -126,5 +126,15 @@ public class UserServiceImpl implements UserService {
 		userDao.updateUserBlackListReleaseStatus(user_idx);
 	}
 
+	@Override
+	public String findLoginIdAsSecondMail(String value) throws Exception {
+		return userDao.findLoginIdAsSecondMail(value);
+	}
+
+	@Override
+	public int changePasswdAsFindNewPasswd(User usr) throws Exception {
+		return userDao.changePasswdAsFindNewPasswd(usr);
+	}
+
 	
 }

@@ -1,5 +1,6 @@
 package com.dev.comm.board.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -17,10 +18,10 @@ public class Board {
 	private String modify_date;
 	private String board_stat_cd;
 	private String board_stat_nm;
-	private List<Reply> replyList;
+	private ArrayList<Reply> replyList;
 	
 	private String writer_id;
-	private String wirter_nick;
+	private String writer_nick;
 	
 	public long getBoard_idx() {
 		return board_idx;
@@ -82,10 +83,10 @@ public class Board {
 	public void setBoard_stat_nm(String board_stat_nm) {
 		this.board_stat_nm = board_stat_nm;
 	}
-	public List<Reply> getReplyList() {
+	public ArrayList<Reply> getReplyList() {
 		return replyList;
 	}
-	public void setReplyList(List<Reply> replyList) {
+	public void setReplyList(ArrayList<Reply> replyList) {
 		this.replyList = replyList;
 	}
 	public String getWriter_id() {
@@ -94,11 +95,11 @@ public class Board {
 	public void setWriter_id(String writer_id) {
 		this.writer_id = writer_id;
 	}
-	public String getWirter_nick() {
-		return wirter_nick;
+	public String getWriter_nick() {
+		return writer_nick;
 	}
-	public void setWirter_nick(String wirter_nick) {
-		this.wirter_nick = wirter_nick;
+	public void setWriter_nick(String writer_nick) {
+		this.writer_nick = writer_nick;
 	}
 	@Override
 	public String toString() {
@@ -106,7 +107,7 @@ public class Board {
 				+ ", board_scope=" + board_scope + ", board_title=" + board_title + ", board_content=" + board_content
 				+ ", reg_date=" + reg_date + ", modify_date=" + modify_date + ", board_stat_cd=" + board_stat_cd
 				+ ", board_stat_nm=" + board_stat_nm + ", replyList=" + replyList + ", writer_id=" + writer_id
-				+ ", wirter_nick=" + wirter_nick + "]";
+				+ ", writer_nick=" + writer_nick + "]";
 	}
 
 }

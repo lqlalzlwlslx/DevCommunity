@@ -10,6 +10,7 @@ public class BoardFile {
 	private String org_file_name;
 	private String real_file_path;
 	
+	
 	public int getFile_idx() {
 		return file_idx;
 	}

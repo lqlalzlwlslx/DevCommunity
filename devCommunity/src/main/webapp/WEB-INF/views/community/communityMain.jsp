@@ -165,6 +165,7 @@
 				<c:if test="${not empty userBean }">
 				<nav id="nav">
 					<ul>
+						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
 						<li id="ucLi"><a href="#" id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
@@ -238,7 +239,7 @@
 								<div class="container">
 									<header class="major">
 										<c:if test="${not empty commInfo}">
-											<h2 style="margin: 0;">${commInfo.comm_name}</h2>
+											<h2 style="margin: 0; font-size:3.5em;">${commInfo.comm_name}</h2>
 											<table>
 												<tbody>
 													<tr>
@@ -275,13 +276,13 @@
 							<c:if test="${not empty cbList}">
 								<c:forEach items="${cbList}" var="cbList" varStatus="status">
 									<div class="main-content-area">	
-								<div class="container container-solid">
-									<header class="major">
-										<h2>${cbList.board_title}</h2>
-									</header>
-									<p>${cbList.board_content}</p>
-								</div>
-							</div>
+										<div class="container container-solid">
+											<header class="major">
+												<h2>${cbList.board_title}</h2>
+											</header>
+											<p>${cbList.board_content}</p>
+										</div>
+									</div>
 								</c:forEach>
 							</c:if>
 							<c:if test="${empty cbList}">
@@ -360,7 +361,7 @@
 						<tr>
 							<td><input type="button" value="커뮤니티 소개글" /></td>
 							<td></td>
-							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요."></textarea></td>
+							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요.&#10;소개글은 커뮤니티 조회 시 노출됩니다."></textarea></td>
 						</tr>
 					</tbody>
 				</table>

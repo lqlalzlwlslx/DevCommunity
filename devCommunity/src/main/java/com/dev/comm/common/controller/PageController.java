@@ -13,6 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dev.comm.user.vo.User;
@@ -89,6 +90,15 @@ public class PageController {
 		return new ModelAndView("redirect:/");
 	}
 	
+	@RequestMapping(value = "/findPasswd", method = RequestMethod.GET)
+	public ModelAndView findPassword(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		try {
+			Thread.sleep(150L);
+		}catch(InterruptedException e) {
+			e.printStackTrace();
+		}
+		return new ModelAndView("config/findPasswd");
+	}
 	
 	
 

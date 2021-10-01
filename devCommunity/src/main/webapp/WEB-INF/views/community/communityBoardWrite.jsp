@@ -19,7 +19,7 @@
 	span.image.avatar{width:150px !important;}
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
-	input[type="radio"] + label{padding-right:2em !important;}
+	input[type="radio"] + label{padding-right:1em !important;}
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
 	.signUpCommunity:hover{cursor:pointer;}
@@ -37,6 +37,19 @@
 	<c:if test="${empty userBean}">
 		location.href="<%=request.getContextPath()%>/";
 	</c:if>
+	
+	<c:if test="${not empty result}">
+		<c:if test="${result == true}">
+			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx=${moveToValue}";
+		</c:if>
+		
+		<c:if test="${result == false}">
+			<c:if test="${not empty msg}">
+				alert("${msg}");
+			</c:if>
+		</c:if>
+	</c:if>
+	
 	var communityPassed = false;
 	window.onload = function (){
 		const userInfoBtn = document.querySelector("#userMyPage");
@@ -159,15 +172,13 @@
 					<h1 id="logo"><span id="loginbtn">${userBean.nick_name} 님</span></h1><br />
 					<div style="display:flex;" align="center">
 					<p></p>
-						<!-- <div style="width:35%;" align="right"><a href="#" onclick="signUp();">회원가입</a></div>
-						<div style="width:2%;"></div>
-						<div style="width:60%;"><a href="#">아이디/비밀번호 찾기</a></div> -->
 					</div>
 					</c:if>
 				</header>
 				<c:if test="${not empty userBean }">
 				<nav id="nav">
 					<ul>
+						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
 						<li id="ucLi"><a href="#" id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
@@ -185,17 +196,6 @@
 					</ul>
 				</nav>
 				</c:if>
-				<!-- 
-				<footer>
-					<ul class="icons">
-						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
-						<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
-					</ul>
-				</footer>
-				 -->
 			</section>
 
 		<!-- Wrapper -->
@@ -226,21 +226,30 @@
 										<input type="button" id="searchBtn" onclick="searchCondition();" value="검색" />
 									</div>
 								</div>
-								<div class="container" style="width:50em;">
+								
+								<div class="container" style="width:60em;">
 								<br /><br />
+								<form name="boardFrm" id="boardFrm" action="<%=request.getContextPath()%>/board/insertCommunityBoard.do" method="POST" enctype="multipart/form-data" >
+								<input type="hidden" name="cidx" value="${comm_idx}" />
+								<div id="loadValues"></div>
 								<table>
 									<tbody>
 										<tr>
 											<td class="boardLeft">제목</td>
-											<td><input type="text" id="boardTitleField"/></td>
+											<td><input type="text" id="board_title" name="board_title"/></td>
 										</tr>
 										<tr>
 											<td class="boardLeft">내용</td>
-											<td><textarea name="boardContent" id="summernote" rows="8" cols="90" style="resize:none;"></textarea></td>
+											<td><textarea name="board_content" id="summernote" rows="8" cols="90" style="resize:none;"></textarea></td>
 										</tr>
-										<tr>
-											<td></td>
+										<tr style="vertical-align:middle;">
+											<td>공개범위</td>
 											<td>
+												<span style="float:left;">
+												<input type="radio" name="boardScope" id="boardScopeA" value="A" checked/><label for="boardScopeA">전체공개</label>
+												<input type="radio" name="boardScope" id="boardScopeC" value="C" /><label for="boardScopeC">커뮤니티공개</label>
+												<input type="hidden" name="boardScopeValue" value="" />
+												</span>
 												<span style="float:right;">
 													<input onclick="cancelBoard();" type="button" value="취소"/>&nbsp;&nbsp;&nbsp;&nbsp;
 													<input onclick="insertCommunityBoard();" type="button" value="등록" />
@@ -249,6 +258,7 @@
 										</tr>
 									</tbody>
 								</table>
+								</form>
 								</div>
 							</section>
 
@@ -309,7 +319,7 @@
 						<tr>
 							<td><input type="button" value="커뮤니티 소개글" /></td>
 							<td></td>
-							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요."></textarea></td>
+							<td colspan="3"><textarea style="resize: none;" rows="2" id="communityIntro" placeholder="소개글을 작성해주세요.&#10;소개글은 커뮤니티 조회 시 노출됩니다."></textarea></td>
 						</tr>
 					</tbody>
 				</table>
@@ -330,7 +340,14 @@
 			height: 350,
 			lang: "ko-KR",
 			disableResizeEditor: true,
-			toolbar: [
+			focus: true,
+			codemirror: {
+			      mode: 'text/html',
+			      htmlMode: true,
+			      lineNumbers: true,
+			      theme: 'monokai'
+			},
+			/* toolbar: [
                 // [groupName, [list of button]]
                 ['Font Style', ['fontname']],
                 ['style', ['bold', 'italic', 'underline']],
@@ -342,7 +359,7 @@
                 ['Insert', ['picture']],
                 ['Insert', ['link']],
                 ['Misc', ['fullscreen']]
-            ],
+            ], */
             
             callbacks: {	//여기 부분이 이미지를 첨부하는 부분
 				onImageUpload : function(files) {
@@ -359,6 +376,11 @@
 				}
 			}
 		});
+		
+		var containerDiv = document.getElementById("loadValues");
+		var ul = document.createElement("ul");
+		var li = document.createElement("li");
+		
 		function uploadSummernoteImageFile(file, editor) { // 이미지 파일 업로드..
 			const frmData = new FormData();
 			frmData.append("file", file);
@@ -372,6 +394,13 @@
 					top.location.href = "<%=request.getContextPath()%>/";
 				}
 				$(editor).summernote('insertImage', data.url);
+				
+				li.style.display = "none";
+				li.innerHTML += '<input type="hidden" name="realFileName" value="'+data.realFileName+'" />';
+				li.innerHTML += '<input type="hidden" name="resPathValue" value="'+data.url+'" />';
+				ul.appendChild(li);
+				containerDiv.appendChild(ul);
+				
 				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="480" height="auto"/></li>');
 
 			});
@@ -389,7 +418,6 @@
 				}
 			}); */
 		}
-		
 	});
 </script>
 
@@ -441,12 +469,25 @@
 			location.href = history.back();
 		}
 		
-		function insertCommunityBoard(){
-			let boardTitle = document.querySelector("#boardTitleField").value;
-			let boardContent = $('summernote').summernote('code');
+		function insertCommunityBoard(){ // 제목, 내용 등 검증하고 submit 처리 해야함.
+			const frm = document.boardFrm;
+			const title = frm.board_title.value;
+			const content = frm.board_content.value;
 			
-			console.log(boardTitle);
-			console.log(boardContent);
+			const cidx = frm.cidx.value;
+			
+			var scopes = document.getElementsByName("boardScope");
+			for(var i = 0; i < scopes.length; i++){
+				if(scopes[i].checked == true){
+					frm.boardScopeValue.value = scopes[i].value;
+				}
+			}
+			
+			if(!title) { alert("제목을 입력해주세요."); document.querySelector("#board_title").focus(); return; }
+			if(!content) { alert("내용을 입력해주세요."); document.querySelector("#summernote").focus(); return; }
+			
+			frm.submit();
+			
 		}
 		
 		

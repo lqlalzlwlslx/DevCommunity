@@ -27,6 +27,8 @@ public class User {
 	
 	private int tryed;
 	
+	private String second_mail;
+	
 	private String bl_scope;
 	
 	public boolean isAdmin() {
@@ -157,6 +159,14 @@ public class User {
 		this.black_edate = black_edate;
 	}
 
+	public String getSecond_mail() {
+		return second_mail;
+	}
+
+	public void setSecond_mail(String second_mail) {
+		this.second_mail = second_mail;
+	}
+
 	@Override
 	public String toString() {
 		return "User [user_idx=" + user_idx + ", user_stat_cd=" + user_stat_cd + ", user_name=" + user_name
@@ -164,13 +174,9 @@ public class User {
 				+ user_role_cd + ", reg_date=" + reg_date + ", login_date=" + login_date + ", pwd_date=" + pwd_date
 				+ ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm + ", access_status=" + access_status
 				+ ", access_ip=" + access_ip + ", black_sdate=" + black_sdate + ", black_edate=" + black_edate
-				+ ", tryed=" + tryed + ", bl_scope=" + bl_scope + "]";
+				+ ", tryed=" + tryed + ", second_mail=" + second_mail + ", bl_scope=" + bl_scope + "]";
 	}
 
-
-
-	
-	
 	
 
 }

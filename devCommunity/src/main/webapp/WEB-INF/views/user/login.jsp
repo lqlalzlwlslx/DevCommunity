@@ -73,7 +73,7 @@
 						</tr>
 						<tr>
 							<td colspan="2"><span style="float:left;">비밀번호가 기억이 나지 않으신가요?</span></td>
-							<td><span style="float:right;"><a href="#">비밀번호 찾기</a></span></td>
+							<td onclick="findPasswd();"><span style="float:right;"><a href="#">비밀번호 찾기</a></span></td>
 						</tr>
 						<tr>
 							<td colspan="2"><span style="float:left;">회원이 아니신가요?</span></td>

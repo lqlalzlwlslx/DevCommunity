@@ -52,4 +52,8 @@ public interface UserService {
 
 	void updateUserBlackListReleaseStatus(int user_idx) throws Exception;
 
+	String findLoginIdAsSecondMail(String value) throws Exception;
+
+	int changePasswdAsFindNewPasswd(User usr) throws Exception;
+
 }

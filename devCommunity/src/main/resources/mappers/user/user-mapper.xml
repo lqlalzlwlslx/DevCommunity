@@ -18,7 +18,8 @@
 			pwd_date,
 			access_ip,
 			tryed,
-			profile_src
+			profile_src,
+			second_mail
 		FROM dec_user
 		WHERE login_id = #{login_id}
 	]]>
@@ -39,7 +40,8 @@
 			pwd_date,
 			access_ip,
 			tryed,
-			profile_src
+			profile_src,
+			second_mail
 		FROM dec_user
 		WHERE user_idx = #{user_idx}
 	]]>
@@ -55,10 +57,10 @@
 	
 	<insert id="insertUser" parameterType="user">
 	<![CDATA[
-		INSERT INTO dec_user(user_stat_cd, user_name, login_id, nick_name, password, user_role_cd, reg_date, profile_src)
+		INSERT INTO dec_user(user_stat_cd, user_name, login_id, nick_name, password, user_role_cd, reg_date, profile_src, second_mail)
 		VALUES(#{user_stat_cd}, #{user_name}, #{login_id}, #{nick_name}, #{password}, #{user_role_cd}, NOW(), ]]>
 		<if test='profile_src == ""'><![CDATA[NULL]]></if>
-		<if test='profile_src != ""'><![CDATA[#{profile_src}]]></if><![CDATA[
+		<if test='profile_src != ""'><![CDATA[#{profile_src}]]></if><![CDATA[, #{second_mail}
 		)
 	]]>
 	</insert>
@@ -82,7 +84,7 @@
 	<update id="updateUserProfile" parameterType="user">
 	<![CDATA[
 		UPDATE dec_user
-		SET user_name = #{user_name}, nick_name = #{nick_name}, password = #{password}, profile_src = #{profile_src}
+		SET user_name = #{user_name}, nick_name = #{nick_name}, password = #{password}, profile_src = #{profile_src}, second_mail = #{second_mail}
 		WHERE user_idx = #{user_idx}
 	]]>
 	</update>
@@ -187,7 +189,9 @@
 	
 	<insert id="insertBlackListUser" parameterType="blackList">
 		<selectKey keyProperty="bl_idx" order="AFTER" resultType="_int">
-			<![CDATA[SELECT bl_idx FROM dec_blacklist]]>
+			<![CDATA[
+				SELECT LAST_INSERT_ID()
+			]]>
 		</selectKey>
 	<![CDATA[
 		INSERT dec_blacklist(user_idx, bl_cont, start_date, end_date)
@@ -253,6 +257,22 @@
 	<![CDATA[
 		UPDATE dec_user
 		SET user_stat_cd = 'A'
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<select id="findLoginIdAsSecondMail" parameterType="java.lang.String" resultType="java.lang.String">
+	<![CDATA[
+		SELECT GROUP_CONCAT(login_id)
+		FROM dec_user
+		WHERE second_mail = #{value}
+	]]>
+	</select>
+	
+	<update id="changePasswdAsFineNewPasswd" parameterType="user">
+	<![CDATA[
+		UPDATE dec_user
+		SET password = #{password}
 		WHERE user_idx = #{user_idx}
 	]]>
 	</update>

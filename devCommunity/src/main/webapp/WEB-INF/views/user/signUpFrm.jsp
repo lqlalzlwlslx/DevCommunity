@@ -36,6 +36,7 @@
 			const pw = document.querySelector("#pw_field").value;
 			const pw2 = document.querySelector("#pw_field2").value;
 			var prosrc = document.getElementById("prosrc").src;
+			let secondMail = document.querySelector("#secondEmailField").value;
 			
 			//if(!(id.indexOf("@") > -1)) {alert("올바른 이메일 주소를 입력해주세요."); return;}
 			
@@ -54,11 +55,13 @@
 				alert('인증번호가 일치하지 않습니다. 다시 확인해주세요.');
 				return;
 			}
+			
+			if(!secondMail) {secondMail = "";}
 			const signFlag = "normal";
 			const signData = {
 					method: 'POST',
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({id, nick, pw, prosrc, signFlag})
+					body: JSON.stringify({id, nick, pw, prosrc, signFlag, secondMail})
 			};
 			
 			fetch("/user/signUpUser", signData)
@@ -118,7 +121,6 @@
 	}
 	var authsetId;
 	function remaining(res){
-		console.log(res);
 		if(res.result == true){
 			alert("인증번호를 전송했습니다. 메일을 확인해주세요.");
 			passedCode = res.passcode.substring(0, res.passcode.indexOf("|"));
@@ -144,7 +146,6 @@
 		if(!inputAuthCode) { alert("인증번호를 입력해주세요."); document.querySelector("#authCodeTxt").focus(); return; }
 		
 		if(inputAuthCode == passedCode){
-			console.log('okay');
 			clearInterval(authsetId);
 			document.getElementById("authCode").innerHTML = "인증완료";
 			document.getElementById("id_field").readOnly = true;
@@ -219,6 +220,10 @@
 								<input type="file" id="fileUpload" style="display: none;" accept="image/*" />
 								<input type="button" value="사진추가" onclick="document.querySelector('#fileUpload').click()" />
 							</td>
+						</tr>
+						<tr>
+							<td class="signTd"><input type="button" class="leftBtn" value="2차이메일" /></td>
+							<td class="signTd" colspan="3"><input type="email" id="secondEmailField" placeholder="필수입력 값은 아닙니다. 하지만 아이디를 잊어버린 경우 정보를 찾을 때 사용됩니다." /></td>
 						</tr>
 						<tr>
 							<td class="signTd"></td>

@@ -248,6 +248,7 @@ public class UserController {
 		String password = element.getAsJsonObject().get("pw").getAsString();
 		String profile_src = element.getAsJsonObject().get("prosrc").getAsString();
 		String signFlag = element.getAsJsonObject().get("signFlag").getAsString();
+		String secondMail = element.getAsJsonObject().get("secondMail").getAsString();
 		
 		
 		if(signFlag.equals("kakao")) {
@@ -265,6 +266,9 @@ public class UserController {
 		user.setUser_role_cd((short)7);
 		if(!profile_src.equals("")) user.setProfile_src(profile_src);
 		else user.setProfile_src(null);
+		
+		if(secondMail.equals("")) user.setSecond_mail(null);
+		else user.setSecond_mail(secondMail);
 		
 		int result = userService.insertUser(user);
 		if(result < 1) {
@@ -387,6 +391,7 @@ public class UserController {
 		String password = element.getAsJsonObject().get("pw1").getAsString();// == null ? "" : element.getAsJsonObject().get("pw1").getAsString();
 		String profile_src = element.getAsJsonObject().get("prosrc").getAsString();
 		profile_src = profile_src.substring(profile_src.indexOf("/resources"));
+		String secondMail = element.getAsJsonObject().get("secondMail").getAsString();
 		
 		if(password.equals("")) password = userService.getUserPassword(user.getUser_idx());
 		
@@ -394,6 +399,8 @@ public class UserController {
 		user.setNick_name(nick_name);
 		user.setPassword(password);
 		user.setProfile_src(profile_src);
+		if(secondMail.equals("")) user.setSecond_mail(null);
+		else user.setSecond_mail(secondMail);
 		
 		try {
 			userService.updateUserProfile(user);
@@ -417,6 +424,7 @@ public class UserController {
 		JsonElement element = parser.parse(data);
 		
 		String email = element.getAsJsonObject().get("mailto").getAsString();
+		String flag = "";
 		log.debug("requested email: " + email);
 		
 		HttpSession session = request.getSession();
@@ -424,7 +432,7 @@ public class UserController {
 		session.removeAttribute(Constants.USER_SESSION_PASSCODE);
 		
 		session = request.getSession();
-		session.setAttribute(Constants.USER_SESSION_PASSCODE, sendPasscode(email));
+		session.setAttribute(Constants.USER_SESSION_PASSCODE, sendPasscode(email, flag));
 		log.debug("attributeNew: " + session.getAttribute(Constants.USER_SESSION_PASSCODE));
 		
 		try {
@@ -440,14 +448,21 @@ public class UserController {
 		return mp;
 	}
 	
-	private String sendPasscode(String emailto) throws Exception {
+	private String sendPasscode(String emailto, String flag) throws Exception {
 		String passcode = new Integer(1000000 + (new Random()).nextInt(1000000)).toString().substring(1);
 		mailFrom = "devcomm00@gmail.com";
 		mailTo = emailto;
-		mailSubject = "[DevCommunity] 회원가입 인증번호가 전송되었습니다.";
-		mailContent += "<h2>인증번호</h2><br />";
-		mailContent += "<h3>"+passcode+"</h3>";
-		
+		if(flag.equals("find")) {
+			mailSubject = "[DevCommunity] 비밀번호 찾기 인증번호가 전송되었습니다.";
+			mailContent = "";
+			mailContent += "<h2>인증번호</h2><br />";
+			mailContent += "<h2>"+passcode+"</h2>";
+		}else {
+			mailSubject = "[DevCommunity] 회원가입 인증번호가 전송되었습니다.";
+			mailContent = "";
+			mailContent += "<h2>인증번호</h2><br />";
+			mailContent += "<h2>"+passcode+"</h2>";
+		}
 		mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
 		
 		passcode += "|" + emailto + "|" + System.currentTimeMillis();
@@ -726,6 +741,15 @@ public class UserController {
 				ArrayList<Board> communityBoardList = boardService.selectAllCommunityBoardList(comm_idx);	//커뮤니티 전체 글 조회
 				ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
 				Community commInfo = communityService.selectCommunityDetailView((int)comm_idx);
+				
+				if(communityBoardList != null) {
+					for(int i = 0; i < communityBoardList.size(); i++) {
+						Board b = new Board();
+						b = communityBoardList.get(i);
+						b.setBoard_content(b.getBoard_content().replaceAll("<p>", ""));
+						b.setBoard_content(b.getBoard_content().replaceAll("</p>", "<br />"));
+					}
+				}
 				if(communityBoardList != null) model.addAttribute("cbList", communityBoardList);
 				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
 				if(commInfo != null) model.addAttribute("commInfo", commInfo);
@@ -766,6 +790,128 @@ public class UserController {
 		model.addAttribute("userInfo", user);
 		
 		return new ModelAndView("/community/communityBoardWrite");
+	}
+	
+	@RequestMapping(value = "/findLoginIdAsSecondMail", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String findLoginIdAsSecondMail(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== findLoginIdAsSecondMail ===");
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		String secondMail = element.getAsJsonObject().get("secondMail").getAsString();
+		
+		String findLoginId = "";
+		
+		try{
+			findLoginId = userService.findLoginIdAsSecondMail(secondMail);
+			String[] loginIds = findLoginId.split(",");
+			log.debug(loginIds.length);
+			if(loginIds.length > 1) {
+				obj.addProperty("result", false);
+				obj.addProperty("msg", "동일한 2차메일주소의 계정이 2개이상입니다. 관리자에게 문의하세요.");
+				return obj.toString();
+			}else {
+				mailFrom = "devcomm00@gmail.com";
+				mailTo = secondMail;
+				mailSubject = "[DevCommunity] 요청하신 아이디 찾기 정보입니다.";
+				mailContent = "안녕하세요. <br />DevCommunity 관리자입니다.";
+				mailContent += "<br /><br />회원님의 로그인 아이디정보는 <br />";
+				mailContent += loginIds[0] + " 입니다.";
+				mailContent += "<br/ ><br />감사합니다.";
+				
+				mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+				
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다. 메일을 확인해주세요.");
+				return obj.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "입력하신 2차메일주소로 가입된 계정이 없습니다.");
+			return obj.toString();
+		}
+	}
+	
+	@RequestMapping(value = "/findPasswdAsLoginIdAuth", method = RequestMethod.POST)
+	@ResponseBody
+	public String findPasswdAsLoginIdAuth(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		String mailto = element.getAsJsonObject().get("mailto").getAsString();
+		String flag = "find";
+		if(mailto.trim().equals("")) {
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "이메일을 입력해주세요.");
+			return obj.toString();
+		}
+		boolean result = false;
+		
+		User tuser = new User();
+		tuser.setLogin_id(mailto);
+		
+		User usr = userService.selectUserInfoAsLogin(tuser);
+		if(usr != null) {
+			HttpSession session = request.getSession();
+			log.debug("SESSION: " + session.getId());
+			session.removeAttribute(Constants.USER_SESSION_PASSCODE);
+			
+			session = request.getSession();
+			session.setAttribute(Constants.USER_SESSION_PASSCODE, sendPasscode(mailto, flag));
+			log.debug("attributeNew: " + session.getAttribute(Constants.USER_SESSION_PASSCODE));
+			
+			try {
+				Thread.sleep(800L);
+			}catch(InterruptedException ie) {
+				ie.printStackTrace();
+				result = false;
+			}
+			result = true;
+			
+			obj.addProperty("result", result);
+			obj.addProperty("passcode", (String)session.getAttribute(Constants.USER_SESSION_PASSCODE));
+			return obj.toString();
+		}else {
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "정보가 없습니다. 다시 확인해주세요.");
+			return obj.toString();
+		}
+	}
+	
+	@RequestMapping(value = "/chagenPasswdAsFindNewPasswd", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String changePasswdAsFineNewPasswd(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		String login_id = element.getAsJsonObject().get("login_id").getAsString();
+		String new_passwd = element.getAsJsonObject().get("new_passwd").getAsString();
+		User usr01 = new User();
+		usr01.setLogin_id(login_id);
+		
+		try {
+			User usr = userService.selectUserInfoAsLogin(usr01);
+			usr.setPassword(passwordEncoder.encode(new_passwd));
+			if(userService.changePasswdAsFindNewPasswd(usr) > 0) {
+				log.debug("CHANGE PASSWORD SUCCESS.");
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다. 메인페이지로 이동됩니다.");
+				return obj.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("CHANGE PASSWORD ERROR.");
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "실패했습니다.");
+			return obj.toString();
+		}
+		
+		return obj.toString();
 	}
 	
 	/*

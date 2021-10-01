@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
 <style>
-	input[type="text"], input[type="password"], input[type="button"]{
+	input[type="text"], input[type="password"], input[type="button"], input[type="email"]{
 		width:80% !important;
 		margin-bottom:2%;
 		margin-right:20%;
@@ -85,6 +85,7 @@
 		const pw1 = document.querySelector("#pw_field").value;
 		const pw2 = document.querySelector("#pw_field2").value;
 		var prosrc ;
+		let secondMail = document.querySelector("#secondEmailField").value;
 		<c:if test="${empty userBean.profile_src}">
 			prosrc = document.getElementById("uploadsrc1").src;
 		</c:if>
@@ -115,11 +116,12 @@
 				return;
 			}
 		}
+		if(!secondMail) {secondMail = "";}
 		
 		const profileData = {
 				method: 'POST',
 				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({nick, pw1, prosrc})
+				body: JSON.stringify({nick, pw1, prosrc, secondMail})
 			};
 		
 		fetch("/user/updateUserProfile", profileData)
@@ -151,7 +153,8 @@
 						<input class="leftBtn" type="button" value="닉네임" style="margin-bottom: 5.5%;" />
 						<input class="leftBtn" type="button" value="비밀번호" style="margin-bottom: 5.5%;" />
 						<input class="leftBtn" type="button" value="비밀번호확인" style="margin-bottom: 55.5%;"/>
-						<input class="leftBtn" type="button" value="프로필이미지" style="margin-bottom: 15.5%;" />
+						<input class="leftBtn" type="button" value="프로필이미지" style="margin-bottom: 65.5%;" />
+						<input class="leftBtn" type="button" value="2차이메일" style="margin-bottom: 15.5%;" />
 					</div>
 					<div id="center_field" style="width:3%;"></div>
 					<div id="right_field">
@@ -173,6 +176,7 @@
 							<input type="file" name="fileUpload" id="fileUpload" style="display: none;" accept="image/*"/>
 							<input type="button" id="fileTxt" style="width: 30% !important; margin-top: 40%;" value="사진변경" onclick="document.querySelector('#fileUpload').click()"/>
 						</div>
+						<input type="email" id="secondEmailField" placeholder="필수입력 값은 아닙니다. 하지만 아이디를 잊어버린 경우 정보를 찾을 때 사용됩니다." value="${userBean.second_mail}" />
 					</div>
 				</div>
 				<br />
