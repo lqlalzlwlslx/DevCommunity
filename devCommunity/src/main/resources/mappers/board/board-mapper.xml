@@ -15,8 +15,8 @@
 			modify_date,
 			board_stat_cd,
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
-			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_id,
-			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
+			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 		FROM dec_community_board
 		WHERE comm_idx = #{comm_idx}
 		ORDER BY reg_date DESC
@@ -92,10 +92,11 @@
 				modify_date,
 				board_stat_cd,
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
-				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_id,
-				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 			FROM dec_community_board
 			WHERE board_scope = 'A'
+			AND board_stat_cd = 'A'
 			
 			UNION
 			
@@ -109,16 +110,134 @@
 				modify_date,
 				board_stat_cd,
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
-				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_id,
-				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) AS writer_nick
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 			FROM dec_community_board
 			WHERE board_scope = 'C'
 			AND board_uidx = #{user_idx}
-			AND comm_idx IN (SELECT user_idx FROM dec_community_user cu WHERE comm_idx = cu.comm_idx)
+			AND board_stat_cd = 'A'
+			AND comm_idx IN (SELECT comm_idx FROM dec_community_user cu WHERE board_uidx = cu.user_idx)
 		) t
 		ORDER BY reg_date DESC
 	]]>
 	</select>
+	
+	<select id="selectOneBoardInfoAsIdx" parameterType="_int" resultType="board">
+	<![CDATA[
+		SELECT board_idx,
+			comm_idx,
+			board_uidx,
+			board_scope,
+			board_title,
+			board_content,
+			reg_date,
+			modify_date,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
+			(SELECT GROUP_CONCAT(org_file_name) FROM dec_community_board_file bf WHERE cb.board_idx = bf.board_idx) as real_file_name,
+			(SELECT GROUP_CONCAT(real_file_path) FROM dec_community_board_file bf WHERE cb.board_idx = bf.board_idx) as res_path
+		FROM dec_community_board cb
+		WHERE board_idx = #{value}
+	]]>
+	</select>
+	
+	<update id="updateBoardStatusAsFlag" parameterType="board">
+	<![CDATA[
+		UPDATE dec_community_board
+		SET board_stat_cd = #{board_stat_cd}
+		WHERE board_idx = #{board_idx}
+	]]>
+	</update>
+	
+	<update id="updateBoardAsIdx" parameterType="board">
+	<![CDATA[
+		UPDATE dec_community_board
+		SET board_scope = #{board_scope}, board_title = #{board_title}, board_content = #{board_content},
+			modify_date = NOW()
+		WHERE board_idx = #{board_idx}
+	]]>
+	</update>
+	
+	<select id="selectCommunityBoardFileListAsUpdated" parameterType="boardFile" resultType="boardFile">
+	<![CDATA[
+		SELECT file_idx,
+			board_idx,
+			org_file_name,
+			real_file_path
+		FROM dec_community_board_file
+		WHERE board_idx = #{board_idx}
+	]]>
+	</select>
+	
+	<select id="selectCommunityBoardFileListAsIdx" parameterType="board" resultType="boardFile">
+	<![CDATA[
+		SELECT file_idx,
+			board_idx,
+			org_file_name,
+			real_file_path
+		FROM dec_community_board_file
+		WHERE board_idx = #{board_idx}
+	]]>
+	</select>
+	
+	<insert id="insertCommunityBoardFileLog" parameterType="boardFile">
+	<![CDATA[
+		INSERT INTO dec_community_board_file_log(file_idx, board_idx, org_file_name, real_file_path)
+		VALUES(#{file_idx}, #{board_idx}, #{org_file_name}, #{real_file_path})
+	]]>
+	</insert>
+	
+	<delete id="deleteCommunityBoardFileAsIdx" parameterType="board">
+	<![CDATA[
+		DELETE FROM dec_community_board_file
+		WHERE board_idx = #{board_idx}
+	]]>
+	</delete>
+	
+	<insert id="insertCommunityBoardReply" parameterType="reply">
+	<![CDATA[
+		INSERT INTO dec_community_board_reply(board_idx, reply_uidx, reply_content, reg_date, modify_date, reply_stat_cd)
+		VALUES(#{board_idx}, #{reply_uidx}, #{reply_content}, NOW(), NULL, 'A')
+	]]>
+	</insert>
+	
+	<select id="selectBoardReplyListAsBidx" parameterType="_long" resultType="reply">
+	<![CDATA[
+		SELECT reply_idx,
+			board_idx,
+			reply_uidx,
+			(SELECT nick_name FROM dec_user WHERE user_idx = reply_uidx) as reply_nick,
+			(SELECT profile_src FROM dec_user WHERE user_idx = reply_uidx) as reply_res_path,
+			reply_content,
+			reg_date,
+			modify_date,
+			reply_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND reply_stat_cd = conf_type_cd) as reply_stat_nm
+		FROM dec_community_board_reply
+		WHERE board_idx = #{board_idx}
+		AND reply_stat_cd = 'A'
+		ORDER BY reg_date DESC
+	]]>
+	</select>
+	
+	<update id="updateCommunityBoardReplyContent" parameterType="reply">
+	<![CDATA[
+		UPDATE dec_community_board_reply
+		SET reply_content = #{reply_content}, modify_date = NOW()
+		WHERE reply_idx = #{reply_idx}
+	]]>
+	</update>
+	
+	<update id="deleteCommunityBoardReply" parameterType="reply">
+	<![CDATA[
+		UPDATE dec_community_board_reply
+		SET reply_stat_cd = 'I'
+		WHERE reply_idx = #{reply_idx}
+	]]>
+	</update>
+	
+	
 
 
 

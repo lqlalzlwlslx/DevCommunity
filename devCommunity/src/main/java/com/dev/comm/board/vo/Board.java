@@ -23,6 +23,9 @@ public class Board {
 	private String writer_id;
 	private String writer_nick;
 	
+	private String real_file_name;
+	private String res_path;
+	
 	public long getBoard_idx() {
 		return board_idx;
 	}
@@ -101,13 +104,27 @@ public class Board {
 	public void setWriter_nick(String writer_nick) {
 		this.writer_nick = writer_nick;
 	}
+	
+	public String getReal_file_name() {
+		return real_file_name;
+	}
+	public void setReal_file_name(String real_file_name) {
+		this.real_file_name = real_file_name;
+	}
+	public String getRes_path() {
+		return res_path;
+	}
+	public void setRes_path(String res_path) {
+		this.res_path = res_path;
+	}
 	@Override
 	public String toString() {
 		return "Board [board_idx=" + board_idx + ", comm_idx=" + comm_idx + ", board_uidx=" + board_uidx
 				+ ", board_scope=" + board_scope + ", board_title=" + board_title + ", board_content=" + board_content
 				+ ", reg_date=" + reg_date + ", modify_date=" + modify_date + ", board_stat_cd=" + board_stat_cd
 				+ ", board_stat_nm=" + board_stat_nm + ", replyList=" + replyList + ", writer_id=" + writer_id
-				+ ", writer_nick=" + writer_nick + "]";
+				+ ", writer_nick=" + writer_nick + ", real_file_name=" + real_file_name + ", res_path=" + res_path
+				+ "]";
 	}
 
 }

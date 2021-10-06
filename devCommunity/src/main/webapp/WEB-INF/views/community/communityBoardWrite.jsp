@@ -363,7 +363,9 @@
             
             callbacks: {	//여기 부분이 이미지를 첨부하는 부분
 				onImageUpload : function(files) {
-					uploadSummernoteImageFile(files[0],this);
+					for(var i = 0; i < files.length; i++){
+						uploadSummernoteImageFile(files[i],this);
+					}
 				},
 				onPaste: function (e) {
 					var clipboardData = e.originalEvent.clipboardData;
@@ -401,7 +403,7 @@
 				ul.appendChild(li);
 				containerDiv.appendChild(ul);
 				
-				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="480" height="auto"/></li>');
+				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="40%;" height="auto"/></li>');
 
 			});
 			

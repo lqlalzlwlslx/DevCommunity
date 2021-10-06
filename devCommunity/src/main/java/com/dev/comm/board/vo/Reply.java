@@ -14,6 +14,8 @@ public class Reply {
 	private String modify_date;
 	private String reply_stat_cd;
 	private String reply_stat_nm;
+	
+	private String reply_res_path;
 	public int getReply_idx() {
 		return reply_idx;
 	}
@@ -68,14 +70,19 @@ public class Reply {
 	public void setReply_stat_nm(String reply_stat_nm) {
 		this.reply_stat_nm = reply_stat_nm;
 	}
+	public String getReply_res_path() {
+		return reply_res_path;
+	}
+	public void setReply_res_path(String reply_res_path) {
+		this.reply_res_path = reply_res_path;
+	}
 	@Override
 	public String toString() {
 		return "Reply [reply_idx=" + reply_idx + ", board_idx=" + board_idx + ", reply_uidx=" + reply_uidx
 				+ ", reply_nick=" + reply_nick + ", reply_content=" + reply_content + ", reg_date=" + reg_date
 				+ ", modify_date=" + modify_date + ", reply_stat_cd=" + reply_stat_cd + ", reply_stat_nm="
-				+ reply_stat_nm + "]";
+				+ reply_stat_nm + ", reply_res_path=" + reply_res_path + "]";
 	}
-	
 	
 
 }

@@ -15,6 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,9 +27,12 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dev.comm.board.service.BoardService;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Reply;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.SessionManager;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Controller
 public class BoardController {
@@ -192,14 +196,21 @@ public class BoardController {
 		if(user == null) {
 			mp.addAttribute("result", false);
 		}
+		Board b = null;
 		
 		//Scope All BoardList.
 		//가입한 커뮤니티의 글들을 함께 불러와서 order by 해야하지 않나?
 		// user를 보내야 가입한 커뮤니티를 알 수 있을거같다...
 		//아니면 따로따로 가져와서 다른 ArrayList에 모두 add시켜볼까?
-		ArrayList<Board> userMainBoardList = boardService.selectUserMainBoardList(user);
+		ArrayList<Board> selectMainBoardList = boardService.selectUserMainBoardList(user);
+		ArrayList<Board> userMainBoardList = new ArrayList<Board>();
 		
-		if(userMainBoardList != null) {
+		if(selectMainBoardList != null) {
+			for(int i = 0; i < selectMainBoardList.size(); i++) {
+				b = selectMainBoardList.get(i);
+				b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+				userMainBoardList.add(b);
+			}
 			mp.addAttribute("result", true);
 			mp.addAttribute("ubList", userMainBoardList);
 		}
@@ -209,9 +220,259 @@ public class BoardController {
 	@RequestMapping(value = "/board/userBoardModify", method = RequestMethod.GET)
 	public ModelAndView userBoardModifyAsFlag(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		User usr = SessionManager.getUserSession(request);
-		// flag따라 수정 삭제 하는거 구현해야댐.
+		if(usr == null) {
+			model.addAttribute("result", false);
+			model.addAttribute("status", "SESSION_TIMEOUT");
+			return new ModelAndView("user/mainUser");
+		}
 		
+		// flag따라 수정 삭제 하는거 구현해야댐.
+		Board boardInfo = null;
+		try {
+			String flag = request.getParameter("flag");
+			int board_idx = Integer.parseInt(request.getParameter("idx"));
+			
+			boardInfo = boardService.selectOneBoardInfoAsIdx(board_idx);
+			if(boardInfo != null) {
+				if(flag.equals("modify")) {
+					model.addAttribute("boardInfo", boardInfo);
+					return new ModelAndView("community/communityBoardModify");
+				}
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("PASING ERORR.");
+		}
 		return new ModelAndView("community/communityBoardModify");
+	}
+	
+	@RequestMapping(value = "/board/userBoardDelete", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap userBoardDeleteAsFlag(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			mp.addAttribute("result", false);
+			mp.addAttribute("status", "SESSION_TIMEOUT");
+			return mp;
+		}
+		
+		Board boardInfo = null;
+		try {
+			String flag = request.getParameter("flag");
+			int board_idx = Integer.parseInt(request.getParameter("idx"));
+			
+			boardInfo = boardService.selectOneBoardInfoAsIdx(board_idx);
+			if(boardInfo != null) {
+				if(flag.equals("delete")) {
+					boardInfo.setBoard_stat_cd("I");
+					boardService.updateBoardStatusAsFlag(boardInfo);
+					mp.addAttribute("result", true);
+					mp.addAttribute("status", "DELETE");
+					return mp;
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("PARSING ERROR.");
+		}
+		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/board/modifyCommunityBoard", method = RequestMethod.POST)
+	@ResponseBody
+	public ModelAndView modifyCommunityBoard(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		//ModelMap mp = new ModelMap();
+		if(user == null) {
+			model.addAttribute("result", false);
+			model.addAttribute("status", "SESSION_TIMEOUT");
+			return new ModelAndView("community/communityBoardModify");
+		}
+		
+		try {
+			Board board = new Board();
+			BoardFile bf = null;
+			
+			int comm_idx = Integer.parseInt(request.getParameter("cidx"));
+			int user_idx = user.getUser_idx();
+			int board_idx = Integer.parseInt(request.getParameter("bidx"));
+			
+			String title = request.getParameter("board_title");
+			String content = request.getParameter("board_content");
+			String scope = request.getParameter("boardScopeValue");
+			
+			String[] realFileNames = request.getParameterValues("realFileName") == null ? null : request.getParameterValues("realFileName");
+			String[] resPathValues = request.getParameterValues("resPathValue") == null ? null : request.getParameterValues("resPathValue");
+			
+			if(content.startsWith("<p><br></p>") || content.endsWith("<p><br></p>")) {
+				content = content.replaceAll("<p><br></p>", "<br />");
+			}
+			
+			board.setBoard_idx(board_idx);
+			board.setComm_idx(comm_idx);
+			board.setBoard_uidx(user_idx);
+			board.setBoard_scope(scope);
+			board.setBoard_title(title);
+			board.setBoard_content(content);
+			
+			try {
+				boardService.updateBoardAsIdx(board);
+				
+				if(realFileNames != null) {
+					boolean[] brr = new boolean[realFileNames.length];
+					Arrays.fill(brr, false);
+					
+					for(int i = 0; i < resPathValues.length; i++) {
+						if(board.getBoard_content().indexOf(resPathValues[i]) > -1) brr[i] = true;
+					}
+					//기존 리스트를 가지고와서, log테이블에 insert후 기존내역 delete.
+					boardService.deleteCommunityBoardFileList(board);
+					
+					for(int i = 0; i < brr.length; i++) {
+						if(brr[i]) {
+							bf = new BoardFile();
+							bf.setBoard_idx(board.getBoard_idx());
+							bf.setOrg_file_name(realFileNames[i]);
+							bf.setReal_file_path(resPathValues[i]);
+
+							boardService.insertCommunityBoardFile(bf);
+						}
+					}
+				}
+				model.addAttribute("result", true);
+				model.addAttribute("status", "UPDATE");
+				model.addAttribute("msg", "성공했습니다.");
+				model.addAttribute("moveToValue", comm_idx);
+				return new ModelAndView("community/communityBoardModify");
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("UPDATE FAILED.");
+				model.addAttribute("result", false);
+				model.addAttribute("status", "UPDATE_FAILED");
+				return new ModelAndView("community/communityBoardModify");
+			}
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("PARSING ERROR.");
+		}
+		return new ModelAndView("error");
+	}
+	
+	@RequestMapping(value = "/board/reply/insertCommunityBoardReply", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String insertCommunityBoardReply(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			response.sendRedirect(request.getContextPath() + "/");
+		}
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int bidx = element.getAsJsonObject().get("bidx").getAsInt();
+			String replyContent = element.getAsJsonObject().get("replyContent").getAsString();
+			
+			Reply reply = new Reply();
+			reply.setBoard_idx(bidx);
+			reply.setReply_content(replyContent);
+			reply.setReply_uidx(user.getUser_idx());
+			
+			boardService.insertCommunityBoardReply(reply);
+			
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			return obj.toString();
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("REPLY VALUE PARSING ERROR.");
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "실패했습니다.");
+			return obj.toString();
+		}
+	}
+	
+	@RequestMapping(value = "/board/reply/updateCommunityBoardReplyContent", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String updateCommunityBoardReplyContent(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/");
+		
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		Reply modifyReply = new Reply();
+		
+		try {
+			String replyContent = element.getAsJsonObject().get("replyModifyContent").getAsString();
+			int ridx = element.getAsJsonObject().get("idx").getAsInt();
+			int uidx = user.getUser_idx();
+			modifyReply.setReply_uidx(uidx);
+			modifyReply.setReply_content(replyContent);
+			modifyReply.setReply_idx(ridx);
+			
+			try {
+				boardService.updateCommunityBoardReplyContent(modifyReply);
+				
+				obj.addProperty("result", true);
+				return obj.toString();
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("REPLY CONTENT UPDATE FAILED");
+				obj.addProperty("result", false);
+				obj.addProperty("status", "UPDATE_FAIL");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("PARSING ERROR.");
+			obj.addProperty("result", false);
+			obj.addProperty("status", "PARSING_FAIL");
+		}
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/board/reply/deleteCommunityBoardReply", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String deleteCommunityBoardReply(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/");
+		
+		JsonObject obj = new JsonObject();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int ridx = element.getAsJsonObject().get("idx").getAsInt();
+			Reply delReply = new Reply();
+			delReply.setReply_idx(ridx);
+			
+			try {
+				boardService.deleteCommunityBoardReply(delReply);
+				obj.addProperty("result", true);
+				return obj.toString();
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("DELETE FAILED");
+				obj.addProperty("result", false);
+				obj.addProperty("status", "DELETE_FAILED");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("REPLY IDX PARSING ERROR.");
+			obj.addProperty("result", false);
+			obj.addProperty("status", "PARSING_FAIL");
+		}
+		
+		return obj.toString();
 	}
 	
 	

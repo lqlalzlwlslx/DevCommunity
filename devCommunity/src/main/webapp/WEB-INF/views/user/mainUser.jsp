@@ -27,11 +27,32 @@
 		left: 50%; position: absolute; background: #b9f; transition: width 0.3s ease 0s, left 0.3s ease 0s; width: 0;
 	}
 	.communityList:hover:after { width: 100%; left: 0; }
+	.replyBtn:hover, .replyspan:hover{cursor: pointer !important;}
+	.replytb{padding:0; }
+	.replyModify:hover, .replyDelete:hover, .replyModifySave:hover, .replyCancel:hover{cursor:pointer;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
 		location.href="<%=request.getContextPath()%>/";
 	</c:if>
+	<c:if test="${not empty result}">
+		<c:if test="${result == false}">
+			<c:if test="${status == 'SESSION_TIMEOUT'}">
+				moveToMain();
+			</c:if>
+		</c:if>
+		<c:if test="${result == true}">
+			<c:if test="${status == 'UPDATE'}">
+				alert("성공했습니다.");
+				location.reload();
+			</c:if>
+			<c:if test="${status == 'DELETE'}">
+				alert("성공했습니다.");
+				location.href="<%=request.getContextPath()%>/";
+			</c:if>
+		</c:if>
+	</c:if>
+	
 	var communityPassed = false;
 	window.onload = function (){
 		const userInfoBtn = document.querySelector("#userMyPage");
@@ -175,7 +196,7 @@
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
-						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em; background-color:">관리</span></c:if></a></li>
+						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em;">관리</span></c:if></a></li>
 						</c:forEach>
 						</c:if>
 						<li id="communityFrm"><a href="#">커뮤니티 개설</a></li>
@@ -797,10 +818,14 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 			if(res.result){
 				let ubList = res.ubList;
 				const login_id = "${userBean.login_id}";
+				const user_idx = "${userBean.user_idx}";
 				let board_writerId;
+				let boardReplyList;
 				//console.log(ubList);
 				for(let i = 0; i < ubList.length; i++){
 					board_writerId = ubList[i].writer_id;
+					boardReplyList = ubList[i].replyList;
+					//console.log(boardReplyList);
 					output = "";
 					output += "<div class='container container-solid'>";
 					output += "<div class='content_inner' style='display:flex;'>";
@@ -817,9 +842,49 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					}
 					output += "</span>";
 					output += "</div>";
-					output += "</div>";
-					output += "<p>"+ubList[i].board_content+"</p>";
-					output += "</div>";
+					output += "</div>";	//content_inner.
+					output += "<div class='content-area'><p>"+ubList[i].board_content+"</p></div>";
+					output += "<div class='container_outer'>";
+					output += "<table><tbody><tr>";
+					output += "<td style='width:12%;'>댓글작성</td>";
+					output += "<td><textarea id='txtArea_"+ubList[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
+					output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+ubList[i].board_idx+");'><input type='button' value='등록' /></td>";
+					output += "</tr></tbody></table>";
+					output += "</div>"; // container_outer.
+					if(boardReplyList.length > 0){
+						//output += "<span class='replyspan'><a> ▼ 댓글보기 </a></span>";	// ▼  ▲
+						output += "<div class='replyDiv'>";
+						for(var j = 0; j < boardReplyList.length; j++){
+							output += "<table style='margin:0.25em;'><tbody>";
+							output += "<tr style='vertical-align:middle;'>";
+							if(boardReplyList[j].profile_src == null){
+								output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td>";
+							}else{
+								output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='"+boardReplyList[j].profile_src+"' style='width:25px; height:25px;' /></span></td>";
+							}
+							output += "<td rowspan='2' class='replytb' style='width:15%;'>"+boardReplyList[j].reply_nick+"</td>";
+							output += "<td rowspan='2' class='replytb' style='width:auto;'><span name='replys' id='replyContent_"+boardReplyList[j].reply_idx+"'>"+boardReplyList[j].reply_content+"</span></td>";
+							if(boardReplyList[j].reply_uidx == user_idx){
+								output += "<td align='center' class='replytb replyModify' name='replyModis' id='replyModify_"+boardReplyList[j].reply_idx+"' style='width:7%;' onclick='replyModify("+boardReplyList[j].reply_idx+");'><span><a>수정</a></span></td>";
+								output += "<td align='center' class='replytb replyModifySave' name='replyModiSaves' id='replyModifySave_"+boardReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyModifySave("+boardReplyList[j].reply_idx+");'><span><a>저장</a></span></td>";
+								output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+boardReplyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+boardReplyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
+								output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+boardReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+boardReplyList[j].reply_idx+");'><span><a>취소</a></span></td>";
+							}
+							output += "</tr>"
+							if(boardReplyList[j].modify_date == null){
+								boardReplyList[j].reg_date = boardReplyList[j].reg_date.substring(2, boardReplyList[j].reg_date.lastIndexOf(":"));
+								output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+boardReplyList[j].reg_date+"</span></td></tr>";
+							}else{
+								boardReplyList[j].modify_date = boardReplyList[j].modify_date.substring(2, boardReplyList[j].modify_date.lastIndexOf(":"));
+								output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+boardReplyList[j].modify_date+"</span></td></tr>";
+							}
+							output += "</tbody></table>";
+						}
+						output += "</div>";
+					}else{
+						output += "<div><span> * 작성된 댓글이 없습니다. </span></div>";
+					}
+					output += "</div><br />";
 					contentArea.innerHTML += output;
 				}
 			}
@@ -828,13 +893,141 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 		let boardFlag;
 		function modifyBoard(idx){
 			boardFlag = "modify";
-			fetch("/board/userModifyBoard.do?flag="+boardFlag+"&idx="+idx);
-			
+			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&idx="+idx;
 		}
 		
 		function deleteBoard(idx){
-			boardFlag = "delete";
-			fetch("/board/userModifyBoard.do?flag="+boardFlag+"&idx="+idx);
+			if(confirm("게시글을 삭제하시겠습니까?")){
+				boardFlag = "delete";
+				location.href="<%=request.getContextPath()%>/board/userBoardDelete.do?flag="+boardFlag+"&idx="+idx;
+			}
+		}
+		
+		function replyInsert(bidx){
+			var txtAreas = document.getElementsByName("replyTxtArea");
+			var replyContent;
+			var tmp;
+			for(var i = 0; i < txtAreas.length; i++){
+				tmp = txtAreas[i].id.substring(txtAreas[i].id.indexOf("_")+1);
+				if(bidx == tmp){
+					replyContent = txtAreas[i].value;
+					break;
+				}
+			}
+			const replyInsertData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({bidx, replyContent})
+			};
+			
+			fetch("/board/reply/insertCommunityBoardReply.do", replyInsertData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result){
+						location.reload();
+					}else{
+						alert(data.msg);
+					}
+				});
+			
+		}
+		
+		var retmp;
+		var value;
+		var replys;
+		var modiBtns;
+		var modiSaveBtns;
+		var delBtns;
+		var canBtns;
+		var modiTxtAreas;
+		function replyModify(idx){
+			replys = document.getElementsByName("replys");
+			modiBtns = document.getElementsByName("replyModis");
+			modiSaveBtns = document.getElementsByName("replyModiSaves");
+			delBtns = document.getElementsByName("replyDels");
+			canBtns = document.getElementsByName("replyCans");
+			for(var i = 0; i < replys.length; i++){
+				retmp = replys[i].id.substring(replys[i].id.indexOf("_")+1);
+				if(idx == retmp){
+					value = replys[i].innerHTML;
+					replys[i].innerHTML = "<textarea id='replyModifyTxtArea_"+idx+"' name='replyModifyTxtAreas' style='resize:none; max-height:5em; max-width:90%; overflow:hidden;'>"+value+"</textarea>";
+					modiBtns[i].style.display = "none";
+					modiSaveBtns[i].style.display = "";
+					delBtns[i].style.display = "none";
+					canBtns[i].style.display = "";
+					break;
+				}
+			}
+		}
+		
+		function replyModifySave(idx){
+			let replyModifyContent;
+			modiTxtAreas = document.getElementsByName("replyModifyTxtAreas");
+			for(var i = 0; i < modiTxtAreas.length; i++){
+				retmp = modiTxtAreas[i].id.substring(modiTxtAreas[i].id.indexOf("_")+1);
+				if(idx == retmp){
+					replyModifyContent = modiTxtAreas[i].value;
+				}
+			}
+			const replyModifyData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({idx, replyModifyContent})
+			};
+			
+			fetch("/board/reply/updateCommunityBoardReplyContent.do", replyModifyData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result){
+						location.reload();
+					}else{
+						alert("실패했습니다.");
+					}
+				});
+		}
+		
+		function replyCancel(idx){
+			replys = document.getElementsByName("replys");
+			modiBtns = document.getElementsByName("replyModis");
+			modiSaveBtns = document.getElementsByName("replyModiSaves");
+			delBtns = document.getElementsByName("replyDels");
+			canBtns = document.getElementsByName("replyCans");
+			for(var i = 0; i < replys.length; i++){
+				retmp = replys[i].id.substring(replys[i].id.indexOf("_")+1);
+				if(idx == retmp){
+					value = replys[i].innerHTML;
+					if(value.indexOf("<textarea") > -1){
+						value = value.substring(value.indexOf(">")+1, value.indexOf("</textarea>"));
+					}
+					replys[i].innerHTML = value;
+					modiBtns[i].style.display = "";
+					modiSaveBtns[i].style.display = "none";
+					delBtns[i].style.display = "";
+					canBtns[i].style.display = "none";
+					break;
+				}
+			}
+		}
+		
+		function replyDelete(idx){
+			if(confirm("삭제하시겠습니까?")){
+				//삭제 처리 fetch..
+				const replyDelData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({idx})
+				};
+				
+				fetch("/board/reply/deleteCommunityBoardReply.do",replyDelData)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result){
+							location.reload();
+						}else{
+							alert("실패했습니다.");
+						}
+					});
+			}
 		}
 		
 	</script>

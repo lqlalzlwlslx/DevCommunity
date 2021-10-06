@@ -3,6 +3,7 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
+
 <style>
 	#loginbtn:hover{pointer-events: none !important;}
 	div.image.main{
@@ -18,7 +19,7 @@
 	span.image.avatar{width:150px !important;}
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
-	input[type="radio"] + label{padding-right:2em !important;}
+	input[type="radio"] + label{padding-right:1em !important;}
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
 	.signUpCommunity:hover{cursor:pointer;}
@@ -29,7 +30,8 @@
 	.communityList:hover:after { width: 100%; left: 0; }
 	.communitySearchTd:hover{cursor:pointer;}
 	.communitySearchTd{padding: 0.25em 0.25em;}
-	.replyBtn:hover{cursor: pointer !important;}
+	.boardLeft{width:5em;}
+	p{margin: 0;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
@@ -37,18 +39,27 @@
 	</c:if>
 	
 	<c:if test="${not empty result}">
-		<c:if test="${result == false}">
-			<c:if test="${status == 'SESSION_TIMEOUT'}">
-				moveToMain();
+		<c:if test="${result == true}">
+			<c:if test="${status == 'UPDATE'}">
+				alert("성공했습니다.");
+				top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx=${moveToValue}";
 			</c:if>
 		</c:if>
-		<c:if test="${result == true}">
-			<c:if test="${status == 'DELETE'}">
-				alert("성공했습니다.");
-				location.reload();
+		
+		<c:if test="${result == false}">
+			<c:if test="${not empty msg}">
+				alert("${msg}");
+			</c:if>
+			<c:if test="${status == 'SESSION_TIMEOUT'}">
+				alert("세션이 만료되어 메인페이지로 이동합니다.");
+				moveToMain();
+			</c:if>
+			<c:if test="${status == 'UPDATE_FAILED'}">
+				alert("실패했습니다.");
 			</c:if>
 		</c:if>
 	</c:if>
+	
 	var communityPassed = false;
 	window.onload = function (){
 		const userInfoBtn = document.querySelector("#userMyPage");
@@ -171,9 +182,6 @@
 					<h1 id="logo"><span id="loginbtn">${userBean.nick_name} 님</span></h1><br />
 					<div style="display:flex;" align="center">
 					<p></p>
-						<!-- <div style="width:35%;" align="right"><a href="#" onclick="signUp();">회원가입</a></div>
-						<div style="width:2%;"></div>
-						<div style="width:60%;"><a href="#">아이디/비밀번호 찾기</a></div> -->
 					</div>
 					</c:if>
 				</header>
@@ -198,17 +206,6 @@
 					</ul>
 				</nav>
 				</c:if>
-				<!-- 
-				<footer>
-					<ul class="icons">
-						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
-						<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
-					</ul>
-				</footer>
-				 -->
 			</section>
 
 		<!-- Wrapper -->
@@ -217,21 +214,9 @@
 				<!-- Main -->
 					<div id="main">
 
-						<!-- One -->
 							<section id="one">
 								<div class="image main" data-position="center">
-									<!-- <img src="/resources/images/banner.jpg" alt="" /> -->
 									<div style="width:10%;"></div>
-									<!-- <c:if test="${not empty ucList}">
-									<div style="width:20%; margin:auto;">
-									<select id="searchScopeTxt">
-											<option value="0">=== 선택 ===</option>
-											<c:forEach items="${ucList}" var="ucList" varStatus="status">
-												<option value="${ucList.comm_name}">${ucList.comm_name}</option>
-											</c:forEach>
-										</select>
-									</div>
-									</c:if> -->
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
 										<select id="searchTxt">
@@ -251,95 +236,45 @@
 										<input type="button" id="searchBtn" onclick="searchCondition();" value="검색" />
 									</div>
 								</div>
-								<div class="container">
-									<header class="major">
-										<c:if test="${not empty commInfo}">
-											<h2 style="margin: 0; font-size:3.5em;">${commInfo.comm_name}</h2>
-											<table>
-												<tbody>
-													<tr>
-														<td class="communitySearchTd">
-															<select id="communitySearchScope">
-																<option value="0">=== 선택 ===</option>
-																<option value="content">내용</option>
-																<option value="title">제목</option>
-																<option value="writer">작성자</option>
-															</select>
-														</td>
-														<td class="communitySearchTd">
-															<input type="text" id="communitySearchTxt" />
-														</td>
-														<td class="communitySearchTd">
-															<input type="button" value="검색" />
-														</td>
-														<td class="communitySearchTd">
-															<span style="float: right;" onclick="moveToMain();"><a href="#">메인페이지로 이동</a></span><br />
-															<span style="float: right;" onclick="communityBoardWrite();"><a href="#">글쓰기</a></span>
-															<span style="display:none;"><button type="button" id="boardModalBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#boardModal"></button></span>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-											
-											
-										</c:if>
-										<c:if test="${empty commInfo}"><h2>잉여잉여잉여잉여</h2></c:if>
-									</header>	
+								
+								<div class="container" style="width:60em;">
+								<br /><br />
+								<form name="boardFrm" id="boardFrm" action="<%=request.getContextPath()%>/board/modifyCommunityBoard.do" method="POST" enctype="multipart/form-data" >
+								<input type="hidden" name="cidx" value="${boardInfo.comm_idx}" />
+								<input type="hidden" name="bidx" value="${boardInfo.board_idx}" />
+								<div id="loadValues"></div>
+								<table>
+									<tbody>
+										<tr>
+											<td class="boardLeft">제목</td>
+											<td><input type="text" id="board_title" name="board_title" value="${boardInfo.board_title}"/></td>
+										</tr>
+										<tr>
+											<td class="boardLeft">내용</td>
+											<td><textarea name="board_content" id="summernote" rows="8" cols="90" style="resize:none;">${boardInfo.board_content}</textarea></td>
+										</tr>
+										<tr style="vertical-align:middle;">
+											<td>공개범위</td>
+											<td>
+												<span style="float:left;">
+												<input type="radio" name="boardScope" id="boardScopeA" value="A" <c:if test="${boardInfo.board_scope == 'A'}">checked</c:if> /><label for="boardScopeA">전체공개</label>
+												<input type="radio" name="boardScope" id="boardScopeC" value="C" <c:if test="${boardInfo.board_scope == 'C'}">checked</c:if>/><label for="boardScopeC">커뮤니티공개</label>
+												<input type="hidden" name="boardScopeValue" value="" />
+												</span>
+												<span style="float:right;">
+													<input onclick="cancelBoard();" type="button" value="취소"/>&nbsp;&nbsp;&nbsp;&nbsp;
+													<input onclick="modifyCommunityBoard();" type="button" value="저장" />
+												</span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								</form>
 								</div>
 							</section>
-							
-							<c:if test="${not empty cbList}">
-								<c:forEach items="${cbList}" var="cbList" varStatus="status">
-									<div class="main-content-area">	
-										<div class="container container-solid">
-											<div class='content_inner' style='display:flex;'>	
-												<div style="width:23em;">
-													<header class="major">
-														<h2>${cbList.board_title}</h2>
-													</header>
-												</div>
-												<div style="width:22em;">
-													<span style="float:right;">작성일 &nbsp;&nbsp;${cbList.reg_date}<br />작성자 &nbsp;&nbsp;${cbList.writer_nick}
-														<c:if test="${cbList.board_uidx == userBean.user_idx}">
-														<span onclick="modifyBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
-														<span onclick="deleteBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
-														</c:if>
-													</span>
-												</div>
-											</div>
-											<div class='content-area'><p>${cbList.board_content}</p></div>
-											<div class='container_outer'>
-												<table><tbody><tr>
-												<td style='width:12%;'>댓글작성</td>
-												<td><textarea style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>
-												<td class='replyBtn' style='width:15%;'><input type='button' value='등록' onclick='replyInsert("${cbList.board_idx}");'/></td>
-												</tr></tbody></table>
-											</div>
-										</div>
-									</div>
-								</c:forEach>
-							</c:if>
-							<c:if test="${empty cbList}">
-							<div class="main-content-area">	
-								<div class="container container-solid">
-									<header class="major">
-										<h2>등록된 게시글이 없습니다.</h2>
-									<!-- <p>DevCoummunity에 오신 것을 환영합니다.<br />
-									이용 수칙에 관해 잘 읽어주시고 활동해주세요.</p> -->
-									</header>
-								</div>
-							</div>
-							</c:if>
+
 					</div>
 
-				<!-- Footer -->
-				<section id="footer" >
-					<div class="container" align="center">
-						<ul class="copyright">
-							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-						</ul>
-					</div>
-				</section>
 			</div>
 
 
@@ -408,6 +343,96 @@
 	</div>
 </div>
 
+
+
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded", function(){
+		$("#summernote").summernote({
+			height: 350,
+			lang: "ko-KR",
+			disableResizeEditor: true,
+			focus: true,
+			codemirror: {
+			      mode: 'text/html',
+			      htmlMode: true,
+			      lineNumbers: true,
+			      theme: 'monokai'
+			},
+            callbacks: {	//여기 부분이 이미지를 첨부하는 부분
+				onImageUpload : function(files) {
+					uploadSummernoteImageFile(files[0],this);
+				},
+				onPaste: function (e) {
+					var clipboardData = e.originalEvent.clipboardData;
+					if (clipboardData && clipboardData.items && clipboardData.items.length) {
+						var item = clipboardData.items[0];
+						if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+							e.preventDefault();
+						}
+					}
+				}
+			}
+		});
+		
+		var containerDiv = document.getElementById("loadValues");
+		var ul = document.createElement("ul");
+		var li = document.createElement("li");
+		li.style.display = "none";
+		
+		<c:if test="${not empty boardInfo.real_file_name}">
+			var fileNames = "${boardInfo.real_file_name}";
+			var resPaths = "${boardInfo.res_path}";
+			
+			var fns = fileNames.split(",");
+			var rps = resPaths.split(",");
+			
+			for(var i = 0; i < fns.length; i++){
+				li.innerHTML += '<input type="hidden" name="realFileName" value="'+fns[i]+'" />';
+				li.innerHTML += '<input type="hidden" name="resPathValue" value="'+rps[i]+'" />';
+				ul.appendChild(li);
+				containerDiv.appendChild(ul);
+			}
+		</c:if>
+		
+		function uploadSummernoteImageFile(file, editor) { // 이미지 파일 업로드..
+			const frmData = new FormData();
+			frmData.append("file", file);
+			
+			fetch("<%=request.getContextPath()%>/user/board/tempImagesUpload",{
+				method: "POST",
+				body: frmData
+			}).then(res => res.json())
+			.then((data) => {
+				if(data.result == false){
+					top.location.href = "<%=request.getContextPath()%>/";
+				}
+				$(editor).summernote('insertImage', data.url);
+				
+				li.innerHTML += '<input type="hidden" name="realFileName" value="'+data.realFileName+'" />';
+				li.innerHTML += '<input type="hidden" name="resPathValue" value="'+data.url+'" />';
+				ul.appendChild(li);
+				containerDiv.appendChild(ul);
+				
+				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="480" height="auto"/></li>');
+
+			});
+			
+			
+			/* $.ajax({
+				data : data,
+				type : "POST",
+				url : "/board/uploadSummernoteImageFile",
+				contentType : false,
+				processData : false,
+				success : function(data) {
+	            	//항상 업로드된 파일의 url이 있어야 한다.
+					$(editor).summernote('insertImage', data.url);
+				}
+			}); */
+		}
+	});
+</script>
+
 	<script type="text/javascript">
 		function uSearch(list){
 			var contentArea = document.querySelector(".main-content-area");
@@ -452,26 +477,33 @@
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
 		
-		function communityBoardWrite(){
-			location.href="<%=request.getContextPath()%>/user/communityBoard.do?cidx="+${commInfo.comm_idx};
+		function cancelBoard(){
+			location.href = history.back();
 		}
 		
-		let boardFlag;
-		function modifyBoard(idx){
-			boardFlag = "modify";
-			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&idx="+idx;
-		}
-		
-		function deleteBoard(idx){
-			if(confirm("게시글을 삭제하시겠습니까?")){
-				boardFlag = "delete";
-				location.href="<%=request.getContextPath()%>/board/userBoardDelete.do?flag="+boardFlag+"&idx="+idx;
+		function modifyCommunityBoard(){ // 제목, 내용 등 검증하고 submit 처리 해야함.
+			const frm = document.boardFrm;
+			const title = frm.board_title.value;
+			const content = frm.board_content.value;
+			
+			const cidx = frm.cidx.value;
+			const bidx = frm.bidx.value;
+			
+			var scopes = document.getElementsByName("boardScope");
+			for(var i = 0; i < scopes.length; i++){
+				if(scopes[i].checked == true){
+					frm.boardScopeValue.value = scopes[i].value;
+				}
 			}
+			
+			if(!title) { alert("제목을 입력해주세요."); document.querySelector("#board_title").focus(); return; }
+			if(!content) { alert("내용을 입력해주세요."); document.querySelector("#summernote").focus(); return; }
+			
+			frm.submit();
+			
 		}
 		
-		function replyInsert(bidx){
-			console.log('hi?');
-		}
+		
 	</script>
 
 

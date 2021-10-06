@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.dev.comm.board.dao.BoardDao;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Reply;
 import com.dev.comm.user.vo.User;
 
 @Service
@@ -39,6 +40,46 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public ArrayList<Board> selectUserMainBoardList(User user) throws Exception {
 		return boardDao.selectUserMainBoardList(user);
+	}
+
+	@Override
+	public Board selectOneBoardInfoAsIdx(int value) throws Exception {
+		return boardDao.selectOneBoardInfoAsIdx(value);
+	}
+
+	@Override
+	public void updateBoardStatusAsFlag(Board boardInfo) throws Exception {
+		boardDao.updateBoardStatusAsFlag(boardInfo);
+	}
+
+	@Override
+	public void updateBoardAsIdx(Board board) throws Exception {
+		boardDao.updateBoardAsIdx(board);
+	}
+
+	@Override
+	public void deleteCommunityBoardFileList(Board board) throws Exception {
+		boardDao.deleteCommunityBoardFileList(board);
+	}
+
+	@Override
+	public void insertCommunityBoardReply(Reply reply) throws Exception {
+		boardDao.insertCommunityBoardReply(reply);
+	}
+
+	@Override
+	public ArrayList<Reply> selectBoardReplyListAsBidx(long board_idx) throws Exception {
+		return boardDao.selectBoardReplyListAsBidx(board_idx);
+	}
+
+	@Override
+	public void updateCommunityBoardReplyContent(Reply modifyReply) throws Exception {
+		boardDao.updateCommunityBoardReplyContent(modifyReply);
+	}
+
+	@Override
+	public void deleteCommunityBoardReply(Reply delReply) throws Exception {
+		boardDao.deleteCommunityBoardReply(delReply);
 	}
 
 }

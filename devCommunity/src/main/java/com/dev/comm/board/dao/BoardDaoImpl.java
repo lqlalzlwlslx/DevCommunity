@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Reply;
 import com.dev.comm.user.vo.User;
 
 @Repository
@@ -57,5 +58,56 @@ public class BoardDaoImpl implements BoardDao {
 	public ArrayList<Board> selectUserMainBoardList(User user) throws Exception {
 		return (ArrayList)sqlSession.selectList("board.selectUserMainBoardList", user);
 	}
+
+	@Override
+	public Board selectOneBoardInfoAsIdx(int value) throws Exception {
+		return sqlSession.selectOne("board.selectOneBoardInfoAsIdx", value);
+	}
+
+	@Override
+	public void updateBoardStatusAsFlag(Board boardInfo) throws Exception {
+		sqlSession.update("board.updateBoardStatusAsFlag", boardInfo);
+	}
+
+	@Override
+	public void updateBoardAsIdx(Board board) throws Exception {
+		sqlSession.update("board.updateBoardAsIdx", board);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void deleteCommunityBoardFileList(Board board) throws Exception {
+		BoardFile bf = null;
+		ArrayList<BoardFile> bfList = (ArrayList)sqlSession.selectList("board.selectCommunityBoardFileListAsIdx", board);
+		if(bfList != null && bfList.size() > 0) {
+			for(int i = 0; i < bfList.size(); i++) {
+				bf = bfList.get(i);
+				sqlSession.insert("board.insertCommunityBoardFileLog", bf);
+			}
+		}
+		sqlSession.delete("board.deleteCommunityBoardFileAsIdx", board);
+	}
+
+	@Override
+	public void insertCommunityBoardReply(Reply reply) throws Exception {
+		sqlSession.insert("board.insertCommunityBoardReply", reply);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Reply> selectBoardReplyListAsBidx(long board_idx) throws Exception {
+		return (ArrayList)sqlSession.selectList("board.selectBoardReplyListAsBidx", board_idx);
+	}
+
+	@Override
+	public void updateCommunityBoardReplyContent(Reply modifyReply) throws Exception {
+		sqlSession.update("board.updateCommunityBoardReplyContent", modifyReply);
+	}
+
+	@Override
+	public void deleteCommunityBoardReply(Reply delReply) throws Exception {
+		sqlSession.update("board.deleteCommunityBoardReply", delReply);
+	}
+
 
 }
