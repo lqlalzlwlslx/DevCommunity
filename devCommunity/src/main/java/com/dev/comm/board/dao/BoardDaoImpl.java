@@ -1,6 +1,7 @@
 package com.dev.comm.board.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,65 @@ public class BoardDaoImpl implements BoardDao {
 	@Override
 	public void deleteCommunityBoardReply(Reply delReply) throws Exception {
 		sqlSession.update("board.deleteCommunityBoardReply", delReply);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectBoardListAsSearchValues(String condition, String value) throws Exception {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("condition", condition);
+		map.put("value", value);
+		return (ArrayList)sqlSession.selectList("board.selectBoardListAsSearchValues", map);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectUserBoardListAsSearchValues(String condition, String value) throws Exception {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("condition", condition);
+		map.put("value",  value);
+		return (ArrayList)sqlSession.selectList("board.selectUserBoardListAsSearchValues", map);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectCommunityBoardListAsSearchValue(int cidx, String condition, String searchValue)
+			throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("cidx", cidx);
+		map.put("condition", condition);
+		map.put("value", searchValue);
+		return (ArrayList)sqlSession.selectList("board.selectCommunityBoardListAsSearchValue", map);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectAdminBoardManageAsBlockList() throws Exception {
+		ArrayList<Board> bList = new ArrayList<Board>();
+		ArrayList<Board> temp = (ArrayList) sqlSession.selectList("board.selectAdminBoardManageAsBlockList");
+		if(temp != null && temp.size() > 0) {
+			for(int i = 0; i < temp.size(); i++) {
+				Board board = temp.get(i);
+				board.setReplyList((ArrayList)sqlSession.selectList("board.selectBoardReplyListAsBidx", board.getBoard_idx()));
+				bList.add(board);
+			}
+		}
+		return bList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectAdminBoardManageAsActiveList() throws Exception {
+		ArrayList<Board> aList = new ArrayList<Board>();
+		ArrayList<Board> temp = (ArrayList) sqlSession.selectList("board.selectAdminBoardManageAsActiveList");
+		if(temp != null && temp.size() > 0) {
+			for(int i = 0; i < temp.size(); i++) {
+				Board board = temp.get(i);
+				board.setReplyList((ArrayList)sqlSession.selectList("board.selectBoardReplyListAsBidx", board.getBoard_idx()));
+				aList.add(board);
+			}
+		}
+		return aList;
 	}
 
 

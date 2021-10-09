@@ -63,6 +63,8 @@
 			location.href="<%=request.getContextPath()%>/console/mainAdmin.do";
 		} else if(value == "userStatus"){ //userStatus.
 			location.href="<%=request.getContextPath()%>/console/user/userManage.do";
+		} else if(value == "boardStatus"){
+			location.href="<%=request.getContextPath()%>/console/board/boardManage.do";
 		} else { //communityManage.
 			//current page. nothing.
 		}
@@ -94,6 +96,7 @@
 			<ul>
 				<li><a href="#" id="communityStatus" onclick="pageHandler(this.id);">커뮤니티 현황</a></li>
 				<li><a href="#" id="userStatus" onclick="pageHandler(this.id);">회원정보 관리</a></li>
+				<li><a href="#" id="boardStatus" onclick="pageHandler(this.id);">게시글 관리</a></li>
 				<li><a href="#" id="communityManage" onclick="pageHandler(this.id);">커뮤니티 관리</a></li>
 				<li><a href="#" onclick="logout();">로그아웃</a></li>
 			</ul>

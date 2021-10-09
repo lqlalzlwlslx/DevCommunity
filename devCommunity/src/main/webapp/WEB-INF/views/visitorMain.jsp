@@ -14,6 +14,8 @@
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4; vertical-align:middle;}
 	p{margin:0 0 1em 0;}
+	table>tbody>tr>td{vertical-align:middle;}
+	.replytb{padding:0; }
 </style>
 
 </head>
@@ -91,9 +93,9 @@
 									<div style="width:25%; margin:auto;">
 										<select id="searchTxt">
 											<option value="0">=== 선택 ===</option>
-											<option value="content">내용</option>
-											<option value="title">제목</option>
-											<option value="writer">작성자</option>
+											<option value="board_content">내용</option>
+											<option value="board_title">제목</option>
+											<option value="board_writer">작성자</option>
 											<option value="community">커뮤니티</option>
 										</select>
 									</div>
@@ -158,7 +160,11 @@
 				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
 				output += "<td>개설일</td><td>"+reqDate+"</td>";
 				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
-				output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
+				if(list[i].comm_intro == null){
+					output += "<tr><td>소개글</td><td colspan='3'> * 소개글이 없습니다. </td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
+				}else{
+					output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
+				}
 				output += "</tbody></table>";
 				output += "</div>";
 				contentArea.innerHTML += output;
@@ -173,8 +179,14 @@
 				.then(res => res.json())
 				.then((data) => {
 					let vbList = data.vbList;
+					let vbReplyList;
 					if(data.result == true){
+						const login_id = "${userBean.login_id}";
+						const user_idx = "${userBean.user_idx}";
+						let board_writerId;
+						let boardReplyList;
 						for(let i = 0; i < vbList.length; i++){
+							vbReplyList = vbList[i].replyList;
 							output = "";
 							output += "<div class='container container-solid'>";
 							output += "<div class='content_inner' style='display:flex;'>";
@@ -186,9 +198,51 @@
 							output += "<div style='width:23em;'>";
 							output += "<span style='float:right;'>작성일 &nbsp;&nbsp;"+vbList[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+vbList[i].writer_nick+"</span>";
 							output += "</div>";
-							output += "</div>";
-							output += "<p>"+vbList[i].board_content+"</p>";
-							output += "</div>";
+							output += "</div>";	//content_inner.
+							output += "<div class='content-area'><p>"+vbList[i].board_content+"</p></div>";
+							output += "<div class='container_outer'>";
+							output += "<table><tbody><tr>";
+							output += "<td style='width:12%'>댓글작성</td>";
+							output += "<td><textArea id='txtArea_"+vbList[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
+							output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+vbList[i].board_idx+");'><input type='button' value='등록' /></td>";
+							output += "</tr></tboby></table>";
+							output += "</div>";	//container_outer.
+							if(vbReplyList.length > 0){
+								output += "<div class='replyDiv'>";
+								for(let j = 0; j < vbReplyList.length; j++){
+									output += "<table style='margin:0.25em;'><tbody>";
+									output += "<tr style='vertical-align:middle;'>";
+									if(vbReplyList[j].reply_res_path == null){
+										output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td>";
+									}else{
+										output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='"+vbReplyList[j].reply_res_path+"' style='width:25px; height:25px;' /></span></td>";
+									}
+									output += "<td rowspan='2' class='replytb' style='width:15%;'>"+vbReplyList[j].reply_nick+"</td>";
+									output += "<td rowspan='2' class='replytb' style='width:auto;'><span name='replys' id='replyContent_"+vbReplyList[j].reply_idx+"'>"+vbReplyList[j].reply_content+"</span></td>";
+									if(vbReplyList[j].reply_uidx == user_idx){
+										output += "<td align='center' class='replytb replyModify' name='replyModis' id='replyModify_"+vbReplyList[j].reply_idx+"' style='width:7%;' onclick='replyModify("+vbReplyList[j].reply_idx+");'><span><a>수정</a></span></td>";
+										output += "<td align='center' class='replytb replyModifySave' name='replyModiSaves' id='replyModifySave_"+vbReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyModifySave("+vbReplyList[j].reply_idx+");'><span><a>저장</a></span></td>";
+										output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+vbReplyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+vbReplyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
+										output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+vbReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+vbReplyList[j].reply_idx+");'><span><a>취소</a></span></td>";
+									}else{
+										output += "<td align='center' class='replytb' name='replyblank' id='replyblank_"+vbReplyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+										output += "<td align='center' class='replytb' name='replyblank2' id='replyblanks_"+vbReplyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+									}
+									output += "</tr>"
+									if(vbReplyList[j].modify_date == null){
+										vbReplyList[j].reg_date = vbReplyList[j].reg_date.substring(2, vbReplyList[j].reg_date.lastIndexOf(":"));
+										output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+vbReplyList[j].reg_date+"</span></td></tr>";
+									}else{
+										vbReplyList[j].modify_date = vbReplyList[j].modify_date.substring(2, vbReplyList[j].modify_date.lastIndexOf(":"));
+										output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+vbReplyList[j].modify_date+"</span></td></tr>";
+									}
+									output += "</tbody></table>";
+								}
+								output += "</div>";
+							}else{
+								output += "<div><span> * 작성된 댓글이 없습니다. </span></div>";
+							}
+							output += "</div><br />";
 							contentArea.innerHTML += output;
 						}
 					}else{
@@ -201,6 +255,84 @@
 					}
 				});
 		}
+		
+		function vSearchBoard(list){
+			let contentArea = document.querySelector(".main-content-area");
+			contentArea.innerHTML = "";
+			let output = "";
+			const login_id = "${userBean.login_id}";
+			const user_idx = "${userBean.user_idx}";
+			let board_writerId;
+			let replyList;
+			for(let i = 0; i < list.length; i++){
+				replyList = list[i].replyList;
+				output = "";
+				output += "<div class='container container-solid'>";
+				output += "<div class='content_inner' style='display:flex;'>";
+				output += "<div style='width:22em;'>";
+				output += "<header class='major'>";
+				output += "<h2>"+list[i].board_title+"</h2>";
+				output += "</header>";
+				output += "</div>";
+				output += "<div style='width:23em;'>";
+				output += "<span style='float:right;'>작성일 &nbsp;&nbsp;"+list[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+list[i].writer_nick+"</span>";
+				output += "</div>";
+				output += "</div>";	//content_inner.
+				output += "<div class='content-area'><p>"+list[i].board_content+"</p></div>";
+				output += "<div class='container_outer'>";
+				output += "<table><tbody><tr>";
+				output += "<td style='width:12%'>댓글작성</td>";
+				output += "<td><textArea id='txtArea_"+list[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
+				output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+list[i].board_idx+");'><input type='button' value='등록' /></td>";
+				output += "</tr></tboby></table>";
+				output += "</div>";	//container_outer.
+				if(replyList.length > 0){
+					output += "<div class='replyDiv'>";
+					for(let j = 0; j < replyList.length; j++){
+						output += "<table style='margin:0.25em;'><tbody>";
+						output += "<tr style='vertical-align:middle;'>";
+						if(replyList[j].reply_res_path == null){
+							output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td>";
+						}else{
+							output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='"+replyList[j].reply_res_path+"' style='width:25px; height:25px;' /></span></td>";
+						}
+						output += "<td rowspan='2' class='replytb' style='width:15%;'>"+replyList[j].reply_nick+"</td>";
+						output += "<td rowspan='2' class='replytb' style='width:auto;'><span name='replys' id='replyContent_"+replyList[j].reply_idx+"'>"+replyList[j].reply_content+"</span></td>";
+						if(replyList[j].reply_uidx == user_idx){
+							output += "<td align='center' class='replytb replyModify' name='replyModis' id='replyModify_"+replyList[j].reply_idx+"' style='width:7%;' onclick='replyModify("+replyList[j].reply_idx+");'><span><a>수정</a></span></td>";
+							output += "<td align='center' class='replytb replyModifySave' name='replyModiSaves' id='replyModifySave_"+replyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyModifySave("+replyList[j].reply_idx+");'><span><a>저장</a></span></td>";
+							output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+replyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+replyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
+							output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+replyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+replyList[j].reply_idx+");'><span><a>취소</a></span></td>";
+						}else{
+							output += "<td align='center' class='replytb' name='replyblank' id='replyblank_"+replyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+							output += "<td align='center' class='replytb' name='replyblank2' id='replyblanks_"+replyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+						}
+						output += "</tr>"
+						if(replyList[j].modify_date == null){
+							replyList[j].reg_date = replyList[j].reg_date.substring(2, replyList[j].reg_date.lastIndexOf(":"));
+							output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].reg_date+"</span></td></tr>";
+						}else{
+							replyList[j].modify_date = replyList[j].modify_date.substring(2, replyList[j].modify_date.lastIndexOf(":"));
+							output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].modify_date+"</span></td></tr>";
+						}
+						output += "</tbody></table>";
+					}
+					output += "</div>";
+				}else{
+					output += "<div><span> * 작성된 댓글이 없습니다. </span></div>";
+				}
+				output += "</div><br />";
+				contentArea.innerHTML += output;
+			}
+		}
+		
+		function replyInsert(bidx){
+			<c:if test="${empty userBean}">
+				alert("로그인이 필요한 서비스입니다.");
+				return;
+			</c:if>
+		}
+		
 	</script>
 </body>
 </html>

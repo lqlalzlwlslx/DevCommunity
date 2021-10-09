@@ -207,17 +207,6 @@
 					</ul>
 				</nav>
 				</c:if>
-				<!-- 
-				<footer>
-					<ul class="icons">
-						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
-						<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
-					</ul>
-				</footer>
-				 -->
 			</section>
 
 		<!-- Wrapper -->
@@ -229,18 +218,7 @@
 						<!-- One -->
 							<section id="one">
 								<div class="image main" data-position="center">
-									<!-- <img src="/resources/images/banner.jpg" alt="" /> -->
 									<div style="width:10%;"></div>
-									<!-- <c:if test="${not empty ucList}">
-									<div style="width:20%; margin:auto;">
-									<select id="searchScopeTxt">
-											<option value="0">=== 선택 ===</option>
-											<c:forEach items="${ucList}" var="ucList" varStatus="status">
-												<option value="${ucList.comm_name}">${ucList.comm_name}</option>
-											</c:forEach>
-										</select>
-									</div>
-									</c:if> -->
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
 										<select id="searchTxt">
@@ -297,35 +275,35 @@
 								</div>
 							</section>
 							
-							<c:if test="${not empty cbList}">
-								<c:forEach items="${cbList}" var="cbList" varStatus="status">
+							<c:if test="${not empty datalist}">
+								<c:forEach items="${datalist}" var="slist" varStatus="status">
 									<div class="main-content-area">	
 										<div class="container container-solid">
 											<div class='content_inner' style='display:flex;'>	
 												<div style="width:23em;">
 													<header class="major">
-														<h2>${cbList.board_title}</h2>
+														<h2>${slist.board_title}</h2>
 													</header>
 												</div>
 												<div style="width:22em;">
-													<span style="float:right;">작성일 &nbsp;&nbsp;${cbList.reg_date}<br />작성자 &nbsp;&nbsp;${cbList.writer_nick}
-														<c:if test="${cbList.board_uidx == userBean.user_idx}">
-														<span onclick="modifyBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
-														<span onclick="deleteBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
+													<span style="float:right;">작성일 &nbsp;&nbsp;${slist.reg_date}<br />작성자 &nbsp;&nbsp;${slist.writer_nick}
+														<c:if test="${slist.board_uidx == userBean.user_idx}">
+														<span onclick="modifyBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
+														<span onclick="deleteBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
 														</c:if>
 													</span>
 												</div>
 											</div>
-											<div class='content-area'><p>${cbList.board_content}</p></div>
+											<div class='content-area'><p>${slist.board_content}</p></div>
 											<div class='container_outer'>
 												<table><tbody><tr>
 												<td style='width:12%;'>댓글작성</td>
-												<td><textarea id="textArea_${cbList.board_idx}" name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>
-												<td class='replyBtn' style='width:15%;'><input type='button' value='등록' onclick='replyInsert("${cbList.board_idx}");'/></td>
+												<td><textarea id="textArea_${slist.board_idx}" name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>
+												<td class='replyBtn' style='width:15%;'><input type='button' value='등록' onclick='replyInsert("${slist.board_idx}");'/></td>
 												</tr></tbody></table>
 											</div>
-											<c:if test="${not empty cbList.replyList}">
-												<c:forEach items="${cbList.replyList}" var="cbReplyList" varStatus="replyStatus">
+											<c:if test="${not empty slist.replyList}">
+												<c:forEach items="${slist.replyList}" var="cbReplyList" varStatus="replyStatus">
 													<div class='replyDiv'>
 														<table style="margin:0.25em;">
 															<tbody>
@@ -356,14 +334,14 @@
 													</div>
 												</c:forEach>
 											</c:if>
-											<c:if test="${empty cbList.replyList}">
+											<c:if test="${empty slist.replyList}">
 												<div><span> * 작성된 댓글이 없습니다. </span></div>
 											</c:if>
 										</div><br />
 									</div>
 								</c:forEach>
 							</c:if>
-							<c:if test="${empty cbList}">
+							<c:if test="${empty datalist}">
 							<div class="main-content-area2">	
 								<div class="container container-solid">
 									<header class="major">

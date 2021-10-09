@@ -90,8 +90,16 @@ public class BoardController {
 		Board board = new Board();
 		board.setBoard_scope("A");
 		
-		ArrayList<Board> visitBoardList = boardService.selectVisitorMainBoardList(board);
-		if(visitBoardList != null) {
+		Board b = null;
+		
+		ArrayList<Board> vBoardList = boardService.selectVisitorMainBoardList(board);
+		ArrayList<Board> visitBoardList = new ArrayList<Board>();
+		if(vBoardList != null) {
+			for(int i = 0; i < vBoardList.size(); i++) {
+				b = vBoardList.get(i);
+				b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+				visitBoardList.add(b);
+			}
 			mp.addAttribute("result", true);
 			mp.addAttribute("vbList", visitBoardList);
 			return mp;
@@ -473,6 +481,30 @@ public class BoardController {
 		}
 		
 		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/console/board/boardManage", method = RequestMethod.GET)
+	public ModelAndView adminBoardManage(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		log.info("=== adminBoardManage ===");
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) {
+			return new ModelAndView("redirect:/console/logout.do");
+		}
+		
+		ArrayList<Board> blockBoardList = null;
+		ArrayList<Board> activeBoardList = null;
+		
+		try {
+			blockBoardList = boardService.selectAdminBoardManageAsBlockList();
+			activeBoardList = boardService.selectAdminBoardManageAsActiveList();
+			
+			model.addAttribute("bbList", blockBoardList);
+			model.addAttribute("abList", activeBoardList);
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("DATA LOAD FAIL");
+		}
+		return new ModelAndView("console/boardManage");
 	}
 	
 	

@@ -46,8 +46,8 @@ public class CommunityController {
 	@Autowired
 	private UserService userService;
 	
-//	@Autowired
-//	private BoardService boardService;
+	@Autowired
+	private BoardService boardService;
 	
 	private String mailFrom;
 	private String mailTo;
@@ -264,7 +264,7 @@ public class CommunityController {
 	
 	@RequestMapping(value = "/community/searchAsValues", method = RequestMethod.GET)
 	@ResponseBody
-	public ModelMap communitySearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ModelMap visitSearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelMap mp = new ModelMap();
 		
 		String condition = request.getParameter("condition");
@@ -276,8 +276,8 @@ public class CommunityController {
 		ArrayList<Community> searchValues = null;
 		ArrayList<Board> boardValues = null;
 		
-		ArrayList<Community> resultValue = null;
-		User user = SessionManager.getUserSession(request);
+		ArrayList<Community> searchCommunityResult = null;
+		ArrayList<Board> searchBoardResult = null;
 		
 		if(condition.equals("community")) { //커뮤니티 검색. condition: community
 			searchValues = new ArrayList<Community>();
@@ -285,7 +285,78 @@ public class CommunityController {
 			
 			if(searchValues.size() > 0) { //여기서 토탈 회원 가공하는 걸 추가적으로 하면 될듯...
 				Community comm = null;
-				resultValue = new ArrayList<Community>();
+				searchCommunityResult = new ArrayList<Community>();
+				for(int i = 0; i < searchValues.size(); i++) {
+					comm = searchValues.get(i);
+					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
+					comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
+//					if(user != null){
+//						comm.setComm_user_stat_cd(communityService.selectCommunityUserStatusAsIdx(comm.getComm_idx(), user.getUser_idx()));
+//					}
+					searchCommunityResult.add(comm);
+				}
+				mp.addAttribute("result", true);
+				mp.addAttribute("status", "COMMUNITY_SEARCH");
+				mp.addAttribute("searchDataList", searchCommunityResult);
+			}else { //결과가 없을때.
+				mp.addAttribute("result", false);
+				mp.addAttribute("msg", "검색 결과가 없습니다.");
+			}
+			
+		}else { // 글 검색. condition: content or title, writer 
+			boardValues = new ArrayList<Board>();
+			boardValues = boardService.selectBoardListAsSearchValues(condition, searchTxt);
+			
+			if(boardValues.size() > 0) {
+				Board b = null;
+				searchBoardResult = new ArrayList<Board>();
+				for(int i = 0; i < boardValues.size(); i++) {
+					b = boardValues.get(i);
+					b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+					
+					searchBoardResult.add(b);
+				}
+				mp.addAttribute("result", true);
+				mp.addAttribute("status", "BOARD_SEARCH");
+				mp.addAttribute("searchDataList", searchBoardResult);
+			}else {
+				mp.addAttribute("result", false);
+				mp.addAttribute("msg", "검색 결과가 없습니다.");
+			}
+		}
+		
+		return mp;
+	}
+	
+	@RequestMapping(value = "/community/userSearchAsValues", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelMap userSearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		ModelMap mp = new ModelMap();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			mp.addAttribute("result", false);
+			mp.addAttribute("status", "SESSION_TIMEOUT");
+		}
+		
+		String condition = request.getParameter("condition");
+		String searchTxt = request.getParameter("searchValue");
+		
+		log.debug("condition: " + condition);
+		log.debug("searchValue: " + searchTxt);
+		
+		ArrayList<Community> searchValues = null;
+		ArrayList<Board> boardValues = null;
+		
+		ArrayList<Community> searchCommunityResult = null;
+		ArrayList<Board> searchBoardResult = null;
+		
+		if(condition.equals("community")) {
+			searchValues = new ArrayList<Community>();
+			searchValues = communityService.selectUserCommunityListAsSearchValues(searchTxt);
+			
+			if(searchValues.size() > 0) { //여기서 토탈 회원 가공하는 걸 추가적으로 하면 될듯...
+				Community comm = null;
+				searchCommunityResult = new ArrayList<Community>();
 				for(int i = 0; i < searchValues.size(); i++) {
 					comm = searchValues.get(i);
 					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
@@ -293,18 +364,34 @@ public class CommunityController {
 					if(user != null){
 						comm.setComm_user_stat_cd(communityService.selectCommunityUserStatusAsIdx(comm.getComm_idx(), user.getUser_idx()));
 					}
-					resultValue.add(comm);
+					searchCommunityResult.add(comm);
 				}
 				mp.addAttribute("result", true);
-				mp.addAttribute("searchDataList", resultValue);
-			}else {//결과가 없을때.
+				mp.addAttribute("status", "COMMUNITY_SEARCH");
+				mp.addAttribute("searchDataList", searchCommunityResult);
+			}else { //결과가 없을때.
 				mp.addAttribute("result", false);
 				mp.addAttribute("msg", "검색 결과가 없습니다.");
 			}
-			
-		}else { // 글 검색. condition: content or title, writer 
+		}else { // boardList..
 			boardValues = new ArrayList<Board>();
-			//boardValues = boardService.selectBoardListAsSearchValues(searchTxt);
+			boardValues = boardService.selectUserBoardListAsSearchValues(condition, searchTxt);
+			
+			if(boardValues.size() > 0) {
+				Board b = null;
+				searchBoardResult = new ArrayList<Board>();
+				for(int i = 0; i < boardValues.size(); i++) {
+					b = boardValues.get(i);
+					b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+					searchBoardResult.add(b);
+				}
+				mp.addAttribute("result", true);
+				mp.addAttribute("status", "BOARD_SEARCH");
+				mp.addAttribute("searchDataList", searchBoardResult);
+			}else {
+				mp.addAttribute("result", false);
+				mp.addAttribute("msg", "검색 결과가 없습니다.");
+			}
 		}
 		
 		return mp;
@@ -344,6 +431,70 @@ public class CommunityController {
 			log.error("IDX VALUE PARSING ERROR !!");
 		}
 		return mp;
+	}
+	
+	@RequestMapping(value = "/community/communityBoardSearchAsValues", method = RequestMethod.GET)
+//	@ResponseBody
+	public ModelAndView communityBoardSearchAsValues(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			model.addAttribute("result", false);
+			model.addAttribute("status", "SESSION_TIMEOUT");
+			model.addAttribute("msg", "세션이 만료되었습니다.");
+			return new ModelAndView("error");
+		}
+		
+		try {
+			int cidx = Integer.parseInt(request.getParameter("cidx"));
+			String condition = request.getParameter("condition");
+			String searchValue = request.getParameter("searchValue");
+			
+			ArrayList<Board> cBoardList = null;
+			ArrayList<Board> communityBoardResult = null;
+			ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+			
+			try {
+				cBoardList = new ArrayList<Board>();
+				cBoardList = boardService.selectCommunityBoardListAsSearchValue(cidx, condition, searchValue);
+				
+				if(cBoardList.size() > 0) {
+					Board b = null;
+					communityBoardResult = new ArrayList<Board>();
+					
+					for(int i = 0; i < cBoardList.size(); i++) {
+						b = cBoardList.get(i);
+						b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+						communityBoardResult.add(b);
+					}
+					
+					Community commInfo = communityService.selectCommunityDetailView((int)cidx);
+					
+					model.addAttribute("result", true);
+					model.addAttribute("status", "BOARD_SEARCH");
+					model.addAttribute("datalist", communityBoardResult);
+					if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+					if(commInfo != null) model.addAttribute("commInfo", commInfo);
+					
+				}else {
+					model.addAttribute("result", false);
+					model.addAttribute("msg", "검색 결과가 없습니다.");
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("SELECT LIST LOAD FAILED");
+			}
+			
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY BOARD SEARCH VALUES PARSING ERROR.");
+			model.addAttribute("result", false);
+			model.addAttribute("status", "PARSING_FAIL");
+			model.addAttribute("msg", "처리에 실패했습니다.");
+			return new ModelAndView("error");
+		}
+		return new ModelAndView("community/communityBoardSearch");
 	}
 	
 	/*

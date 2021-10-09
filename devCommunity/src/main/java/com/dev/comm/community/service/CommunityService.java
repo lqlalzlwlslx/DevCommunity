@@ -38,4 +38,6 @@ public interface CommunityService {
 
 	String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception;
 
+	ArrayList<Community> selectUserCommunityListAsSearchValues(String searchTxt) throws Exception;
+
 }

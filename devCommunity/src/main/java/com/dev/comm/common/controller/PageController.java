@@ -87,7 +87,7 @@ public class PageController {
 			log.error(e);
 		}
 		
-		return new ModelAndView("redirect:/");
+		return new ModelAndView("redirect:/console");
 	}
 	
 	@RequestMapping(value = "/findPasswd", method = RequestMethod.GET)

@@ -86,5 +86,10 @@ public class CommunityServiceImpl implements CommunityService {
 	public String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception {
 		return communityDao.selectCommunityUserStatusAsIdx(comm_idx, user_idx);
 	}
+
+	@Override
+	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception {
+		return communityDao.selectUserCommunityListAsSearchValues(value);
+	}
 	
 }

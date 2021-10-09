@@ -26,81 +26,35 @@
 	</c:if>
 	
 	window.onload = function(){
-		getCommunityStatus();
-	}
-	
-	function getCommunityStatus(){
-		fetch("/console/community/communityStatus")
-			.then(res => res.json())
-			.then(data => {
-				drawPieChart(data);
-				drawBarChart(data);
-			});
-	}
-	
-	function drawPieChart(res){
-		//console.log(res);
-		var pieElement = document.querySelector(".flex_item1");
-		pieElement.innerHTML = "<canvas id='pieChart' style='width: 100%; height: 100%; margin: auto; padding: auto;'></canvas>";
 		
-		new Chart(document.getElementById("pieChart"), {
-			type: 'pie',
-			data: {
-				labels: ["Java", "C", "Python", "Database"],
-				datasets: [{
-					//label: ["JAVA"],
-					backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9"],
-					data: [res.comm_type_j, res.comm_type_c, res.comm_type_p, res.comm_type_d]
-				}]
-			},
-			options: {
-				legend: {display: true },
-				title: {
-					display: true,
-					text: "커뮤니티 카테고리별 개설 현황"
-				},
-				//maintainAspectRatio: false,
-				responsive: false
-			}
-		});
-			
 	}
+	<c:if test="${not empty bbList}">
+		console.log("bbList is not empty");
+		<c:forEach items="${bbList}" var="bblist" varStatus="bbStatus">
+			console.log("${bblist}");
+		</c:forEach>
+	</c:if>
+	<c:if test="${empty bbList}">
+		console.log("bbList is empty");
+	</c:if>
 	
-	function drawBarChart(res){
-		//console.log(res);
-		var barElement = document.querySelector(".flex_item2");
-		barElement.innerHTML = "<canvas id='barChart' style='width: 100%; height: 100%; margin: auto; padding: auto;'></canvas>";
-		
-		new Chart(document.getElementById("barChart"),{
-			type: 'bar',
-			data: {
-				labels: ["Java", "C", "Python", "Database"],
-				datasets: [{
-					//label: "커뮤니티 카테고리 별 개설 현황",
-					backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9"],
-					data: [res.comm_type_j, res.comm_type_c, res.comm_type_p, res.comm_type_d]
-				}]
-			},
-			options: {
-				legend: {display: false },
-				title: {
-					display: true,
-					text: "커뮤니티 카테고리별 개설 현황"
-				},
-				//maintainAspectRatio: false,
-				responsive: false
-			}
-			
-		});
-	}
+	<c:if test="${not empty abList}">
+		console.log("abList is not empty");
+		<c:forEach items="${abList}" var="ablist" varStatus="abStatus">
+			console.log("${ablist}");
+		</c:forEach>
+	</c:if>
+	
+	
+	
 	
 	function pageHandler(value){
 		if(value == "communityStatus"){ //communityStatus.
-			//current page. nothing.
+			location.href="<%=request.getContextPath()%>/console/mainAdmin.do";
 		} else if(value == "userStatus"){ //userStatus.
 			location.href="<%=request.getContextPath()%>/console/user/userManage.do";
 		} else if(value == "boardStatus"){
-			location.href="<%=request.getContextPath()%>/console/board/boardManage.do";
+			// current page. nothing.
 		} else { //communityManage.
 			location.href="<%=request.getContextPath()%>/console/community/communityManage.do";
 		}
@@ -131,7 +85,7 @@
 			<ul>
 				<li><a href="#" id="communityStatus" onclick="pageHandler(this.id);">커뮤니티 현황</a></li>
 				<li><a href="#" id="userStatus" onclick="pageHandler(this.id);">회원정보 관리</a></li>
-				<li><a href="#" id="boardStatus" onclick="pageHandler(this.id);">게시글 관리</a></li>
+				<li><a href="#" id="boardStatus" onclick="paheHandler(this.id);">게시글 관리</a></li>
 				<li><a href="#" id="communityManage" onclick="pageHandler(this.id);">커뮤니티 관리</a></li>
 				<li><a href="#" onclick="logout();">로그아웃</a></li>
 			</ul>
@@ -142,8 +96,21 @@
 	<div id="wrapper">
 		<!-- <h2>&nbsp;&nbsp;Developer Community</h2> -->
 		<div id="main" class="flex_container" align="center">
-			<div class="flex_item1"></div>
-			<div class="flex_item2"></div>
+			<div class="flex_item1">
+				<div align="left">
+					<span><b><font size="5">&nbsp; * &nbsp;차단게시글 현황</font></b></span><hr style="margin:1em;">
+						<c:if test="${empty bbList}">
+							현재 차단게시글이 없습니다.
+						</c:if>
+						<c:if test="${not empty bbList}">
+						<table>
+						</table>
+				</c:if>
+				</div>
+			</div>
+			<div class="flex_item2">
+			
+			</div>
 		</div>
 	
 	</div>

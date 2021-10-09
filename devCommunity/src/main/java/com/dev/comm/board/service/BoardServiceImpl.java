@@ -82,4 +82,30 @@ public class BoardServiceImpl implements BoardService {
 		boardDao.deleteCommunityBoardReply(delReply);
 	}
 
+	@Override
+	public ArrayList<Board> selectBoardListAsSearchValues(String condition, String searchTxt) throws Exception {
+		return boardDao.selectBoardListAsSearchValues(condition, searchTxt);
+	}
+
+	@Override
+	public ArrayList<Board> selectUserBoardListAsSearchValues(String condition, String searchTxt) throws Exception {
+		return boardDao.selectUserBoardListAsSearchValues(condition, searchTxt);
+	}
+
+	@Override
+	public ArrayList<Board> selectCommunityBoardListAsSearchValue(int cidx, String condition, String searchValue)
+			throws Exception {
+		return boardDao.selectCommunityBoardListAsSearchValue(cidx, condition, searchValue);
+	}
+
+	@Override
+	public ArrayList<Board> selectAdminBoardManageAsBlockList() throws Exception {
+		return boardDao.selectAdminBoardManageAsBlockList();
+	}
+
+	@Override
+	public ArrayList<Board> selectAdminBoardManageAsActiveList() throws Exception {
+		return boardDao.selectAdminBoardManageAsActiveList();
+	}
+
 }

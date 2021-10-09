@@ -9,12 +9,13 @@
 			comm_idx,
 			board_uidx,
 			board_scope,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
 			board_title,
 			board_content,
 			reg_date,
 			modify_date,
 			board_stat_cd,
-			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 		FROM dec_community_board
@@ -29,16 +30,18 @@
 			comm_idx,
 			board_uidx,
 			board_scope,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
 			board_title,
 			board_content,
 			reg_date,
 			modify_date,
 			board_stat_cd,
-			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 		FROM dec_community_board
 		WHERE board_scope = #{board_scope}
+		AND board_stat_cd = 'A'
 		ORDER BY reg_date DESC
 	]]>
 	</select>
@@ -61,6 +64,7 @@
 			comm_idx,
 			board_uidx,
 			board_scope,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
 			board_title,
 			board_content,
 			reg_date,
@@ -86,12 +90,13 @@
 				comm_idx,
 				board_uidx,
 				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
 				board_title,
 				board_content,
 				reg_date,
 				modify_date,
 				board_stat_cd,
-				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 			FROM dec_community_board
@@ -104,12 +109,13 @@
 				comm_idx,
 				board_uidx,
 				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
 				board_title,
 				board_content,
 				reg_date,
 				modify_date,
 				board_stat_cd,
-				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 			FROM dec_community_board
@@ -128,11 +134,12 @@
 			comm_idx,
 			board_uidx,
 			board_scope,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
 			board_title,
 			board_content,
 			reg_date,
 			modify_date,
-			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
 			(SELECT GROUP_CONCAT(org_file_name) FROM dec_community_board_file bf WHERE cb.board_idx = bf.board_idx) as real_file_name,
@@ -236,6 +243,177 @@
 		WHERE reply_idx = #{reply_idx}
 	]]>
 	</update>
+	
+	<select id="selectBoardListAsSearchValues" parameterType="java.lang.String" resultType="board">
+	<![CDATA[
+		SELECT b.board_idx,
+			b.comm_idx,
+			b.board_uidx,
+			b.board_scope,
+			b.board_title,
+			b.board_content,
+			b.board_stat_cd,
+			b.board_stat_nm,
+			b.writer_id,
+			b.writer_nick,
+			b.reg_date,
+			b.modify_date
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
+				reg_date,
+				modify_date
+			FROM dec_community_board ) b
+		WHERE b.board_scope = 'A'
+		AND b.board_stat_cd = 'A'
+	]]>
+	<if test='condition.equals("board_title") and condition != null and condition != ""'>
+		<![CDATA[AND b.board_title LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<if test='condition.equals("board_content") and condition != null and condition != ""'>
+		<![CDATA[AND b.board_content LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<if test='condition.equals("board_writer") and condition != null and condition != ""'>
+		<![CDATA[AND b.writer_nick LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<![CDATA[ORDER BY reg_date DESC]]>
+	</select>
+	
+	<select id="selectUserBoardListAsSearchValues" parameterType="java.util.HashMap" resultType="board">
+	<![CDATA[
+		SELECT b.board_idx,
+			b.comm_idx,
+			b.board_uidx,
+			b.board_scope,
+			b.board_title,
+			b.board_content,
+			b.board_stat_cd,
+			b.board_stat_nm,
+			b.writer_id,
+			b.writer_nick,
+			b.reg_date,
+			b.modify_date
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
+				reg_date,
+				modify_date
+			FROM dec_community_board ) b
+		WHERE b.board_scope IN ('A', 'C')
+		AND b.comm_idx IN (SELECT comm_idx FROM dec_community_user cu WHERE b.board_uidx = cu.user_idx)
+		AND b.board_stat_cd = 'A'
+	]]>
+	<if test='condition.equals("board_title") and condition != null and condition != ""'>
+		<![CDATA[AND b.board_title LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<if test='condition.equals("board_content") and condition != null and condition != ""'>
+		<![CDATA[AND b.board_content LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<if test='condition.equals("board_writer") and condition != null and condition != ""'>
+		<![CDATA[AND b.writer_nick LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<![CDATA[ORDER BY reg_date DESC]]>
+	</select>
+	
+	<select id="selectCommunityBoardListAsSearchValue" parameterType="java.util.HashMap" resultType="board">
+	<![CDATA[
+		SELECT b.*
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
+				reg_date,
+				modify_date
+			FROM dec_community_board
+			WHERE comm_idx = #{cidx}
+			AND board_stat_cd = 'A'
+		) b
+		WHERE 1 = 1
+	]]>
+	<if test='condition.equals("inCommunity_title") and condition != null and condition != ""'>
+		<![CDATA[AND board_title LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<if test='condition.equals("inCommunity_content") and condition != null and condition != ""'>
+		<![CDATA[AND board_content LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	<if test='condition.equals("inCommunity_writer") and condition != null and condition != ""'>
+		<![CDATA[AND writer_nick LIKE CONCAT('%', #{value}, '%')]]>
+	</if>
+	</select>
+	
+	<select id="selectAdminBoardManageAsBlockList" resultType="board">
+	<![CDATA[
+		SELECT t.*
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_nick,
+				reg_date,
+				modify_date
+			FROM dec_community_board b
+			WHERE b.board_stat_cd = 'B'
+		) t
+	]]>
+	</select>
+	
+	<select id="selectAdminBoardManageAsActiveList" resultType="board">
+	<![CDATA[
+		SELECT t.*
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_nick,
+				reg_date,
+				modify_date
+			FROM dec_community_board b
+			WHERE b.board_stat_cd <> 'B'
+		) t
+	]]>
+	</select>
 	
 	
 

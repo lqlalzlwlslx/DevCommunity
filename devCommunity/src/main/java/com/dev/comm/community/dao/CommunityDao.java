@@ -37,4 +37,6 @@ public interface CommunityDao {
 
 	String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception;
 
+	ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception;
+
 }

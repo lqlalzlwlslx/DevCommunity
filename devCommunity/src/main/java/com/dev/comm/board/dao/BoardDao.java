@@ -37,4 +37,14 @@ public interface BoardDao {
 
 	void deleteCommunityBoardReply(Reply delReply) throws Exception;
 
+	ArrayList<Board> selectBoardListAsSearchValues(String condition, String searchTxt) throws Exception;
+
+	ArrayList<Board> selectUserBoardListAsSearchValues(String condition, String searchTxt) throws Exception;
+
+	ArrayList<Board> selectCommunityBoardListAsSearchValue(int cidx, String condition, String searchValue) throws Exception;
+
+	ArrayList<Board> selectAdminBoardManageAsBlockList() throws Exception;
+
+	ArrayList<Board> selectAdminBoardManageAsActiveList() throws Exception;
+
 }

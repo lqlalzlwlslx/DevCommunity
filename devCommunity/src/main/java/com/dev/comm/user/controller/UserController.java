@@ -738,19 +738,21 @@ public class UserController {
 		try {
 			long comm_idx = Long.parseLong(request.getParameter("idx"));
 			if(comm_idx > 0) {
-				ArrayList<Board> communityBoardList = boardService.selectAllCommunityBoardList(comm_idx);	//커뮤니티 전체 글 조회
+				ArrayList<Board> cBoardList = boardService.selectAllCommunityBoardList(comm_idx);	//커뮤니티 전체 글 조회
 				ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
 				Community commInfo = communityService.selectCommunityDetailView((int)comm_idx);
 				
-				if(communityBoardList != null) {
-					for(int i = 0; i < communityBoardList.size(); i++) {
+				ArrayList<Board> communityBoardList = new ArrayList<Board>();
+				
+				if(cBoardList != null) {
+					for(int i = 0; i < cBoardList.size(); i++) {
 						Board b = new Board();
-						b = communityBoardList.get(i);
-						b.setBoard_content(b.getBoard_content().replaceAll("<p>", ""));
-						b.setBoard_content(b.getBoard_content().replaceAll("</p>", "<br />"));
+						b = cBoardList.get(i);
+						b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+						communityBoardList.add(b);
 					}
 				}
-				if(communityBoardList != null) model.addAttribute("cbList", communityBoardList);
+				if(communityBoardList.size() > 0) model.addAttribute("cbList", communityBoardList);
 				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
 				if(commInfo != null) model.addAttribute("commInfo", commInfo);
 				

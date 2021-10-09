@@ -10,8 +10,10 @@ public class Board {
 	
 	private long board_idx;
 	private long comm_idx;
+	private String comm_name;
 	private int board_uidx;
 	private String board_scope;
+	private String board_scope_nm;
 	private String board_title;
 	private String board_content;
 	private String reg_date;
@@ -38,6 +40,12 @@ public class Board {
 	public void setComm_idx(long comm_idx) {
 		this.comm_idx = comm_idx;
 	}
+	public String getComm_name() {
+		return comm_name;
+	}
+	public void setComm_name(String comm_name) {
+		this.comm_name = comm_name;
+	}
 	public int getBoard_uidx() {
 		return board_uidx;
 	}
@@ -49,6 +57,12 @@ public class Board {
 	}
 	public void setBoard_scope(String board_scope) {
 		this.board_scope = board_scope;
+	}
+	public String getBoard_scope_nm() {
+		return board_scope_nm;
+	}
+	public void setBoard_scope_nm(String board_scope_nm) {
+		this.board_scope_nm = board_scope_nm;
 	}
 	public String getBoard_title() {
 		return board_title;

@@ -40,7 +40,9 @@
 	
 	<c:if test="${not empty result}">
 		<c:if test="${result == true}">
-			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx=${moveToValue}";
+			<c:if test="${not empty moveToValue}">
+				top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx=${moveToValue}";
+			</c:if>
 		</c:if>
 		
 		<c:if test="${result == false}">

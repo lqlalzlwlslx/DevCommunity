@@ -68,6 +68,7 @@ public class CommunityDaoImpl implements CommunityDao {
 		sqlSession.insert("community.insertCommunityManager", map);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<Community> selectCommunityListAsSearchValues(String value) throws Exception {
 		return (ArrayList) sqlSession.selectList("community.selectCommunityListAsSearchValues", value);
@@ -99,6 +100,12 @@ public class CommunityDaoImpl implements CommunityDao {
 		map.put("comm_idx", (int)comm_idx);
 		map.put("user_idx", user_idx);
 		return sqlSession.selectOne("community.selectCommunityUserStatusAsIdx", map);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception {
+		return (ArrayList)sqlSession.selectList("community.selectUserCommunityListAsSearchValues", value);
 	}
 	
 }

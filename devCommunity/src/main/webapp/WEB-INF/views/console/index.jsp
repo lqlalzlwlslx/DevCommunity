@@ -45,9 +45,11 @@
 				if(data.result == true) { top.location.href="<%=request.getContextPath()%>/console/mainAdmin.do"; }
 				else { alert("실패했습니다."); return;}
 			});
-		
-		
 	}
+	
+	document.addEventListener("DOMContentLoaded", function(){
+		document.querySelector("#id_field").focus();
+	});
 </script>
 <body>
 	

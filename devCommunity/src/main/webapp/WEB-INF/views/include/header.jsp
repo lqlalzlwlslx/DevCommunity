@@ -59,22 +59,45 @@
 		if(condition == "0"){ alert("검색할 항목을 선택해주세요."); return; }
 		if(!searchValue){ alert("검색할 단어를 입력해주세요."); return; }
 		
-		fetch("/community/searchAsValues.do?condition="+condition+"&searchValue="+searchValue)
-			.then(res => res.json())
-			.then(data => drawSearchResult(data));
+		<c:if test="${empty userBean}">
+			fetch("/community/searchAsValues.do?condition="+condition+"&searchValue="+searchValue)
+				.then(res => res.json())
+				.then(data => drawSearchResult(data));
+		</c:if>
+		<c:if test="${not empty userBean}">
+			fetch("/community/userSearchAsValues.do?condition="+condition+"&searchValue="+searchValue)
+				.then(res => res.json())
+				.then(data => drawUserSearchResult(data));
+		</c:if>
 	}
 	
-	function drawSearchResult(data){
+	function drawSearchResult(data){ // empty userBean searchResult.
 		console.log(data);
 		if(data.result == true){
-			<c:if test="${empty userBean}">
+			if(data.status == "COMMUNITY_SEARCH"){ //커뮤니티 이름 검색 result.
 				vSearch(data.searchDataList);
-			</c:if>
-			<c:if test="${not empty userBean}">
-				uSearch(data.searchDataList);
-			</c:if>
+			}else if(data.status == "BOARD_SEARCH"){ // 제목, 내용, 작성자..
+				vSearchBoard(data.searchDataList);
+			}
 		}else{
 			alert('검색 결과가 없습니다.');
+		}
+	}
+	
+	function drawUserSearchResult(data){ // not empty userBeanSearchResult.
+		console.log(data);
+		if(data.result){
+			if(data.status == "COMMUNITY_SEARCH"){
+				uSearch(data.searchDataList);
+			}else{
+				uSearchBoard(data.searchDataList);
+			}
+		}else{
+			if(data.status == "SESSION_TIMEOUT"){
+				location.href="<%=request.getContextPath()%>/logout.do";
+			}else{
+				alert("검색 결과가 없습니다.");
+			}
 		}
 	}
 	
@@ -108,7 +131,12 @@
 	
 	
 	function logout(){
-		location.href="<%=request.getContextPath()%>/logout.do";
+		<c:if test="${not empty adminBean}">
+			location.href="<%=request.getContextPath()%>/console/logout.do";
+		</c:if>
+		<c:if test="${not empty userBean}">
+			location.href="<%=request.getContextPath()%>/logout.do";
+		</c:if>
 	}
 	
 	function moveToMain(){
