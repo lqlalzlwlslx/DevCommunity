@@ -140,11 +140,14 @@
 	}
 	
 	function moveToMain(){
-		top.location.href="<%=request.getContextPath()%>/";
+		<c:if test="${not empty userBean}">
+			location.href="<%=request.getContextPath()%>/user/mainUser.do";
+		</c:if>
+		location.href="<%=request.getContextPath()%>/";
 	}
 	
 	function findPasswd(){
-		top.location.href="<%=request.getContextPath()%>/findPasswd.do";
+		location.href="<%=request.getContextPath()%>/findPasswd.do";
 	}
 </script>
 	

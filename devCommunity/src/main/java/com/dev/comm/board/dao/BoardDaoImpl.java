@@ -169,5 +169,20 @@ public class BoardDaoImpl implements BoardDao {
 		return aList;
 	}
 
+	@Override
+	public void adminUpdateBlockBoardToReleaseAsIdx(Board b) throws Exception {
+		sqlSession.update("board.adminUpdateBlockBoardToReleaseAsIdx", b);
+	}
+
+	@Override
+	public void adminUpdateActiveBoardToBlockAsIdx(Board b) throws Exception {
+		sqlSession.update("board.adminUpdateActiveBoardToBlockAsIdx", b);
+	}
+
+	@Override
+	public void adminDeleteCommunityBoardAsIdx(Board board) throws Exception {
+		sqlSession.update("board.adminDeleteCommunityBoardAsIdx", board);
+	}
+
 
 }

@@ -47,4 +47,10 @@ public interface BoardDao {
 
 	ArrayList<Board> selectAdminBoardManageAsActiveList() throws Exception;
 
+	void adminUpdateBlockBoardToReleaseAsIdx(Board b) throws Exception;
+
+	void adminUpdateActiveBoardToBlockAsIdx(Board b) throws Exception;
+
+	void adminDeleteCommunityBoardAsIdx(Board board) throws Exception;
+
 }

@@ -225,16 +225,16 @@
 										output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+vbReplyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+vbReplyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
 										output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+vbReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+vbReplyList[j].reply_idx+");'><span><a>취소</a></span></td>";
 									}else{
-										output += "<td align='center' class='replytb' name='replyblank' id='replyblank_"+vbReplyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
-										output += "<td align='center' class='replytb' name='replyblank2' id='replyblanks_"+vbReplyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+										output += "<td colspan='2' align='center' class='replytb' name='replyblank' id='replyblank_"+vbReplyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+										output += "<td colspan='2' align='center' class='replytb' name='replyblank2' id='replyblanks_"+vbReplyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
 									}
 									output += "</tr>"
 									if(vbReplyList[j].modify_date == null){
 										vbReplyList[j].reg_date = vbReplyList[j].reg_date.substring(2, vbReplyList[j].reg_date.lastIndexOf(":"));
-										output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+vbReplyList[j].reg_date+"</span></td></tr>";
+										output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+vbReplyList[j].reg_date+"</span></td></tr>";
 									}else{
 										vbReplyList[j].modify_date = vbReplyList[j].modify_date.substring(2, vbReplyList[j].modify_date.lastIndexOf(":"));
-										output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+vbReplyList[j].modify_date+"</span></td></tr>";
+										output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+vbReplyList[j].modify_date+"</span></td></tr>";
 									}
 									output += "</tbody></table>";
 								}

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 public class User {
 	
 	private int user_idx;
+	private int comm_idx;
 	private String user_stat_cd;
 	private String user_name;
 	private String login_id;
@@ -25,6 +26,8 @@ public class User {
 	private String black_sdate;
 	private String black_edate;
 	
+	private int user_comm_role;
+	
 	private int tryed;
 	
 	private String second_mail;
@@ -41,6 +44,14 @@ public class User {
 	public void setUser_idx(int user_idx) {
 		this.user_idx = user_idx;
 	}
+	public int getComm_idx() {
+		return comm_idx;
+	}
+
+	public void setComm_idx(int comm_idx) {
+		this.comm_idx = comm_idx;
+	}
+
 	public String getUser_stat_cd() {
 		return user_stat_cd;
 	}
@@ -159,6 +170,14 @@ public class User {
 		this.black_edate = black_edate;
 	}
 
+	public int getUser_comm_role() {
+		return user_comm_role;
+	}
+
+	public void setUser_comm_role(int user_comm_role) {
+		this.user_comm_role = user_comm_role;
+	}
+
 	public String getSecond_mail() {
 		return second_mail;
 	}
@@ -169,14 +188,13 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [user_idx=" + user_idx + ", user_stat_cd=" + user_stat_cd + ", user_name=" + user_name
-				+ ", login_id=" + login_id + ", nick_name=" + nick_name + ", password=" + password + ", user_role_cd="
-				+ user_role_cd + ", reg_date=" + reg_date + ", login_date=" + login_date + ", pwd_date=" + pwd_date
-				+ ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm + ", access_status=" + access_status
-				+ ", access_ip=" + access_ip + ", black_sdate=" + black_sdate + ", black_edate=" + black_edate
-				+ ", tryed=" + tryed + ", second_mail=" + second_mail + ", bl_scope=" + bl_scope + "]";
+		return "User [user_idx=" + user_idx + ", comm_idx=" + comm_idx + ", user_stat_cd=" + user_stat_cd
+				+ ", user_name=" + user_name + ", login_id=" + login_id + ", nick_name=" + nick_name + ", password="
+				+ password + ", user_role_cd=" + user_role_cd + ", reg_date=" + reg_date + ", login_date=" + login_date
+				+ ", pwd_date=" + pwd_date + ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm
+				+ ", access_status=" + access_status + ", access_ip=" + access_ip + ", black_sdate=" + black_sdate
+				+ ", black_edate=" + black_edate + ", user_comm_role=" + user_comm_role + ", tryed=" + tryed
+				+ ", second_mail=" + second_mail + ", bl_scope=" + bl_scope + "]";
 	}
-
-	
 
 }

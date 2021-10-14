@@ -196,7 +196,7 @@
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
-						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em;">관리</span></c:if></a></li>
+						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}</a></li>
 						</c:forEach>
 						</c:if>
 						<li id="communityFrm"><a href="#">커뮤니티 개설</a></li>
@@ -873,6 +873,9 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 								output += "<td align='center' class='replytb replyModifySave' name='replyModiSaves' id='replyModifySave_"+boardReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyModifySave("+boardReplyList[j].reply_idx+");'><span><a>저장</a></span></td>";
 								output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+boardReplyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+boardReplyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
 								output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+boardReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+boardReplyList[j].reply_idx+");'><span><a>취소</a></span></td>";
+							}else{
+								output += "<td colspan='2' align='center' class='replytb' name='replyblank' id='replyblank_"+boardReplyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
+								output += "<td colspan='2' align='center' class='replytb' name='replyblank2' id='replyblanks_"+boardReplyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
 							}
 							output += "</tr>"
 							if(boardReplyList[j].modify_date == null){
@@ -942,16 +945,16 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 							output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+replyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+replyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
 							output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+replyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+replyList[j].reply_idx+");'><span><a>취소</a></span></td>";
 						}else{
-							output += "<td align='center' class='replytb' name='replyblank' id='replyblank_"+replyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
-							output += "<td align='center' class='replytb' name='replyblank2' id='replyblanks_"+replyList[j].reply_idx+"' style='width:7%;'><span>&nbsp;</span></td>";
+							output += "<td colspan='2' align='center' class='replytb' name='replyblank' id='replyblank_"+replyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
+							output += "<td colspan='2' align='center' class='replytb' name='replyblank2' id='replyblanks_"+replyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
 						}
 						output += "</tr>"
 						if(replyList[j].modify_date == null){
 							replyList[j].reg_date = replyList[j].reg_date.substring(2, replyList[j].reg_date.lastIndexOf(":"));
-							output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].reg_date+"</span></td></tr>";
+							output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].reg_date+"</span></td></tr>";
 						}else{
 							replyList[j].modify_date = replyList[j].modify_date.substring(2, replyList[j].modify_date.lastIndexOf(":"));
-							output += "<tr><td class='replytb' colspan='2' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].modify_date+"</span></td></tr>";
+							output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].modify_date+"</span></td></tr>";
 						}
 						output += "</tbody></table>";
 					}
@@ -967,13 +970,28 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 		let boardFlag;
 		function modifyBoard(idx){
 			boardFlag = "modify";
-			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&idx="+idx;
+			enterFlag = "um";
+			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&enterFlag="+enterFlag+"&idx="+idx;
 		}
 		
 		function deleteBoard(idx){
 			if(confirm("게시글을 삭제하시겠습니까?")){
 				boardFlag = "delete";
-				location.href="<%=request.getContextPath()%>/board/userBoardDelete.do?flag="+boardFlag+"&idx="+idx;
+				const boardDelData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({idx, boardFlag})
+				};
+				fetch("/board/userBoardDelete.do",boardDelData)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result){
+							alert("성공했습니다.");
+							location.reload();
+						}else{
+							alert("실패했습니다.");
+						}
+					});
 			}
 		}
 		

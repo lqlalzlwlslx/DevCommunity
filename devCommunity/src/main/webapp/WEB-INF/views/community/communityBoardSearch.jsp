@@ -197,7 +197,7 @@
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
-						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em; background-color:">관리</span></c:if></a></li>
+						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}</a></li>
 						</c:forEach>
 						</c:if>
 						<li id="communityFrm"><a href="#">커뮤니티 개설</a></li>

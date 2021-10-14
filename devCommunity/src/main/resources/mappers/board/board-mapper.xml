@@ -20,6 +20,7 @@
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
 		FROM dec_community_board
 		WHERE comm_idx = #{comm_idx}
+		AND board_stat_cd = 'A'
 		ORDER BY reg_date DESC
 	]]>
 	</select>
@@ -384,7 +385,8 @@
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_nick,
 				reg_date,
-				modify_date
+				modify_date,
+				(SELECT count(*) FROM dec_community_board_reply r WHERE b.board_idx = r.board_idx) as reply_total
 			FROM dec_community_board b
 			WHERE b.board_stat_cd = 'B'
 		) t
@@ -408,12 +410,37 @@
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = b.board_uidx) as writer_nick,
 				reg_date,
-				modify_date
+				modify_date,
+				(SELECT count(*) FROM dec_community_board_reply r WHERE b.board_idx = r.board_idx) as reply_total
 			FROM dec_community_board b
 			WHERE b.board_stat_cd <> 'B'
 		) t
 	]]>
 	</select>
+	
+	<update id="adminUpdateBlockBoardToReleaseAsIdx" parameterType="board">
+	<![CDATA[
+		UPDATE dec_community_board
+		SET board_stat_cd = 'A'
+		WHERE board_idx = #{board_idx}
+	]]>
+	</update>
+	
+	<update id="adminUpdateActiveBoardToBlockAsIdx" parameterType="board">
+	<![CDATA[
+		UPDATE dec_community_board
+		SET board_stat_cd = 'B'
+		WHERE board_idx = #{board_idx}
+	]]>
+	</update>
+	
+	<update id="adminDeleteCommunityBoardAsIdx" parameterType="board">
+	<![CDATA[
+		UPDATE dec_community_board
+		SET board_stat_cd = 'I'
+		WHERE board_idx = #{board_idx}
+	]]>
+	</update>
 	
 	
 

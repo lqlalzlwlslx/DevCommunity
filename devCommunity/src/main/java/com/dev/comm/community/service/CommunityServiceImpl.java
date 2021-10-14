@@ -91,5 +91,35 @@ public class CommunityServiceImpl implements CommunityService {
 	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception {
 		return communityDao.selectUserCommunityListAsSearchValues(value);
 	}
+
+	@Override
+	public ArrayList<User> selectCommunityAllMembers(Community comm) throws Exception {
+		return communityDao.selectCommunityAllMembers(comm);
+	}
+
+	@Override
+	public int selectCountCommunityRequestUser(Community comm) throws Exception {
+		return communityDao.selectCountCommunityRequestUser(comm);
+	}
+
+	@Override
+	public ArrayList<User> selectCommunityUsersAsCommIdx(int commIdx) throws Exception {
+		return communityDao.selectCommunityUsersAsCommIdx(commIdx);
+	}
+
+	@Override
+	public int updateCommunityManagerAsMandate(int commIdx, int toIdx) throws Exception {
+		return communityDao.updateCommunityManagerAsMandate(commIdx, toIdx);
+	}
+
+	@Override
+	public void updateCommunityUserAsFromIdx(int commIdx, int fromIdx) throws Exception {
+		communityDao.updateCommunityUserAsFromIdx(commIdx, fromIdx);
+	}
+
+	@Override
+	public void updateCommunityManagerInfoAsMandate(int commIdx, int toIdx, String toNick) throws Exception {
+		communityDao.updateCommunityManagerInfoAsMandate(commIdx, toIdx, toNick);
+	}
 	
 }

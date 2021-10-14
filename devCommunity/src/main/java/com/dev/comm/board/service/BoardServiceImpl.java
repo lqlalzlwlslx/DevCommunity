@@ -108,4 +108,19 @@ public class BoardServiceImpl implements BoardService {
 		return boardDao.selectAdminBoardManageAsActiveList();
 	}
 
+	@Override
+	public void adminUpdateBlockBoardToReleaseAsIdx(Board b) throws Exception {
+		boardDao.adminUpdateBlockBoardToReleaseAsIdx(b);
+	}
+
+	@Override
+	public void adminUpdateActiveBoardToBlockAsIdx(Board b) throws Exception {
+		boardDao.adminUpdateActiveBoardToBlockAsIdx(b);
+	}
+
+	@Override
+	public void adminDeleteCommunityBoardAsIdx(Board board) throws Exception {
+		boardDao.adminDeleteCommunityBoardAsIdx(board);
+	}
+
 }

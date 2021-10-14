@@ -583,7 +583,7 @@ public class UserController {
 		return mp;
 	}
 	
-	@RequestMapping(value = "console/user/insertBlackListUser", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@RequestMapping(value = "/console/user/insertBlackListUser", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
 	@ResponseBody
 	public String insertBlackListUser(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
 		log.info("===admin insertBlackList===");
@@ -837,7 +837,7 @@ public class UserController {
 		}
 	}
 	
-	@RequestMapping(value = "/findPasswdAsLoginIdAuth", method = RequestMethod.POST)
+	@RequestMapping(value = "/findPasswdAsLoginIdAuth", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
 	@ResponseBody
 	public String findPasswdAsLoginIdAuth(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
 		JsonObject obj = new JsonObject();

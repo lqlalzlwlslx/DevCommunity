@@ -107,5 +107,47 @@ public class CommunityDaoImpl implements CommunityDao {
 	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception {
 		return (ArrayList)sqlSession.selectList("community.selectUserCommunityListAsSearchValues", value);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<User> selectCommunityAllMembers(Community comm) throws Exception {
+		return (ArrayList)sqlSession.selectList("community.selectCommunityAllMembers", comm);
+	}
+
+	@Override
+	public int selectCountCommunityRequestUser(Community comm) throws Exception {
+		return sqlSession.selectOne("community.selectCountCommunityRequestUser", comm);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<User> selectCommunityUsersAsCommIdx(int commIdx) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectCommunityUsersAsCommIdx", commIdx);
+	}
+
+	@Override
+	public int updateCommunityManagerAsMandate(int commIdx, int toIdx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("comm_idx", commIdx);
+		map.put("to_idx", toIdx);
+		return sqlSession.update("community.updateCommunityManagerAsMandate", map);
+	}
+
+	@Override
+	public void updateCommunityUserAsFromIdx(int commIdx, int fromIdx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("comm_idx", commIdx);
+		map.put("from_idx", fromIdx);
+		sqlSession.update("community.updateCommunityUserAsFromIdx", map);
+	}
+
+	@Override
+	public void updateCommunityManagerInfoAsMandate(int commIdx, int toIdx, String toNick) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("comm_idx", commIdx);
+		map.put("to_idx", toIdx);
+		map.put("to_nick", toNick);
+		sqlSession.update("community.updateCommunityManagerInfoAsMandate", map);
+	}
 	
 }

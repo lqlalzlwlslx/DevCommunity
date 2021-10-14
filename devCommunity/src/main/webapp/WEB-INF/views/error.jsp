@@ -9,11 +9,6 @@
 <title>DevCommunity</title>
 </head>
 <body>
-<c:if test="${not empty msg}">
-<script type="text/javascript">
-	alert(msg);
-</script>
-</c:if>
 	<div align="center">
 		<span>죄송합니다. 페이지를 표시할 수 없습니다.</span>
 	</div>

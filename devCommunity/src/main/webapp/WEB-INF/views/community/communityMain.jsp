@@ -50,7 +50,7 @@
 		<c:if test="${result == true}">
 			<c:if test="${status == 'DELETE'}">
 				alert("성공했습니다.");
-				location.reload();
+				//location.reload();
 			</c:if>
 		</c:if>
 	</c:if>
@@ -197,7 +197,7 @@
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
-						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}<c:if test="${ucList.comm_role_cd == 9}"><span style="margin-left:3em; background-color:">관리</span></c:if></a></li>
+						<li id="ucList_${ucList.comm_idx}" onclick="moveToCommunityView(${ucList.comm_idx})" class="communityList" style="display:none; cursor:pointer;"><a>${ucList.comm_name}</a></li>
 						</c:forEach>
 						</c:if>
 						<li id="communityFrm"><a href="#">커뮤니티 개설</a></li>
@@ -263,7 +263,10 @@
 								<div class="container">
 									<header class="major">
 										<c:if test="${not empty commInfo}">
-											<h2 style="margin: 0; font-size:3.5em;">${commInfo.comm_name}</h2>
+											<div style="display:flex;">
+											<div style="width:90%;"><h2 style="margin: 0; font-size:3.5em;">${commInfo.comm_name}</h2></div>
+											<div align="right" style="padding-top: 1em;"><c:if test="${commInfo.manager_idx == userBean.user_idx}"><span style="float:right;" onclick="communityManagerSettings('${commInfo.comm_idx}');"><input type="button" value="커뮤니티 관리" style="background-color:#4acaa8;"/></span></c:if></div>
+											</div>
 											<table>
 												<tbody>
 													<tr>
@@ -343,6 +346,10 @@
 																		<td align="center" class="replytb replyModifySave" name="replyModiSaves" id="replyModifySave_${cbReplyList.reply_idx}" style="width:7%; display:none;" onclick="replyModifySave('${cbReplyList.reply_idx}');"><span><a>저장</a></span></td>
 																		<td align="center" class="replytb replyDelete" name="replyDels" id="replyDelete_${cbReplyList.reply_idx}" style="width:7%;" onclick="replyDelete('${cbReplyList.reply_idx}');"><span><a>삭제</a></span></td>
 																		<td align="center" class="replytb replyCancel" name="replyCans" id="replyCancel_${cbReplyList.reply_idx}" style="width:7%; display:none;" onclick="replyCancel('${cbReplyList.reply_idx}');"><span><a>취소</a></span></td>
+																	</c:if>
+																	<c:if test="${cbReplyList.reply_uidx != userBean.user_idx}">
+																		<td colspan="2" align="center" class="replytb" style="width:7%;">&nbsp;</td>
+																		<td colspan="2" align="center" class="replytb" style="width:7%;">&nbsp;</td>
 																	</c:if>
 																</tr>
 																<tr>
@@ -501,13 +508,28 @@
 		let boardFlag;
 		function modifyBoard(idx){
 			boardFlag = "modify";
-			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&idx="+idx;
+			enterFlag = "cm";
+			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&enterFlag="+enterFlag+"&idx="+idx;
 		}
 		
 		function deleteBoard(idx){
 			if(confirm("게시글을 삭제하시겠습니까?")){
 				boardFlag = "delete";
-				location.href="<%=request.getContextPath()%>/board/userBoardDelete.do?flag="+boardFlag+"&idx="+idx;
+				const boardDelData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({idx, boardFlag})
+				};
+				fetch("/board/userBoardDelete.do",boardDelData)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result){
+							alert("성공했습니다.");
+							location.reload();
+						}else{
+							alert("실패했습니다.");
+						}
+					});
 			}
 		}
 		
@@ -627,7 +649,7 @@
 				fetch("/board/reply/deleteCommunityBoardReply.do",replyDelData)
 					.then(res => res.json())
 					.then((data) => {
-						if(data.result){
+						if(data.result == true){
 							location.reload();
 						}else{
 							alert("실패했습니다.");
@@ -648,6 +670,10 @@
 				.then(res => res.json())
 				.then(data => drawCommunityBoardSearchResult(data)); */
 			location.href="<%=request.getContextPath()%>/community/communityBoardSearchAsValues.do?condition="+inCondition+"&searchValue="+inSearchValue+"&cidx="+${commInfo.comm_idx};
+		}
+		
+		function communityManagerSettings(idx){
+			location.href="<%=request.getContextPath()%>/community/communityManagerSettingsView.do?idx="+idx;
 		}
 	</script>
 

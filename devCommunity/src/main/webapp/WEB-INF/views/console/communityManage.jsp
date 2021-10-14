@@ -19,6 +19,7 @@
 		padding: 2% 0 2% 4%;
 	}
 	#detailCommunity:hover, #closureCommunity:hover{cursor:pointer;}
+	table td {padding:0.5em 0.5em;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty adminBean}">
@@ -130,14 +131,14 @@
 						<tbody>
 							<c:forEach items="${communityConfirmList}" var="ccList" varStatus="status">
 								<tr>
-									<td>${ccList.manager_name}</td>
-									<td>${ccList.comm_name}</td>
-									<td>${ccList.comm_type_nm}</td>
-									<td>${ccList.comm_reg_cont}</td>
-									<td>${ccList.comm_intro}</td>
-									<td>${ccList.reg_date}</td>
-									<td><span><a href="#" onclick="approval('settle', ${ccList.manager_idx}, ${ccList.comm_idx});">승인</a></span></td>
-									<td><span><a href="#" onclick="approval('reject', ${ccList.manager_idx}, ${ccList.comm_idx});">반려</a></span></td>
+									<td style="width:">${ccList.manager_name}</td>
+									<td style="width:15%;">${ccList.comm_name}</td>
+									<td style="width:10%;">${ccList.comm_type_nm}</td>
+									<td style="width:">${ccList.comm_reg_cont}</td>
+									<td style="width:">${ccList.comm_intro}</td>
+									<td style="width:">${ccList.reg_date}</td>
+									<td style="width:5%;"><span><a href="#" onclick="approval('settle', ${ccList.manager_idx}, ${ccList.comm_idx});">승인</a></span></td>
+									<td style="width:5%;"><span><a href="#" onclick="approval('reject', ${ccList.manager_idx}, ${ccList.comm_idx});">반려</a></span></td>
 								</tr>
 							</c:forEach>
 						</tbody>

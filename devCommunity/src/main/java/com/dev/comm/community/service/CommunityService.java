@@ -40,4 +40,16 @@ public interface CommunityService {
 
 	ArrayList<Community> selectUserCommunityListAsSearchValues(String searchTxt) throws Exception;
 
+	ArrayList<User> selectCommunityAllMembers(Community comm) throws Exception;
+
+	int selectCountCommunityRequestUser(Community comm) throws Exception;
+
+	ArrayList<User> selectCommunityUsersAsCommIdx(int commIdx) throws Exception;
+
+	int updateCommunityManagerAsMandate(int commIdx, int toIdx) throws Exception;
+
+	void updateCommunityUserAsFromIdx(int commIdx, int fromIdx) throws Exception;
+
+	void updateCommunityManagerInfoAsMandate(int commIdx, int toIdx, String toNick) throws Exception;
+
 }

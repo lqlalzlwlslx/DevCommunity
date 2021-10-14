@@ -28,6 +28,8 @@ import com.dev.comm.board.service.BoardService;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
 import com.dev.comm.board.vo.Reply;
+import com.dev.comm.community.service.CommunityService;
+import com.dev.comm.community.vo.Community;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.SessionManager;
 import com.google.gson.JsonElement;
@@ -42,6 +44,9 @@ public class BoardController {
 	
 	@Autowired
 	private BoardService boardService;
+	
+	@Autowired
+	private CommunityService communityService;
 	
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -132,9 +137,13 @@ public class BoardController {
 			String[] realFileNames = request.getParameterValues("realFileName") == null ? null : request.getParameterValues("realFileName");
 			String[] resPathValues = request.getParameterValues("resPathValue") == null ? null : request.getParameterValues("resPathValue");
 			
-			if(content.startsWith("<p><br></p>") || content.endsWith("<p><br></p>")) {
-				content = content.replaceAll("<p><br></p>", "<br />");
-			}
+//			if(content.contains("<p><br></p><p><br></p>")) content = content.replaceAll("<p><br></p><p><br></p>", "<br />");
+//			if(content.startsWith("<p><br></p>") || content.endsWith("<p><br></p>") || content.contains("<p><br></p>")) {
+//				content = content.replaceAll("<p><br></p>", "");
+//			}
+			content = content.replaceAll("<p>", "");
+			content = content.replaceAll("<br>", "");
+			content = content.replaceAll("</p>", "<br />");
 			
 			log.debug(content.isEmpty());
 			if(content.isEmpty()) {
@@ -227,8 +236,8 @@ public class BoardController {
 	
 	@RequestMapping(value = "/board/userBoardModify", method = RequestMethod.GET)
 	public ModelAndView userBoardModifyAsFlag(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-		User usr = SessionManager.getUserSession(request);
-		if(usr == null) {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
 			model.addAttribute("result", false);
 			model.addAttribute("status", "SESSION_TIMEOUT");
 			return new ModelAndView("user/mainUser");
@@ -238,11 +247,16 @@ public class BoardController {
 		Board boardInfo = null;
 		try {
 			String flag = request.getParameter("flag");
+			String enFlag = request.getParameter("enterFlag");
 			int board_idx = Integer.parseInt(request.getParameter("idx"));
 			
 			boardInfo = boardService.selectOneBoardInfoAsIdx(board_idx);
+			ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+			
 			if(boardInfo != null) {
 				if(flag.equals("modify")) {
+					if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+					model.addAttribute("enFlag", enFlag);
 					model.addAttribute("boardInfo", boardInfo);
 					return new ModelAndView("community/communityBoardModify");
 				}
@@ -255,30 +269,31 @@ public class BoardController {
 		return new ModelAndView("community/communityBoardModify");
 	}
 	
-	@RequestMapping(value = "/board/userBoardDelete", method = RequestMethod.GET)
+	@RequestMapping(value = "/board/userBoardDelete", method = RequestMethod.POST)
 	@ResponseBody
-	public ModelMap userBoardDeleteAsFlag(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelMap mp = new ModelMap();
+	public String userBoardDeleteAsFlag(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
 		User user = SessionManager.getUserSession(request);
 		if(user == null) {
-			mp.addAttribute("result", false);
-			mp.addAttribute("status", "SESSION_TIMEOUT");
-			return mp;
+			obj.addProperty("result", false);
+			obj.addProperty("status", "SESSION_TIMEOUT");
+			return obj.toString();
 		}
-		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
 		Board boardInfo = null;
 		try {
-			String flag = request.getParameter("flag");
-			int board_idx = Integer.parseInt(request.getParameter("idx"));
+			String flag = element.getAsJsonObject().get("boardFlag").getAsString();
+			int board_idx = element.getAsJsonObject().get("idx").getAsInt();
 			
 			boardInfo = boardService.selectOneBoardInfoAsIdx(board_idx);
 			if(boardInfo != null) {
 				if(flag.equals("delete")) {
 					boardInfo.setBoard_stat_cd("I");
 					boardService.updateBoardStatusAsFlag(boardInfo);
-					mp.addAttribute("result", true);
-					mp.addAttribute("status", "DELETE");
-					return mp;
+					obj.addProperty("result", true);
+					obj.addProperty("status", "DELETE");
+					return obj.toString();
 				}
 			}
 		}catch(Exception e) {
@@ -286,7 +301,7 @@ public class BoardController {
 			log.error("PARSING ERROR.");
 		}
 		
-		return mp;
+		return obj.toString();
 	}
 	
 	@RequestMapping(value = "/board/modifyCommunityBoard", method = RequestMethod.POST)
@@ -315,9 +330,13 @@ public class BoardController {
 			String[] realFileNames = request.getParameterValues("realFileName") == null ? null : request.getParameterValues("realFileName");
 			String[] resPathValues = request.getParameterValues("resPathValue") == null ? null : request.getParameterValues("resPathValue");
 			
-			if(content.startsWith("<p><br></p>") || content.endsWith("<p><br></p>")) {
-				content = content.replaceAll("<p><br></p>", "<br />");
-			}
+//			if(content.contains("<p><br></p><p><br></p>")) content.replaceAll("<p><br></p><p><br></p>", "<br />");
+//			if(content.startsWith("<p><br></p>") || content.endsWith("<p><br></p>") || content.contains("<p><br></p>")) {
+//				content = content.replaceAll("<p><br></p>", "");
+//			}
+			content = content.replaceAll("<p>", "");
+			content = content.replaceAll("<br>", "");
+			content = content.replaceAll("</p>", "<br />");
 			
 			board.setBoard_idx(board_idx);
 			board.setComm_idx(comm_idx);
@@ -328,6 +347,8 @@ public class BoardController {
 			
 			try {
 				boardService.updateBoardAsIdx(board);
+				
+				ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
 				
 				if(realFileNames != null) {
 					boolean[] brr = new boolean[realFileNames.length];
@@ -354,6 +375,7 @@ public class BoardController {
 				model.addAttribute("status", "UPDATE");
 				model.addAttribute("msg", "성공했습니다.");
 				model.addAttribute("moveToValue", comm_idx);
+				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
 				return new ModelAndView("community/communityBoardModify");
 				
 			}catch(Exception e) {
@@ -505,6 +527,137 @@ public class BoardController {
 			log.error("DATA LOAD FAIL");
 		}
 		return new ModelAndView("console/boardManage");
+	}
+	
+	@RequestMapping(value = "/console/board/blockBoardToReleaseAsIdx", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String adminBlockBoardToRelease(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) {
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "SESSION_TIMEOUT");
+			return obj.toString();
+		}
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int bidx = element.getAsJsonObject().get("idx").getAsInt();
+			Board b = new Board();
+			b.setBoard_idx(bidx);
+			
+			try {
+				boardService.adminUpdateBlockBoardToReleaseAsIdx(b);
+				
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다.");
+				return obj.toString();
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("BLOCK TO RELEASE UPDATE FAIL");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("ADMIN CONSOLE BLOCK BOARD TO RELEASE IDX PARSING FAIL");
+		}
+		
+		return null;
+	}
+	
+	@RequestMapping(value = "/console/board/activeBoardToBlockAsIdx", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String adminActiveBoardToBlock(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) {
+			obj.addProperty("result", false);
+			obj.addProperty("msg", "SESSION_TIMEOUT");
+			return obj.toString();
+		}
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int bidx = element.getAsJsonObject().get("idx").getAsInt();
+			Board b = new Board();
+			b.setBoard_idx(bidx);
+			
+			try {
+				boardService.adminUpdateActiveBoardToBlockAsIdx(b);
+				
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다."); 
+				return obj.toString();
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("ACTIVE TO BLOCK UPDATE FAIL");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("ADMIN CONSOLE ACTIVE BOARD TO BLOCK IDX PARSING FAIL");
+		}
+		
+		return null;
+	}
+	
+	private boolean adminBoardDeleteRequest(HttpServletRequest request, HttpServletResponse response, String data) throws Exception {
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) return false;
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int bidx = element.getAsJsonObject().get("idx").getAsInt();
+			Board board = new Board();
+			board.setBoard_idx(bidx);
+			
+			try {
+				boardService.adminDeleteCommunityBoardAsIdx(board);
+				return true;
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("BOARD DELETE FAIL");
+				return false;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("DELETE BOARD IDX PARSING FAIL");
+			return false;
+		}
+	}
+	
+	@RequestMapping(value = "/console/board/blockBoardToDeleteAsIdx", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String adminBlockBoardToDelete(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		
+		if(adminBoardDeleteRequest(request, response, data)) {
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			return obj.toString();
+		}
+		obj.addProperty("result", false);
+		obj.addProperty("msg", "SESSION_TIMEOUT");
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/console/board/activeBoardToDeleteAsIdx", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String adminActiveBoardToDelete(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		
+		if(adminBoardDeleteRequest(request, response, data)) {
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			return obj.toString();
+		}
+		obj.addProperty("result", false);
+		obj.addProperty("msg", "SESSION_TIMEOUT");
+		return obj.toString();
 	}
 	
 	

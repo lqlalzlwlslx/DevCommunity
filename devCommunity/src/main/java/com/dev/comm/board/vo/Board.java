@@ -28,6 +28,8 @@ public class Board {
 	private String real_file_name;
 	private String res_path;
 	
+	private int reply_total;
+	
 	public long getBoard_idx() {
 		return board_idx;
 	}
@@ -130,6 +132,12 @@ public class Board {
 	}
 	public void setRes_path(String res_path) {
 		this.res_path = res_path;
+	}
+	public int getReply_total() {
+		return reply_total;
+	}
+	public void setReply_total(int reply_total) {
+		this.reply_total = reply_total;
 	}
 	@Override
 	public String toString() {

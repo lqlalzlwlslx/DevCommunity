@@ -110,7 +110,7 @@ public class CommunityController {
 		
 		Community community = new Community();
 		community.setComm_name(comm_name);
-		community.setManager_idx(Integer.toString(user.getUser_idx()));
+		community.setManager_idx(user.getUser_idx());
 		community.setManager_name(user.getNick_name());
 		community.setComm_type_cd(comm_type);
 		community.setComm_reg_cont(comm_reg_cont);
@@ -122,6 +122,7 @@ public class CommunityController {
 			mailFrom = user.getLogin_id();
 			mailTo = userService.selectAdminEmail(); //decadmin@gmail.com,saint@pdic.co.kr
 			
+			mailContent = "";
 			mailContent += "<h2>커뮤니티 신청 건이 있습니다.</h2><br />";
 			mailContent += "<h3>확인 후 사이트에 접속하셔서 승인 바랍니다.</h3><br /><br />";
 			mailContent += "<h4>신청자(닉네임) : " + community.getManager_name() + "<br />";
@@ -495,6 +496,93 @@ public class CommunityController {
 			return new ModelAndView("error");
 		}
 		return new ModelAndView("community/communityBoardSearch");
+	}
+	
+	@RequestMapping(value = "/community/communityManagerSettingsView", method = RequestMethod.GET)
+	public ModelAndView communityManagerSettingView(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			model.addAttribute("msg", "세션이 만료되었습니다.");
+			return new ModelAndView("error");
+		}
+		
+		try {
+			int cidx = Integer.parseInt(request.getParameter("idx"));
+			Community comm = communityService.selectCommunityDetailView(cidx);
+			comm.setTotal_member(communityService.selectCountCommunityUser(comm));
+			comm.setComm_sign_request(communityService.selectCountCommunityRequestUser(comm));
+			comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
+			comm.setUserList(communityService.selectCommunityAllMembers(comm));
+			
+			ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+			
+			if(comm.getManager_idx() != user.getUser_idx()) return new ModelAndView("error");
+			else {
+				model.addAttribute("comminfo", comm);
+				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+				return new ModelAndView("communityManage/communityManageMain");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY MANAGE IDX VALUE PARSING ERROR.");
+		}
+		
+		return new ModelAndView("error");
+	}
+	
+	@RequestMapping(value = "/community/mandateCommunityManager", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String mandateCommunityManager(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) {
+			obj.addProperty("result", false);
+			return obj.toString();
+		}
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int commIdx = element.getAsJsonObject().get("comm_idx").getAsInt();
+			int toIdx = element.getAsJsonObject().get("user_idx").getAsInt();
+			int fromIdx = element.getAsJsonObject().get("manager_idx").getAsInt();
+			String toNick = element.getAsJsonObject().get("nick").getAsString();
+			
+			try {
+				ArrayList<User> communityUsers = communityService.selectCommunityUsersAsCommIdx(commIdx);
+				if(communityUsers != null && communityUsers.size() > 0) {
+					for(int i = 0; i < communityUsers.size(); i++) {
+						User usr01 = communityUsers.get(i);
+						if(usr01.getUser_idx() == toIdx && usr01.getUser_stat_cd().equals("A")) {
+							if(communityService.updateCommunityManagerAsMandate(commIdx, toIdx) > 0) break;
+						}else {
+							continue;
+						}
+					}
+				}
+				
+				communityService.updateCommunityUserAsFromIdx(commIdx, fromIdx);
+				communityService.updateCommunityManagerInfoAsMandate(commIdx, toIdx, toNick);
+				
+				//위임받는 사람 정보 가지고 sendMail 구현하자..
+				
+				
+				obj.addProperty("result", true);
+				obj.addProperty("comm_idx", commIdx);
+				obj.addProperty("msg", "성공했습니다.");
+				return obj.toString();
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("MANDATE COMMUNITY MANAGER QUERY FAIL");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("MANDATE COMMUNITY MANAGER VALUE PARSING ERROR.");
+		}
+		
+		return null;
 	}
 	
 	/*
