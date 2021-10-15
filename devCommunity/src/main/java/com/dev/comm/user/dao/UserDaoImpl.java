@@ -147,5 +147,10 @@ public class UserDaoImpl implements UserDao {
 		return sqlSession.update("user.changePasswdAsFineNewPasswd", usr);
 	}
 
+	@Override
+	public void updateUserStatusAsOverTryedLogin(User tUser) throws Exception {
+		sqlSession.update("user.updateUserStatusAsOverTryedLogin", tUser);
+	}
+
 	
 }

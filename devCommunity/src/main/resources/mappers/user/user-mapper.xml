@@ -272,7 +272,15 @@
 	<update id="changePasswdAsFineNewPasswd" parameterType="user">
 	<![CDATA[
 		UPDATE dec_user
-		SET password = #{password}
+		SET password = #{password}, tryed = 0
+		WHERE user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<update id="updateUserStatusAsOverTryedLogin" parameterType="user">
+	<![CDATA[
+		UPDATE dec_user
+		SET user_stat_cd = #{user_stat_cd}
 		WHERE user_idx = #{user_idx}
 	]]>
 	</update>

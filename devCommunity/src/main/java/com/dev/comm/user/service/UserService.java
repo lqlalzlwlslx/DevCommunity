@@ -56,4 +56,6 @@ public interface UserService {
 
 	int changePasswdAsFindNewPasswd(User usr) throws Exception;
 
+	void updateUserStatusAsOverTryedLogin(User tUser) throws Exception;
+
 }

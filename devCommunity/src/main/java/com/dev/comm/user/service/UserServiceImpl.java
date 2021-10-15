@@ -136,5 +136,10 @@ public class UserServiceImpl implements UserService {
 		return userDao.changePasswdAsFindNewPasswd(usr);
 	}
 
+	@Override
+	public void updateUserStatusAsOverTryedLogin(User tUser) throws Exception {
+		userDao.updateUserStatusAsOverTryedLogin(tUser);
+	}
+
 	
 }

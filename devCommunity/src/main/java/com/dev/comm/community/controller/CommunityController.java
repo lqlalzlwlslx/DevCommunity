@@ -442,7 +442,7 @@ public class CommunityController {
 			model.addAttribute("result", false);
 			model.addAttribute("status", "SESSION_TIMEOUT");
 			model.addAttribute("msg", "세션이 만료되었습니다.");
-			return new ModelAndView("error");
+			return new ModelAndView("redirect:/");
 		}
 		
 		try {
@@ -493,7 +493,7 @@ public class CommunityController {
 			model.addAttribute("result", false);
 			model.addAttribute("status", "PARSING_FAIL");
 			model.addAttribute("msg", "처리에 실패했습니다.");
-			return new ModelAndView("error");
+			return new ModelAndView("redirect:/");
 		}
 		return new ModelAndView("community/communityBoardSearch");
 	}
@@ -503,7 +503,7 @@ public class CommunityController {
 		User user = SessionManager.getUserSession(request);
 		if(user == null) {
 			model.addAttribute("msg", "세션이 만료되었습니다.");
-			return new ModelAndView("error");
+			return new ModelAndView("redirect:/");
 		}
 		
 		try {
@@ -513,6 +513,7 @@ public class CommunityController {
 			comm.setComm_sign_request(communityService.selectCountCommunityRequestUser(comm));
 			comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
 			comm.setUserList(communityService.selectCommunityAllMembers(comm));
+			comm.setReqUserList(communityService.selectCommunitySignRequestUsers(comm));
 			
 			ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
 			
@@ -527,7 +528,7 @@ public class CommunityController {
 			log.error("COMMUNITY MANAGE IDX VALUE PARSING ERROR.");
 		}
 		
-		return new ModelAndView("error");
+		return new ModelAndView("redirect:/");
 	}
 	
 	@RequestMapping(value = "/community/mandateCommunityManager", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
@@ -585,34 +586,110 @@ public class CommunityController {
 		return null;
 	}
 	
-	/*
-	@RequestMapping(value = "/community/userSearchAsValues", method = RequestMethod.GET)
+	@RequestMapping(value = "/community/updateCommunityIntro.do", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
 	@ResponseBody
-	public ModelMap communityUserSearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelMap mp = new ModelMap();
+	public String updateCommunityIntro(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath()+"/logout.do");
 		
-		String bCondition = request.getParameter("bCondition");
-		String condition = request.getParameter("condition");
-		String searchValue = request.getParameter("searchValue");
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
 		
-		log.debug("bCondition: " + bCondition);
-		log.debug("condition: " + condition);
-		log.debug("searchValue: " + searchValue);
-		
-		ArrayList<Community> communityValues = null;
-		ArrayList<Board> boardValues = null;
-		
-		if(!bCondition.equals("0")) {
-			if(condition.equals("community")) {
-				mp.addAttribute("result", false);
-				mp.addAttribute("msg", "커뮤니티를 선택하신 경우 제목, 내용, 작성자로만 검색이 가능합니다.");
-				return mp;
+		try {
+			int comm_idx = element.getAsJsonObject().get("comm_idx").getAsInt();
+			String comm_intro = element.getAsJsonObject().get("modiTxt").getAsString();
+			
+			Community comminfo = communityService.selectCommunityDetailView(comm_idx);
+			if(comminfo.getManager_idx() != user.getUser_idx()) {
+				obj.addProperty("result", false);
+				return obj.toString();
+			}else {
+				comminfo = new Community();
+				comminfo.setComm_idx(comm_idx);
+				comminfo.setComm_intro(comm_intro);
+				
+				communityService.updateCommunityIntro(comminfo);
+				obj.addProperty("result", true);
+				return obj.toString();
 			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("UPDATE COMMUNITY INTRO VALUE PARSING FAIL");
 		}
 		
-		
-		
-		return mp;
+		return null;
 	}
-	*/
+	
+	private boolean confirmStatus(HttpServletRequest request, User user, String data) throws Exception {
+		boolean result = false;
+		if(user == null) return result;
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int cidx = element.getAsJsonObject().get("confirmCidx").getAsInt();
+			int uidx = element.getAsJsonObject().get("idx").getAsInt();
+			String status = element.getAsJsonObject().get("confirmStatus").getAsString();
+			
+			if(status.equals("A")) {
+				//update...
+				communityService.updateCommunityConfirmUserStatus(cidx, uidx, status);
+				result = true;
+			}else {
+				//delete...
+				communityService.deleteCommunityRejectUserStatus(cidx, uidx);
+				result = true;
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY CONFIRM STATUS VALUE PARSING FAIL");
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping(value = "/community/communityConfirmSignAsStatus", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityConfirmSignAsStatus(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User usr = SessionManager.getUserSession(request);
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		if(confirmStatus(request, usr, data)) {
+			obj.addProperty("result", true);
+			obj.addProperty("uidx", element.getAsJsonObject().get("idx").getAsInt());
+			obj.addProperty("msg", "성공했습니다.");
+		}else {
+			obj.addProperty("result", false);
+		}
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/community/communityRejectSignAsStatus", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityRejectSignAsStatus(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User usr = SessionManager.getUserSession(request);
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		if(confirmStatus(request, usr, data)) {
+			obj.addProperty("result", true);
+			obj.addProperty("uidx", element.getAsJsonObject().get("idx").getAsInt());
+			obj.addProperty("msg", "성공했습니다.");
+		}else {
+			obj.addProperty("result", false);
+		}
+		return obj.toString();
+	}
+	
+	
+	
+	
+	
+	
+	
 }

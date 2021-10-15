@@ -121,5 +121,25 @@ public class CommunityServiceImpl implements CommunityService {
 	public void updateCommunityManagerInfoAsMandate(int commIdx, int toIdx, String toNick) throws Exception {
 		communityDao.updateCommunityManagerInfoAsMandate(commIdx, toIdx, toNick);
 	}
+
+	@Override
+	public void updateCommunityIntro(Community comminfo) throws Exception {
+		communityDao.updateCommunityIntro(comminfo);
+	}
+
+	@Override
+	public ArrayList<User> selectCommunitySignRequestUsers(Community comm) throws Exception {
+		return communityDao.selectCommunitySignRequestUsers(comm);
+	}
+
+	@Override
+	public void deleteCommunityRejectUserStatus(int cidx, int uidx) throws Exception {
+		communityDao.deleteCommunityRejectUserStatus(cidx, uidx);
+	}
+
+	@Override
+	public void updateCommunityConfirmUserStatus(int cidx, int uidx, String status) throws Exception {
+		communityDao.updateCommunityConfirmUserStatus(cidx, uidx, status);
+	}
 	
 }

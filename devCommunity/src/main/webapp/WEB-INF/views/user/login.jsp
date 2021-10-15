@@ -8,6 +8,7 @@
 		border:0px groove !important;
 		width:30%; margin-top:10%;
 	}
+	#mainBtn{ font-size: 1.5em; padding: 0.5em 0 0 1.5em; }
 </style>
 <script type="text/javascript">
 	window.onload = function(){
@@ -49,7 +50,7 @@
 </script>
 </head>
 <body>
-
+<div id="mainBtn" onclick="moveToMain();"><span><a href="#">메인으로 가기</a></span></div>
 	<div align="center">
 		<form>
 			<fieldset>

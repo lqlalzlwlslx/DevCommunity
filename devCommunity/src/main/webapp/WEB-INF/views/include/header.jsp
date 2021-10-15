@@ -122,6 +122,7 @@
 					.then((data) => {
 						if(data.result == true){
 							alert(data.msg);
+							//location.reload();
 						}
 					});
 				

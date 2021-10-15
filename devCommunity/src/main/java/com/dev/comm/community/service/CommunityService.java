@@ -52,4 +52,12 @@ public interface CommunityService {
 
 	void updateCommunityManagerInfoAsMandate(int commIdx, int toIdx, String toNick) throws Exception;
 
+	void updateCommunityIntro(Community comminfo) throws Exception;
+
+	ArrayList<User> selectCommunitySignRequestUsers(Community comm) throws Exception;
+
+	void deleteCommunityRejectUserStatus(int cidx, int uidx) throws Exception;
+
+	void updateCommunityConfirmUserStatus(int cidx, int uidx, String status) throws Exception;
+
 }

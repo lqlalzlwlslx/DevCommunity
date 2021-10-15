@@ -149,5 +149,33 @@ public class CommunityDaoImpl implements CommunityDao {
 		map.put("to_nick", toNick);
 		sqlSession.update("community.updateCommunityManagerInfoAsMandate", map);
 	}
+
+	@Override
+	public void updateCommunityIntro(Community comminfo) throws Exception {
+		sqlSession.update("community.updateCommunityIntro", comminfo);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<User> selectCommunitySignRequestUsers(Community comm) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectCommunitySignRequestUsers", comm);
+	}
+
+	@Override
+	public void deleteCommunityRejectUserStatus(int cidx, int uidx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("comm_idx", cidx);
+		map.put("user_idx", uidx);
+		sqlSession.delete("community.deleteCommunityRejectUserStatus", map);
+	}
+
+	@Override
+	public void updateCommunityConfirmUserStatus(int cidx, int uidx, String status) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("comm_idx", cidx);
+		map.put("user_idx", uidx);
+		map.put("comm_user_stat_cd", status);
+		sqlSession.update("community.updateCommunityConfirmUserStatus", map);
+	}
 	
 }

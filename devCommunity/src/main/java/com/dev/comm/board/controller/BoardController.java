@@ -121,7 +121,7 @@ public class BoardController {
 		User user = SessionManager.getUserSession(request);
 		if(user == null) {
 			model.addAttribute("msg", "세션이 만료되었습니다.");
-			return new ModelAndView("error");
+			return new ModelAndView("redirect:/");
 		}
 		
 		try {

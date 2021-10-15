@@ -68,6 +68,11 @@
 			document.querySelector(".modal-open").style.overflow = "auto";
 		});
 		
+		document.querySelector("#communityRequestListView").addEventListener("click", function(){
+			document.querySelector(".modal-open").style.paddingRight = "0px";
+			document.querySelector(".modal-open").style.overflow = "auto";
+		});
+		
 	}
 	
 	function ucListview(){
@@ -231,18 +236,23 @@
 										<colgroup>
 											<col width="20%">
 											<col width="auto">
-											<col width="10%">
+											<col width="5%">
+											<col width="3%">
+											<col width="3%">
 										</colgroup>
 										<tbody>
 											<tr>
 												<td>커뮤니티명</td>
 												<td>${comminfo.comm_name}</td>
 												<td></td>
+												<td></td>
+												<td></td>
 											</tr>
 											<tr>
 												<td>커뮤니티 관리자</td>
 												<td>${comminfo.manager_name}</td>
-												<td>
+												<td></td>
+												<td colspan="2" align="right">
 													<span><input type="button" id="proxyManagerBtn" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#proxyManagerModal" value="관리자 위임" /></span>
 												</td>
 											</tr>
@@ -250,31 +260,41 @@
 												<td>커뮤니티 타입</td>
 												<td>${comminfo.comm_type_nm}</td>
 												<td></td>
+												<td></td>
+												<td></td>
 											</tr>
 											<tr>
 												<td>커뮤니티 개설일</td>
 												<td>${fn:substring(comminfo.reg_date, 2, 16)}</td>
 												<td></td>
+												<td></td>
+												<td></td>
 											</tr>
 											<tr>
 												<td>커뮤니티 소개글</td>
-												<td>${comminfo.comm_intro}</td>
-												<td></td>
+												<td class="modifyIntro" colspan="2"><span id="commintro_txt"><c:if test="${empty comminfo.comm_intro}"><span> * 소개글을 수정해주세요.</span></c:if><c:if test="${not empty comminfo.comm_intro}">${comminfo.comm_intro}</c:if></span></td>
+												<td class="modifyIntro1" align="center" style="display:none;" onclick="modifySave('${comminfo.comm_idx}')"><span><input type="button" style="background-color:#4acaa8;" value="변경" /></span></td>
+												<td class="modifyIntro2" align="center" style="display:none;" onclick="modifyCancel('${comminfo.comm_idx}');"><span><input type="button" style="background-color:#4acaa8;" value="취소" /></span></td>
+												<td colspan="2" class="modifyIntro4" align="center" onclick="modifyCommunityIntro('${comminfo.comm_idx}');"><span><input type="button" style="background-color:#4acaa8;" value="소개글 수정" /></span></td>
 											</tr>
 											<tr>
 												<td>회원수</td>
 												<td>${comminfo.total_member} 명</td>
 												<td></td>
+												<td colspan="2" align="right"><span><input type="button" style="background-color:#4acaa8;" value="회원관리" /></span></td>
 											</tr>
 											<tr>
 												<td>가입신청</td>
 												<td>${comminfo.comm_sign_request} 명</td>
 												<td></td>
+												<td colspan="2" align="right"><span><input id="communityRequestListView" type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#requestUserListModal"value="목록보기" /></span></td>
 											</tr>
 											<tr>
 												<td>게시글 수</td>
 												<td>${comminfo.total_board} 개</td>
 												<td></td>
+												<td></td>
+												<td align="right"></td>
 											</tr>
 										</tbody>
 									</table>
@@ -369,12 +389,12 @@
 		</div>
 	</div>
 </div>
-
+<!-- 관리자 위임 모달 -->
 <div class="modal fade" id="proxyManagerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">커뮤니티 매니저 위임</h5>
+				<h5 class="modal-title" id="proxyManagerModalLabel">커뮤니티 관리자 위임</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
@@ -394,9 +414,61 @@
 						</table>
 					</c:forEach>
 				</c:if>
+				<c:if test="${empty comminfo.userList}">
+					<div><span> * 위임 대상자가 없습니다.</span></div>
+				</c:if>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 가입신청자 확인 모달 -->
+<div class="modal fade" id="requestUserListModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="requestUserListModalLabel">커뮤니티 가입신청 리스트</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<c:if test="${not empty comminfo.reqUserList}">
+				<table style="margin:0.25em;">
+				<thead>
+					<tr>
+						<th style="width:10%;"></th>
+						<th align="right" style="width:auto; text-align:center;">닉네임</th>
+						<th align="center" style="width:20%; text-align:center;">신청일자</th>
+						<th style="width:20%;"></th>
+						<th style="width:20%;"></th>
+					</tr>
+				</thead>
+				</table>
+					<c:forEach items="${comminfo.reqUserList}" var="commReqList" varStatus="commReqStatus">
+						<table style="margin:0.25em;" id="reqUsers_${commReqList.user_idx}" name="reqTables">
+							<tbody>
+								<tr>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;">
+										<c:if test="${commReqList.profile_src == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;" /></span></c:if>
+										<c:if test="${commReqList.profile_src != null}"><span><img class="commUserListImg" src="${commReqList.profile_src}" style="width:30px; height:30px;"/></span></c:if>
+									</td>
+									<td align="center" style="padding:0.1em 0.1em; width:auto;">${commReqList.nick_name}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:20%;">${fn:substring(commReqList.user_comm_req_date, 2, 16)}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:20%;" onclick="confirmSignCommunity('${commReqList.user_idx}');"><span><a><input type="button" value="승인" style="background-color:#4acaa8;"/></a></span></td>
+									<td align="center" style="padding:0.1em 0.1em; width:20%;" onclick="rejectSignCommunity('${commReqList.user_idx}');"><span><a><input type="button" value="반려" style="background-color:#4acaa8;"/></a></span></td>
+								</tr>
+							</tbody>
+						</table>
+					</c:forEach>
+				</c:if>
+				<c:if test="${empty comminfo.userList}">
+					<div><span> * 가입신청 리스트가 없습니다.</span></div>
+				</c:if>
+			</div>
+			<div class="modal-footer">
+				<button type="button" id="reqUserListCloseBtn" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
 			</div>
 		</div>
@@ -429,6 +501,102 @@
 		function moveToCommunityView(value){
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
+		
+		var introSpan;
+		var introTxt;
+		function modifyCommunityIntro(comm_idx){
+			introSpan = document.getElementById("commintro_txt");
+			introTxt = introSpan.innerHTML;
+			introSpan.innerHTML = "<textarea id='introModifyTxt' style='resize:none; max-height:5em; max-width:90%; overflow:hidden;'>"+introTxt+"</textarea>";
+			
+			if(document.querySelector(".modifyIntro1").style.display == "none"){
+				document.querySelector(".modifyIntro").setAttribute("colspan", "2");
+				document.querySelector(".modifyIntro1").style.display = "";
+				document.querySelector(".modifyIntro2").style.display = "";
+				document.querySelector(".modifyIntro4").style.display = "none";
+			}
+		}
+		
+		function modifyCancel(comm_idx){
+			introSpan.innerHTML = introTxt;
+			if(document.querySelector(".modifyIntro1").style.display == ""){
+				document.querySelector(".modifyIntro1").style.display = "none";
+				document.querySelector(".modifyIntro2").style.display = "none";
+				document.querySelector(".modifyIntro4").style.display = "";
+			}
+		}
+		
+		function modifySave(comm_idx){
+			var modiTxt = document.getElementById("introModifyTxt").value;
+			const introModifyData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({comm_idx, modiTxt})
+			};
+			
+			fetch("/community/updateCommunityIntro.do", introModifyData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result){
+						alert("성공했습니다.");
+						location.reload();
+					}
+				});
+		}
+		
+		function reqUsersHide(uidx){
+			var tid;
+			var tables = document.getElementsByName("reqTables");
+			for(var i = 0; i < tables.length; i++){
+				tid = tables[i].id.substring(tables[i].id.indexOf("_")+1);
+				if(uidx == tid){
+					tables[i].style.display = "none";
+				}
+			}
+		}
+		
+		var confirmCidx = "${comminfo.comm_idx}";
+		var confirmStatus;
+		function confirmSignCommunity(idx){
+			/* if(confirm("승인 하시겠습니까?")){
+				
+			} */
+			confirmStatus = "A";
+			const confirmSignData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({confirmCidx, idx, confirmStatus})
+			};
+			fetch("/community/communityConfirmSignAsStatus.do", confirmSignData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result) {
+						alert("성공했습니다.");
+						reqUsersHide(data.uidx);
+					}
+				});
+		}
+		
+		function rejectSignCommunity(idx){
+			/* if(confirm("반려 하시겠습니까?")){
+				
+			} */
+			confirmStatus = "D";
+			const rejectSignData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({confirmCidx, idx, confirmStatus})
+			};
+			fetch("/community/communityRejectSignAsStatus.do", rejectSignData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result){
+						alert("성공했습니다.");
+						reqUsersHide(data.uidx);
+					}
+				});
+		}
+		
 	</script>
 
 

@@ -24,7 +24,7 @@ function kakaoLogin(){
 							body: JSON.stringify({id, pw, nick, prosrc})
 						};
 						
-						fetch("/userLoginIdCheck.do?", checkData) //체크하고 없으면 insert.
+						fetch("/userLoginIdCheckAsKakao.do?", checkData) //체크하고 없으면 insert.
 							.then(res => res.json())
 							.then((data) => {
 								console.log(data);
@@ -54,6 +54,7 @@ function kakaoLogin(){
 		})
 	
 }
+
 
 /*
 function kakaoLogin(value){ // 카카오 회원가입, 로그인 로직 분리.

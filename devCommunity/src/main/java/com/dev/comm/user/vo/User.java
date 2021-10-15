@@ -27,6 +27,7 @@ public class User {
 	private String black_edate;
 	
 	private int user_comm_role;
+	private String user_comm_req_date;
 	
 	private int tryed;
 	
@@ -178,6 +179,14 @@ public class User {
 		this.user_comm_role = user_comm_role;
 	}
 
+	public String getUser_comm_req_date() {
+		return user_comm_req_date;
+	}
+
+	public void setUser_comm_req_date(String user_comm_req_date) {
+		this.user_comm_req_date = user_comm_req_date;
+	}
+
 	public String getSecond_mail() {
 		return second_mail;
 	}
@@ -193,8 +202,9 @@ public class User {
 				+ password + ", user_role_cd=" + user_role_cd + ", reg_date=" + reg_date + ", login_date=" + login_date
 				+ ", pwd_date=" + pwd_date + ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm
 				+ ", access_status=" + access_status + ", access_ip=" + access_ip + ", black_sdate=" + black_sdate
-				+ ", black_edate=" + black_edate + ", user_comm_role=" + user_comm_role + ", tryed=" + tryed
-				+ ", second_mail=" + second_mail + ", bl_scope=" + bl_scope + "]";
+				+ ", black_edate=" + black_edate + ", user_comm_role=" + user_comm_role + ", user_comm_req_date="
+				+ user_comm_req_date + ", tryed=" + tryed + ", second_mail=" + second_mail + ", bl_scope=" + bl_scope
+				+ "]";
 	}
 
 }

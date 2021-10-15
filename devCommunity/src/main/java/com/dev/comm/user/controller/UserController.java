@@ -100,7 +100,7 @@ public class UserController {
 			obj.addProperty("result", false);
 			return obj.toString();
 		}else {
-			log.debug(tmpUser == null ? "true" : "false");
+			//log.debug(tmpUser == null ? "true" : "false");
 			if(tmpUser != null && loginFlag.equals("kakao")) {
 				boolean kakaoResult = authentication(request, tmpUser);
 				if(kakaoResult) {
@@ -109,14 +109,14 @@ public class UserController {
 				}
 			}
 		}
-		
+		tmpUser = null;
 		User user = new User();
 		user.setLogin_id(login_id);
 		
 		boolean result = false;
 		User tUser = userService.selectUserInfoAsLogin(user);
 		
-		if(tUser != null) {
+		if(tUser != null && !tUser.getUser_stat_cd().equals("T")) {
 			result = true;
 			if(tUser.getUser_role_cd() == 99 && tUser.getPassword().equals("mismatchadmin")) {
 				User usr01 = new User();
@@ -137,12 +137,16 @@ public class UserController {
 				tUser.setTryed(tUser.getTryed() + 1);
 				userService.updateUserLoginTry(tUser);
 				
-				if(tUser.getTryed() > 5) {
+				if(tUser.getTryed() > 4) {
 					// 로그인 시도횟수 임계치 실패로직..
+					tUser.setUser_stat_cd("T");
+					userService.updateUserStatusAsOverTryedLogin(tUser);
+					obj.addProperty("result", result);
+					obj.addProperty("msg", "로그인 시도 5회 실패로 계정이 잠금되었습니다.\n관리자에게 문의하세요.");
 				}
 				
 				obj.addProperty("result", result);
-				obj.addProperty("msg", "아이디 또는 비밀번호가 잘못되었습니다.");
+				obj.addProperty("msg", "아이디 또는 비밀번호가 잘못되었습니다.\n로그인 시도 5회 실패시 계정이 잠금됩니다.\n"+(5 - tUser.getTryed())+"회 남았습니다.");
 				return obj.toString();
 			}
 			
@@ -153,7 +157,12 @@ public class UserController {
 			}
 			obj.addProperty("result", result);
 			return obj.toString();
-		}else {
+		}else if(tUser != null && tUser.getUser_stat_cd().equals("T")){
+			result = false;
+			obj.addProperty("result", result);
+			obj.addProperty("msg", "계정이 잠금 상태입니다.\n관리자에게 문의하세요.");
+			return obj.toString();
+		}else{
 			result = false;
 			obj.addProperty("result", result);
 			obj.addProperty("msg", "아이디 또는 비밀번호를 잘못입력하셨습니다.\n다시 확인해주세요.");
@@ -161,7 +170,7 @@ public class UserController {
 		}
 	}
 	
-	@RequestMapping(value = "/userLoginIdCheck", method = RequestMethod.POST)
+	@RequestMapping(value = "/userLoginIdCheckAsKakao", method = RequestMethod.POST)
 	@ResponseBody
 	public String userLoginIdCheck(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
 		JsonObject obj = new JsonObject();
@@ -204,8 +213,6 @@ public class UserController {
 			}else {
 				obj.addProperty("result", false);
 			}
-			
-			
 		}
 		
 		return obj.toString();
@@ -857,7 +864,7 @@ public class UserController {
 		tuser.setLogin_id(mailto);
 		
 		User usr = userService.selectUserInfoAsLogin(tuser);
-		if(usr != null) {
+		if(usr != null && !usr.getUser_stat_cd().equals("T")) {
 			HttpSession session = request.getSession();
 			log.debug("SESSION: " + session.getId());
 			session.removeAttribute(Constants.USER_SESSION_PASSCODE);
@@ -878,6 +885,11 @@ public class UserController {
 			obj.addProperty("passcode", (String)session.getAttribute(Constants.USER_SESSION_PASSCODE));
 			return obj.toString();
 		}else {
+			if(usr.getUser_stat_cd().equals("T")) {
+				obj.addProperty("result", false);
+				obj.addProperty("msg", "로그인 시도 5회 이상 실패로 잠금된 계정입니다.\n관리자에게 문의하세요.");
+				return obj.toString();
+			}
 			obj.addProperty("result", false);
 			obj.addProperty("msg", "정보가 없습니다. 다시 확인해주세요.");
 			return obj.toString();

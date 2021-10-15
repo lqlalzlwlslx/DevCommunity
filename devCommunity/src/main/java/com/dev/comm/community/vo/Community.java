@@ -21,6 +21,7 @@ public class Community {
 	private String reg_date;
 	private ArrayList<Board> boardList;
 	private ArrayList<User> userList;
+	private ArrayList<User> reqUserList;
 	
 	private String comm_reg_cont;
 	
@@ -101,6 +102,12 @@ public class Community {
 	}
 	public void setUserList(ArrayList<User> userList) {
 		this.userList = userList;
+	}
+	public ArrayList<User> getReqUserList() {
+		return reqUserList;
+	}
+	public void setReqUserList(ArrayList<User> reqUserList) {
+		this.reqUserList = reqUserList;
 	}
 	public String getComm_reg_cont() {
 		return comm_reg_cont;
@@ -186,11 +193,12 @@ public class Community {
 		return "Community [comm_idx=" + comm_idx + ", comm_name=" + comm_name + ", comm_type_cd=" + comm_type_cd
 				+ ", comm_type_nm=" + comm_type_nm + ", comm_stat_cd=" + comm_stat_cd + ", comm_stat_nm=" + comm_stat_nm
 				+ ", comm_role_cd=" + comm_role_cd + ", reg_date=" + reg_date + ", boardList=" + boardList
-				+ ", userList=" + userList + ", comm_reg_cont=" + comm_reg_cont + ", comm_type_j=" + comm_type_j
-				+ ", comm_type_c=" + comm_type_c + ", comm_type_p=" + comm_type_p + ", comm_type_d=" + comm_type_d
-				+ ", manager_idx=" + manager_idx + ", manager_name=" + manager_name + ", status=" + status
-				+ ", comm_intro=" + comm_intro + ", total_member=" + total_member + ", total_board=" + total_board
-				+ ", comm_user_stat_cd=" + comm_user_stat_cd + ", comm_sign_request=" + comm_sign_request + "]";
+				+ ", userList=" + userList + ", reqUserList=" + reqUserList + ", comm_reg_cont=" + comm_reg_cont
+				+ ", comm_type_j=" + comm_type_j + ", comm_type_c=" + comm_type_c + ", comm_type_p=" + comm_type_p
+				+ ", comm_type_d=" + comm_type_d + ", manager_idx=" + manager_idx + ", manager_name=" + manager_name
+				+ ", status=" + status + ", comm_intro=" + comm_intro + ", total_member=" + total_member
+				+ ", total_board=" + total_board + ", comm_user_stat_cd=" + comm_user_stat_cd + ", comm_sign_request="
+				+ comm_sign_request + "]";
 	}
 
 }
