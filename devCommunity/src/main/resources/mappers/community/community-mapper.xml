@@ -18,7 +18,7 @@
 		FROM dec_community dc, dec_community_user dcu
 		WHERE dc.comm_idx = dcu.comm_idx
 		AND dcu.comm_role_cd IN (7, 9)
-		AND dcu.comm_user_stat_cd = 'A'
+		AND dcu.comm_user_stat_cd <> 'R'
 		AND dcu.user_idx = #{user_idx}
 	]]>
 	</select>
@@ -145,6 +145,7 @@
 		WHERE c.comm_idx = cu.comm_idx
 		AND c.comm_idx = #{comm_idx}
 		AND cu.comm_user_stat_cd = 'A'
+		AND cu.comm_role_cd = 7
 	]]>
 	</select>
 	
@@ -163,6 +164,26 @@
 		FROM dec_community c, dec_community_board cb
 		WHERE c.comm_idx = cb.comm_idx
 		AND c.comm_idx = #{comm_idx}
+		AND cb.board_stat_cd IN ('A')
+	]]>
+	</select>
+	
+	<select id="selectCountCommunityBlack" parameterType="community" resultType="_int">
+	<![CDATA[
+		SELECT count(*)
+		FROM dec_community c, dec_community_user cu
+		WHERE c.comm_idx = cu.comm_idx
+		AND cu.comm_user_stat_cd = 'CB'
+	]]>
+	</select>
+	
+	<select id="selectCountCommunityBlackBoard" parameterType="community" resultType="_int">
+	<![CDATA[
+		SELECT count(*)
+		FROM dec_community c, dec_community_board cb
+		WHERE c.comm_idx = cb.comm_idx
+		AND c.comm_idx = #{comm_idx}
+		AND cb.board_stat_cd IN ('B', 'CB')
 	]]>
 	</select>
 	
@@ -233,7 +254,7 @@
 	<![CDATA[
 		SELECT comm_idx,
 			user_idx,
-			(SELECT user_stat_cd FROM dec_user u WHERE u.user_idx = cu.user_idx) as user_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'USER_STAT' AND conf_type_cd = comm_user_stat_cd) as user_comm_stat_nm,
 			(SELECT nick_name FROM dec_user u WHERE cu.user_idx = u.user_idx) as nick_name,
 			(SELECT profile_src FROM dec_user u WHERE cu.user_idx = u.user_idx) as profile_src,
 			cu.comm_role_cd as user_comm_role,
@@ -241,6 +262,26 @@
 		FROM dec_community_user cu
 		WHERE cu.comm_idx = #{comm_idx}
 		AND cu.comm_user_stat_cd = 'R'
+	]]>
+	</select>
+	
+	<select id="selectCommunityBlackListUser" parameterType="community" resultType="user">
+	<![CDATA[
+		SELECT cu.comm_idx,
+			cu.user_idx,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'USER_STAT' AND conf_type_cd = comm_user_stat_cd) as user_comm_stat_nm,
+			(SELECT nick_name FROM dec_user u WHERE cu.user_idx = u.user_idx) as nick_name,
+			(SELECT profile_src FROM dec_user u WHERE cu.user_idx = u.user_idx) as profile_src,
+			cu.comm_role_cd as user_comm_role,
+			cu.reg_date as user_comm_req_date,
+			(SELECT start_date FROM dec_comm_blacklist bl WHERE bl.comm_idx = cu.comm_idx AND bl.user_idx = u.user_idx) as black_sdate,
+			(SELECT end_date FROM dec_comm_blacklist bl WHERE bl.comm_idx = cu.comm_idx AND bl.user_idx = u.user_idx) as black_edate,
+			(SELECT bl_comm_cont FROM dec_comm_blacklist bl WHERE bl.comm_idx = cu.comm_idx AND bl.user_idx = u.user_idx) as black_cont,
+			(SELECT bl_comm_scope FROM dec_comm_blacklist bl WHERE bl.comm_idx = cu.comm_idx AND bl.user_idx = u.user_idx) as black_scope
+		FROM dec_community_user cu, dec_user u
+		WHERE cu.comm_idx = #{comm_idx}
+		AND cu.user_idx = u.user_idx
+		AND cu.comm_user_stat_cd = 'CB'
 	]]>
 	</select>
 	
@@ -295,6 +336,145 @@
 		AND user_idx = #{user_idx}
 	]]>
 	</update>
+	
+	<delete id="deleteCommunitySignUserCancel" parameterType="java.util.HashMap">
+	<![CDATA[
+		DELETE FROM dec_community_user
+		WHERE comm_idx = #{comm_idx}
+		AND user_idx = #{user_idx}
+	]]>
+	</delete>
+	
+	<update id="updateUserCommunityLoginDate" parameterType="java.util.HashMap">
+	<![CDATA[
+		UPDATE dec_community_user
+		SET login_date = NOW()
+		WHERE comm_idx = #{comm_idx}
+		AND user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<insert id="insertCommunityBlackListUser" parameterType="communityBlackList">
+		<selectKey keyProperty="bl_idx" order="AFTER" resultType="_int">
+			<![CDATA[
+				SELECT LAST_INSERT_ID()
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO dec_comm_blacklist(comm_idx, user_idx, bl_comm_cont, bl_comm_scope, start_date, end_date)
+			VALUES(#{comm_idx}, #{user_idx}, #{bl_comm_cont}, #{bl_comm_scope}, NOW(), #{end_date})
+		]]>
+	</insert>
+	
+	<select id="selectCommunityBlackListUserForLog" parameterType="communityBlackList" resultType="communityBlackList">
+	<![CDATA[
+		SELECT bl_idx,
+			comm_idx,
+			user_idx,
+			bl_comm_cont,
+			bl_comm_scope,
+			start_date,
+			end_date
+		FROM dec_comm_blacklist
+		WHERE bl_idx = #{bl_idx}
+	]]>
+	</select>
+	
+	<select id="selectCommunityBlackListUserInfo" parameterType="java.util.HashMap" resultType="communityBlackList">
+	<![CDATA[
+		SELECT bl_idx,
+			comm_idx,
+			user_idx,
+			bl_comm_cont,
+			bl_comm_scope,
+			start_date,
+			end_date
+		FROM dec_comm_blacklist
+		WHERE comm_idx = #{cidx}
+		AND user_idx = #{uidx}
+	]]>
+	</select>
+	
+	<delete id="deleteCommunityUserBlackList" parameterType="communityBlackList">
+	<![CDATA[
+		DELETE FROM dec_comm_blacklist
+		WHERE comm_idx = #{comm_idx}
+		AND user_idx = #{user_idx}
+	]]>
+	</delete>
+	
+	<update id="updateCommunityBlackListLogRelease" parameterType="communityBlackList">
+	<![CDATA[
+		UPDATE dec_blacklist_log
+		SET release_date = NOW()
+		WHERE bl_flag = 'C'
+		AND bl_idx = #{bl_idx}
+		AND user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<update id="updateCommunityUserBlackListReleaseStatus" parameterType="java.util.HashMap">
+	<![CDATA[
+		UPDATE dec_community_user
+		SET comm_user_stat_cd = 'A'
+		WHERE comm_idx = #{cidx}
+		AND user_idx = #{uidx}
+	]]>
+	</update>
+	
+	<select id="selectCommunityBlackBoardList" parameterType="community" resultType="board">
+	<![CDATA[
+		SELECT b.*
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				reg_date,
+				modify_date,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
+				(SELECT count(*) FROM dec_community_board_reply r WHERE r.board_idx = b.board_idx) as reply_total
+			FROM dec_community_board b
+			WHERE b.comm_idx = #{comm_idx}
+			AND b.board_stat_cd IN ('B', 'CB')
+		) b
+		ORDER BY reg_date DESC
+	]]>
+	</select>
+	
+	<select id="selectCommunityActiveBoardList" parameterType="community" resultType="board">
+	<![CDATA[
+		SELECT b.*
+		FROM (
+			SELECT board_idx,
+				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
+				board_uidx,
+				board_scope,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
+				board_title,
+				board_content,
+				reg_date,
+				modify_date,
+				board_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
+				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
+				(SELECT count(*) FROM dec_community_board_reply r WHERE r.board_idx = b.board_idx) as reply_total
+			FROM dec_community_board b
+			WHERE b.comm_idx = #{comm_idx}
+			AND b.board_stat_cd IN ('A')
+		) b
+		ORDER BY reg_date DESC
+	]]>
+	</select>
 
 
 

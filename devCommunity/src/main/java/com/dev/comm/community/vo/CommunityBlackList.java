@@ -8,8 +8,12 @@ public class CommunityBlackList {
 	private int bl_idx;
 	private long comm_idx;
 	private int user_idx;
+	private String bl_comm_cont;
+	private int bl_comm_scope;
+	private int bl_scope;
 	private String start_date;
 	private String end_date;
+	private String bl_flag;
 	
 	public int getBl_idx() {
 		return bl_idx;
@@ -40,6 +44,30 @@ public class CommunityBlackList {
 	}
 	public void setEnd_date(String end_date) {
 		this.end_date = end_date;
+	}
+	public String getBl_flag() {
+		return bl_flag;
+	}
+	public void setBl_flag(String bl_flag) {
+		this.bl_flag = bl_flag;
+	}
+	public String getBl_comm_cont() {
+		return bl_comm_cont;
+	}
+	public void setBl_comm_cont(String bl_comm_cont) {
+		this.bl_comm_cont = bl_comm_cont;
+	}
+	public int getBl_comm_scope() {
+		return bl_comm_scope;
+	}
+	public void setBl_comm_scope(int bl_comm_scope) {
+		this.bl_comm_scope = bl_comm_scope;
+	}
+	public int getBl_scope() {
+		return bl_scope;
+	}
+	public void setBl_scope(int bl_scope) {
+		this.bl_scope = bl_scope;
 	}
 	@Override
 	public String toString() {

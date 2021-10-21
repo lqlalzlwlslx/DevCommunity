@@ -29,6 +29,7 @@
 	<![CDATA[
 		SELECT board_idx,
 			comm_idx,
+			(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
 			board_uidx,
 			board_scope,
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
@@ -40,7 +41,7 @@
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 			(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
-		FROM dec_community_board
+		FROM dec_community_board b
 		WHERE board_scope = #{board_scope}
 		AND board_stat_cd = 'A'
 		ORDER BY reg_date DESC
@@ -89,6 +90,7 @@
 		FROM (
 			SELECT board_idx,
 				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
 				board_uidx,
 				board_scope,
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
@@ -100,7 +102,7 @@
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
-			FROM dec_community_board
+			FROM dec_community_board b
 			WHERE board_scope = 'A'
 			AND board_stat_cd = 'A'
 			
@@ -108,6 +110,7 @@
 			
 			SELECT board_idx,
 				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = b.comm_idx) as comm_name,
 				board_uidx,
 				board_scope,
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
@@ -119,7 +122,7 @@
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick
-			FROM dec_community_board
+			FROM dec_community_board b
 			WHERE board_scope = 'C'
 			AND board_uidx = #{user_idx}
 			AND board_stat_cd = 'A'
@@ -388,7 +391,7 @@
 				modify_date,
 				(SELECT count(*) FROM dec_community_board_reply r WHERE b.board_idx = r.board_idx) as reply_total
 			FROM dec_community_board b
-			WHERE b.board_stat_cd = 'B'
+			WHERE b.board_stat_cd IN ('B', 'CB')
 		) t
 	]]>
 	</select>
@@ -413,7 +416,7 @@
 				modify_date,
 				(SELECT count(*) FROM dec_community_board_reply r WHERE b.board_idx = r.board_idx) as reply_total
 			FROM dec_community_board b
-			WHERE b.board_stat_cd <> 'B'
+			WHERE b.board_stat_cd = 'A'
 		) t
 	]]>
 	</select>
@@ -439,6 +442,29 @@
 		UPDATE dec_community_board
 		SET board_stat_cd = 'I'
 		WHERE board_idx = #{board_idx}
+	]]>
+	</update>
+	
+	<update id="updateCommunityBoardToFlagAsCommunityManager" parameterType="java.util.HashMap">
+	<![CDATA[
+		UPDATE dec_community_board
+	]]>
+	<if test='flag.equals("black") and flag != null'>
+		<![CDATA[ SET board_stat_cd = 'CB' ]]>
+	</if>
+	<if test='flag.equals("delete") and flag != null'>
+		<![CDATA[ SET board_stat_cd = 'I' ]]>
+	</if>
+	<![CDATA[
+		WHERE board_idx = #{bidx}
+	]]>
+	</update>
+	
+	<update id="updateCommunityBlackBoardToActiveAsCommunityManager" parameterType="_int">
+	<![CDATA[
+		UPDATE dec_community_board
+		SET board_stat_cd = 'A'
+		WHERE board_idx = #{bidx}
 	]]>
 	</update>
 	

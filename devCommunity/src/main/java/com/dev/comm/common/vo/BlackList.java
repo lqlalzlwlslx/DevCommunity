@@ -8,8 +8,10 @@ public class BlackList {
 	private int bl_idx;
 	private int user_idx;
 	private String bl_cont;
+	private int bl_scope;
 	private String start_date;
 	private String end_date;
+	private String bl_flag;
 	
 	public int getBl_idx() {
 		return bl_idx;
@@ -29,6 +31,12 @@ public class BlackList {
 	public void setBl_cont(String bl_cont) {
 		this.bl_cont = bl_cont;
 	}
+	public int getBl_scope() {
+		return bl_scope;
+	}
+	public void setBl_scope(int bl_scope) {
+		this.bl_scope = bl_scope;
+	}
 	public String getStart_date() {
 		return start_date;
 	}
@@ -40,6 +48,12 @@ public class BlackList {
 	}
 	public void setEnd_date(String end_date) {
 		this.end_date = end_date;
+	}
+	public String getBl_flag() {
+		return bl_flag;
+	}
+	public void setBl_flag(String bl_flag) {
+		this.bl_flag = bl_flag;
 	}
 	@Override
 	public String toString() {

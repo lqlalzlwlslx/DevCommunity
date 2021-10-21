@@ -520,6 +520,9 @@ public class BoardController {
 			blockBoardList = boardService.selectAdminBoardManageAsBlockList();
 			activeBoardList = boardService.selectAdminBoardManageAsActiveList();
 			
+			for(int i = 0; i < blockBoardList.size(); i++) blockBoardList.get(i).setReplyList(boardService.selectBoardReplyListAsBidx(blockBoardList.get(i).getBoard_idx()));
+			for(int i = 0; i < activeBoardList.size(); i++) activeBoardList.get(i).setReplyList(boardService.selectBoardReplyListAsBidx(activeBoardList.get(i).getBoard_idx()));
+			
 			model.addAttribute("bbList", blockBoardList);
 			model.addAttribute("abList", activeBoardList);
 		}catch(Exception e) {
@@ -657,6 +660,95 @@ public class BoardController {
 		}
 		obj.addProperty("result", false);
 		obj.addProperty("msg", "SESSION_TIMEOUT");
+		return obj.toString();
+	}
+	
+	private int communityActiveBoardToFlag(HttpServletRequest request, HttpServletResponse response, String data, String flag) throws Exception {
+		boolean result;
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int bidx = element.getAsJsonObject().get("bidx").getAsInt();
+			if(bidx > 0) {
+				boardService.updateCommunityBoardToFlagAsCommunityManager(bidx, flag);
+				return bidx;
+			}else {
+				return -1;
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY ACTIVE BOARD TO FLAG VALUE PARSING ERROR.");
+		}
+		
+		return 0;
+	}
+	
+	@RequestMapping(value = "/board/communityActiveBoardToBlack", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityActiveBoardToBlack(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		
+		int bidx = communityActiveBoardToFlag(request, response, data, "black");
+		if(bidx > 0) {
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			obj.addProperty("bidx", bidx);
+			return obj.toString();
+		}
+		obj.addProperty("result", false);
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/board/communityActiveBoardToDelete", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityActiveBoardToDelete(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		
+		int bidx = communityActiveBoardToFlag(request, response, data, "delete");
+		if(bidx > 0) {
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			obj.addProperty("bidx", bidx);
+			return obj.toString();
+		}
+		obj.addProperty("result", false);
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/board/communityBlackBoardToActive", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityBlackBoardToActive(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int bidx = element.getAsJsonObject().get("bidx").getAsInt();
+			if(bidx > 0) {
+				if(boardService.updateCommunityBlackBoardToActiveAsCommunityManager(bidx) > 0) {
+					obj.addProperty("result", true);
+					obj.addProperty("msg", " 성공했습니다.");
+					obj.addProperty("bidx", bidx);
+				}else {
+					obj.addProperty("result", false);
+					obj.addProperty("msg", "실패했습니다.");
+				}
+			}else {
+				obj.addProperty("result", false);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY BLACK BOARD TO ACTIVE VALUE PARSING FAIL");
+		}
+		
 		return obj.toString();
 	}
 	

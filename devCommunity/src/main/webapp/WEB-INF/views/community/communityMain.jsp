@@ -15,6 +15,7 @@
   		height: 150px;
   		object-fit: cover;
 	}
+	#ucLi:hover{cursor:pointer; }
 	span.image.avatar{width:150px !important;}
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
@@ -36,6 +37,11 @@
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
 		location.href="<%=request.getContextPath()%>/";
+	</c:if>
+	
+	<c:if test="${not empty COMM_BLOCKED}">
+		alert("커뮤니티 관리자에 의해 활동정지 상태입니다.\n메인 화면으로 이동합니다.");
+		moveToMain();
 	</c:if>
 	
 	<c:if test="${not empty result}">
@@ -191,7 +197,7 @@
 					<ul>
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
-						<li id="ucLi"><a href="#" id="ucListView">커뮤니티</a></li>
+						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
 						<li id="ucEmpty"style="display:none;"><a>현재 가입된 커뮤니티가 없습니다.</a></li>
 						</c:if>

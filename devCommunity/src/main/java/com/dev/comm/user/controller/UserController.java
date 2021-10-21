@@ -102,7 +102,7 @@ public class UserController {
 		}else {
 			//log.debug(tmpUser == null ? "true" : "false");
 			if(tmpUser != null && loginFlag.equals("kakao")) {
-				boolean kakaoResult = authentication(request, tmpUser);
+				boolean kakaoResult = authentication(request, tmpUser, loginFlag);
 				if(kakaoResult) {
 					obj.addProperty("result", true);
 					return obj.toString();
@@ -113,6 +113,7 @@ public class UserController {
 		User user = new User();
 		user.setLogin_id(login_id);
 		
+//		String msg = "";
 		boolean result = false;
 		User tUser = userService.selectUserInfoAsLogin(user);
 		
@@ -137,12 +138,13 @@ public class UserController {
 				tUser.setTryed(tUser.getTryed() + 1);
 				userService.updateUserLoginTry(tUser);
 				
-				if(tUser.getTryed() > 4) {
+				if(tUser.getTryed() >= 4) {
 					// 로그인 시도횟수 임계치 실패로직..
 					tUser.setUser_stat_cd("T");
 					userService.updateUserStatusAsOverTryedLogin(tUser);
 					obj.addProperty("result", result);
 					obj.addProperty("msg", "로그인 시도 5회 실패로 계정이 잠금되었습니다.\n관리자에게 문의하세요.");
+					return obj.toString();
 				}
 				
 				obj.addProperty("result", result);
@@ -150,7 +152,15 @@ public class UserController {
 				return obj.toString();
 			}
 			
-			result = authentication(request, tUser);
+			if(tUser.getUser_stat_cd().equals("B")) { //////////////~일까지.. 기간 체크해주자..
+				result = false;
+				BlackList blinfo = userService.selectBlackListUserInfo(tUser);
+				obj.addProperty("result", result);
+				obj.addProperty("msg", "로그인 시도하신 계정은 "+ blinfo.getBl_scope() +"일 활동정지 된 계정입니다.\n" + blinfo.getEnd_date() + "일 이후 로그인이 가능합니다.");
+				return obj.toString();
+			}
+			
+			result = authentication(request, tUser, loginFlag);
 			if(!result) {
 				obj.addProperty("result", result);
 				return obj.toString();
@@ -218,13 +228,14 @@ public class UserController {
 		return obj.toString();
 	}
 	
-	private boolean authentication(HttpServletRequest request, User user) throws Exception {
+	private boolean authentication(HttpServletRequest request, User user, String loginFlag) throws Exception {
 		if(user != null) {
 			HttpSession session = request.getSession();
 			log.debug("SESSION: " + session.getId());
 			
 			user.setAccess_ip(request.getRemoteAddr());
 			user.setTryed(0);
+			user.setLogin_flag(loginFlag);
 			userService.updateUserLogin(user);
 			
 			UserAccessLog ual = new UserAccessLog();
@@ -493,8 +504,8 @@ public class UserController {
 		int dupleCount = Integer.parseInt(count);
 		
 		if(dupleCount > 0) {
-			mp.addAttribute("result", false);
-			mp.addAttribute("msg", "사용중인 닉네임입니다.");
+			mp.addAttribute("result", true);
+			mp.addAttribute("msg", "사용중인 닉네임입니다.\n동일한 닉네임으로 사용은 가능합니다.");
 		} else {
 			mp.addAttribute("result", true);
 			mp.addAttribute("msg", "사용가능한 닉네임입니다.");
@@ -626,6 +637,8 @@ public class UserController {
 			bl.setUser_idx(user_idx);
 			bl.setEnd_date(endDate);
 			bl.setBl_cont(blCont);
+			bl.setBl_scope(blScope);
+			bl.setBl_flag("S");
 			
 			bl = userService.insertBlackListuser(bl);
 			
@@ -729,12 +742,41 @@ public class UserController {
 		try {
 			communityService.insertCommunityUser(cu);
 			obj.addProperty("result", true);
+			obj.addProperty("cidx", comm_idx);
 			obj.addProperty("msg", "성공했습니다.");
 		}catch(Exception e) {
 			e.printStackTrace();
 			log.error(e);
 		}
 		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/user/communitySignCancel", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String userCommunitySignCancel(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== user CommunitySign Cancel ===");
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int user_idx = element.getAsJsonObject().get("uid").getAsInt();
+			int comm_idx = element.getAsJsonObject().get("comm_idx").getAsInt();
+			
+			communityService.deleteCommunitySignUserCancel(user_idx, comm_idx);
+			
+			obj.addProperty("result", true);
+			obj.addProperty("cidx", comm_idx);
+			return obj.toString();
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("USER COMMUNITY SIGN CANCEL VALUE PARSING ERROR.");
+		}
+		
+		return null;
 	}
 	
 	@RequestMapping(value = "/user/moveToCommunityView", method = RequestMethod.GET)
@@ -745,6 +787,9 @@ public class UserController {
 		try {
 			long comm_idx = Long.parseLong(request.getParameter("idx"));
 			if(comm_idx > 0) {
+				String commStatus = userService.getUserCommunityStatus(user.getUser_idx(), comm_idx);
+				if(commStatus.equals("CB")) model.addAttribute("COMM_BLOCKED", commStatus);
+				
 				ArrayList<Board> cBoardList = boardService.selectAllCommunityBoardList(comm_idx);	//커뮤니티 전체 글 조회
 				ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
 				Community commInfo = communityService.selectCommunityDetailView((int)comm_idx);
@@ -762,6 +807,8 @@ public class UserController {
 				if(communityBoardList.size() > 0) model.addAttribute("cbList", communityBoardList);
 				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
 				if(commInfo != null) model.addAttribute("commInfo", commInfo);
+				
+				communityService.updateUserCommunityLoginDate(user.getUser_idx(), comm_idx);
 				
 				return new ModelAndView("community/communityMain");
 				

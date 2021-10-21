@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
 
+import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
@@ -176,6 +178,84 @@ public class CommunityDaoImpl implements CommunityDao {
 		map.put("user_idx", uidx);
 		map.put("comm_user_stat_cd", status);
 		sqlSession.update("community.updateCommunityConfirmUserStatus", map);
+	}
+
+	@Override
+	public void deleteCommunitySignUserCancel(int user_idx, int comm_idx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("user_idx", user_idx);
+		map.put("comm_idx", comm_idx);
+		sqlSession.delete("community.deleteCommunitySignUserCancel", map);
+	}
+
+	@Override
+	public void updateUserCommunityLoginDate(int user_idx, long comm_idx) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("user_idx", user_idx);
+		map.put("comm_idx", comm_idx);
+		sqlSession.update("community.updateUserCommunityLoginDate", map);
+	}
+
+	@Override
+	public int selectCountCommunityBlack(Community comm) throws Exception {
+		return sqlSession.selectOne("community.selectCountCommunityBlack", comm);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<User> selectCommunityBlackListUser(Community comm) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectCommunityBlackListUser", comm);
+	}
+
+	@Override
+	public CommunityBlackList insertCommunityBlackListUser(CommunityBlackList cbl) throws Exception {
+		sqlSession.insert("community.insertCommunityBlackListUser", cbl);
+		CommunityBlackList commBlackList = new CommunityBlackList();
+		commBlackList = sqlSession.selectOne("community.selectCommunityBlackListUserForLog", cbl);
+		return commBlackList;
+	}
+
+	@Override
+	public CommunityBlackList selectCommunityBlackListUserInfo(int uidx, int cidx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("uidx", uidx);
+		map.put("cidx", cidx);
+		return sqlSession.selectOne("community.selectCommunityBlackListUserInfo", map);
+	}
+
+	@Override
+	public void deleteCommunityUserBlackList(CommunityBlackList comBlinfo) throws Exception {
+		sqlSession.delete("community.deleteCommunityUserBlackList", comBlinfo);
+	}
+
+	@Override
+	public void updateCommunityUserBlackListLogRelease(CommunityBlackList comBlinfo) throws Exception {
+		sqlSession.update("community.updateCommunityBlackListLogRelease", comBlinfo);
+	}
+
+	@Override
+	public void updateCommunityUserBlackListReleaseStatus(int uidx, int cidx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("uidx", uidx);
+		map.put("cidx", cidx);
+		sqlSession.update("community.updateCommunityUserBlackListReleaseStatus", map);
+	}
+
+	@Override
+	public int selectCountCommunityBlackBoard(Community comm) throws Exception {
+		return sqlSession.selectOne("community.selectCountCommunityBlackBoard", comm);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectCommunityBlackBoardList(Community comm) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectCommunityBlackBoardList", comm);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Board> selectCommunityActiveBoardList(Community comm) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectCommunityActiveBoardList", comm);
 	}
 	
 }

@@ -184,5 +184,18 @@ public class BoardDaoImpl implements BoardDao {
 		sqlSession.update("board.adminDeleteCommunityBoardAsIdx", board);
 	}
 
+	@Override
+	public void updateCommunityBoardToFlagAsCommunityManager(int bidx, String flag) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("bidx", bidx);
+		map.put("flag", flag);
+		sqlSession.update("board.updateCommunityBoardToFlagAsCommunityManager", map);
+	}
+
+	@Override
+	public int updateCommunityBlackBoardToActiveAsCommunityManager(int bidx) throws Exception {
+		return sqlSession.update("board.updateCommunityBlackBoardToActiveAsCommunityManager", bidx);
+	}
+
 
 }

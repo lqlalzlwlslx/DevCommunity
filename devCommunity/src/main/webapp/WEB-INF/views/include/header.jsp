@@ -50,11 +50,15 @@
 		location.href="<%=request.getContextPath()%>/signUpFrm.do";
 	}
 	
-	function searchCondition(){
-		
+	function searchCondition(dCondition, dValue){
 		const sBox = document.querySelector("#searchTxt");
-		const condition = sBox.options[sBox.selectedIndex].value;
-		const searchValue = document.querySelector("#searchInputTxt").value;
+		let condition = sBox.options[sBox.selectedIndex].value;
+		let searchValue = document.querySelector("#searchInputTxt").value;
+		
+		if(dCondition){
+			condition = dCondition;
+			searchValue = dValue;
+		}
 		
 		if(condition == "0"){ alert("검색할 항목을 선택해주세요."); return; }
 		if(!searchValue){ alert("검색할 단어를 입력해주세요."); return; }
@@ -88,7 +92,7 @@
 		console.log(data);
 		if(data.result){
 			if(data.status == "COMMUNITY_SEARCH"){
-				uSearch(data.searchDataList);
+				uSearch(data.searchDataList, data.condition, data.searchValue);
 			}else{
 				uSearchBoard(data.searchDataList);
 			}
@@ -123,11 +127,31 @@
 						if(data.result == true){
 							alert(data.msg);
 							//location.reload();
+							statusTxt(data.cidx, data.condition, data.searchValue);
 						}
 					});
 				
 			}
 		</c:if>
+	}
+	
+	function signCancel(cidx){
+		if(confirm("신청을 취소하시겠습니까?")){
+			const uid = "${userBean.user_idx}";
+			const comm_idx = cidx;
+			const commCancelData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({uid, comm_idx})
+			};
+			fetch("/user/communitySignCancel.do", commCancelData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result){
+						statusTxt(data.cidx);
+					}
+				});
+		}
 	}
 	
 	

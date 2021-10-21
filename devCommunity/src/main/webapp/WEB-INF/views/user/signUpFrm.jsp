@@ -90,7 +90,6 @@
 		
 	}
 	function showProfile(res){
-		console.log(res);
 		if(res.result == true){
 			document.getElementById("prosrc").src = ${contextPath}res.src;
 		}

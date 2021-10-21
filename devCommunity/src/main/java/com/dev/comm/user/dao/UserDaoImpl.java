@@ -1,6 +1,7 @@
 package com.dev.comm.user.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
+import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.user.vo.User;
 
 @Repository
@@ -81,16 +83,19 @@ public class UserDaoImpl implements UserDao {
 		return sqlSession.selectOne("user.getLoginIdAsIdx", manager_idx);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<User> selectBlackListUser() throws Exception {
 		return (ArrayList)sqlSession.selectList("user.selectBlackListUser");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<User> selectAllUserList() throws Exception {
 		return (ArrayList)sqlSession.selectList("user.selectAllUserList");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<Conf> selectConfAsBlackListScope() throws Exception {
 		return (ArrayList)sqlSession.selectList("user.selectConfAsBlackListScope");
@@ -151,6 +156,39 @@ public class UserDaoImpl implements UserDao {
 	public void updateUserStatusAsOverTryedLogin(User tUser) throws Exception {
 		sqlSession.update("user.updateUserStatusAsOverTryedLogin", tUser);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<User> selectCommunityMemberManage(int cidx) throws Exception {
+		return (ArrayList) sqlSession.selectList("user.selectCommunityMemberManage", cidx);
+	}
+
+	@Override
+	public BlackList selectBlackListUserInfo(User tUser) throws Exception {
+		return sqlSession.selectOne("user.selectBlackListUserInfo", tUser);
+	}
+
+	@Override
+	public void updateCommunityUserBlackListStatus(long comm_idx, int user_idx) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("comm_idx", comm_idx);
+		map.put("user_idx", user_idx);
+		sqlSession.update("user.updateCommunityUserBlackListStatus", map);
+	}
+
+	@Override
+	public void insertCommunityBlackListUserLog(CommunityBlackList cbl) throws Exception {
+		sqlSession.insert("user.insertCommunityBlackListUserLog", cbl);
+	}
+
+	@Override
+	public String getUserCommunityStatus(int user_idx, long comm_idx) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("user_idx", user_idx);
+		map.put("comm_idx", comm_idx);
+		return sqlSession.selectOne("user.getUserCommunityStatus", map);
+	}
+
 
 	
 }

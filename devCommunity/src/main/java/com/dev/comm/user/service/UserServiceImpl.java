@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
+import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.user.dao.UserDao;
 import com.dev.comm.user.vo.User;
 
@@ -139,6 +140,31 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void updateUserStatusAsOverTryedLogin(User tUser) throws Exception {
 		userDao.updateUserStatusAsOverTryedLogin(tUser);
+	}
+
+	@Override
+	public ArrayList<User> selectCommunityMemberManage(int cidx) throws Exception {
+		return userDao.selectCommunityMemberManage(cidx);
+	}
+
+	@Override
+	public BlackList selectBlackListUserInfo(User tUser) throws Exception {
+		return userDao.selectBlackListUserInfo(tUser);
+	}
+
+	@Override
+	public void updateCommunityUserBlackListStatus(long comm_idx, int user_idx) throws Exception {
+		userDao.updateCommunityUserBlackListStatus(comm_idx, user_idx);
+	}
+
+	@Override
+	public void inserCommunityBlackListUserLog(CommunityBlackList cbl) throws Exception {
+		userDao.insertCommunityBlackListUserLog(cbl);
+	}
+
+	@Override
+	public String getUserCommunityStatus(int user_idx, long comm_idx) throws Exception {
+		return userDao.getUserCommunityStatus(user_idx, comm_idx);
 	}
 
 	

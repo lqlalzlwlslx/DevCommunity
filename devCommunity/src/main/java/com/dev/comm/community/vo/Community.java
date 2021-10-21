@@ -20,8 +20,10 @@ public class Community {
 	private short comm_role_cd;
 	private String reg_date;
 	private ArrayList<Board> boardList;
+	private ArrayList<Board> blackBoardList;
 	private ArrayList<User> userList;
 	private ArrayList<User> reqUserList;
+	private ArrayList<User> blackUserList;
 	
 	private String comm_reg_cont;
 	
@@ -37,7 +39,9 @@ public class Community {
 	
 	private String comm_intro;
 	private int total_member;
+	private int total_black;
 	private int total_board;
+	private int total_black_board;
 	
 	private String comm_user_stat_cd;
 	
@@ -109,6 +113,12 @@ public class Community {
 	public void setReqUserList(ArrayList<User> reqUserList) {
 		this.reqUserList = reqUserList;
 	}
+	public ArrayList<User> getBlackUserList() {
+		return blackUserList;
+	}
+	public void setBlackUserList(ArrayList<User> blackUserList) {
+		this.blackUserList = blackUserList;
+	}
 	public String getComm_reg_cont() {
 		return comm_reg_cont;
 	}
@@ -176,6 +186,12 @@ public class Community {
 	public void setTotal_board(int total_board) {
 		this.total_board = total_board;
 	}
+	public int getTotal_black() {
+		return total_black;
+	}
+	public void setTotal_black(int total_black) {
+		this.total_black = total_black;
+	}
 	public String getComm_user_stat_cd() {
 		return comm_user_stat_cd;
 	}
@@ -187,6 +203,18 @@ public class Community {
 	}
 	public void setComm_sign_request(int comm_sign_request) {
 		this.comm_sign_request = comm_sign_request;
+	}
+	public ArrayList<Board> getBlackBoardList() {
+		return blackBoardList;
+	}
+	public void setBlackBoardList(ArrayList<Board> blackBoardList) {
+		this.blackBoardList = blackBoardList;
+	}
+	public int getTotal_black_board() {
+		return total_black_board;
+	}
+	public void setTotal_black_board(int total_black_board) {
+		this.total_black_board = total_black_board;
 	}
 	@Override
 	public String toString() {

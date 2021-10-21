@@ -15,6 +15,7 @@
   		height: 150px;
   		object-fit: cover;
 	}
+	#ucLi:hover{cursor:pointer; }
 	span.image.avatar{width:150px !important;}
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
@@ -37,6 +38,7 @@
 		-o-transform:scale(5);
 		transform:scale(5);
 	}
+	.ablist_titles:hover, .ablist_black:hover, .ablist_delete:hover, .ablist_active:hover, .bblist_titles:hover, .bblist_black:hover, .ablist_replytotal:hover, .bblist_replytotal:hover{cursor:pointer;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
@@ -69,6 +71,30 @@
 		});
 		
 		document.querySelector("#communityRequestListView").addEventListener("click", function(){
+			document.querySelector(".modal-open").style.paddingRight = "0px";
+			document.querySelector(".modal-open").style.overflow = "auto";
+		});
+		
+		document.querySelector("#reqUserListCloseBtn").addEventListener("click", function(){
+			location.reload();
+		});
+		
+		document.querySelector("#communityMemberManage").addEventListener("click", function(){
+			document.querySelector(".modal-open").style.paddingRight = "0px";
+			document.querySelector(".modal-open").style.overflow = "auto";
+		});
+		
+		document.querySelector("#communityBlackManage").addEventListener("click", function(){
+			document.querySelector(".modal-open").style.paddingRight = "0px";
+			document.querySelector(".modal-open").style.overflow = "auto";
+		});
+		
+		document.querySelector("#communityActiveBoardview").addEventListener("click", function(){
+			document.querySelector(".modal-open").style.paddingRight = "0px";
+			document.querySelector(".modal-open").style.overflow = "auto";
+		});
+		
+		document.querySelector("#communityBlackBoardview").addEventListener("click", function(){
 			document.querySelector(".modal-open").style.paddingRight = "0px";
 			document.querySelector(".modal-open").style.overflow = "auto";
 		});
@@ -156,9 +182,7 @@
 					return;
 				}
 			});
-		
 	}
-	
 </script>
 </head>
 <body>
@@ -186,7 +210,7 @@
 					<ul>
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
-						<li id="ucLi"><a href="#" id="ucListView">커뮤니티</a></li>
+						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
 						<li id="ucEmpty"style="display:none;"><a>현재 가입된 커뮤니티가 없습니다.</a></li>
 						</c:if>
@@ -230,7 +254,10 @@
 									<header class="major">
 										<h2 style="font-size:3.5em;">${comminfo.comm_name}</h2>
 									</header>
-									<div><span>* 기본정보</span></div>
+									<div>
+										<span>* 기본정보</span>
+										<span style="float:right; cursor:pointer; font-size:1.25em;" onclick="closureCommunity('${comminfo.comm_idx}', '${comminfo.comm_name}');"><a>커뮤니티 폐쇄신청</a></span>
+									</div>
 									<br />
 									<table>
 										<colgroup>
@@ -279,22 +306,33 @@
 											</tr>
 											<tr>
 												<td>회원수</td>
-												<td>${comminfo.total_member} 명</td>
+												<td id="commUserTotal">${comminfo.total_member} 명</td>
 												<td></td>
-												<td colspan="2" align="right"><span><input type="button" style="background-color:#4acaa8;" value="회원관리" /></span></td>
+												<td colspan="2" align="right" id="communityMemberManage"><span><input type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#communityMemberManageModal" value="회원관리" /></span></td>
+											</tr>
+											<tr>
+												<td>차단회원</td>
+												<td>${comminfo.total_black} 명</td>
+												<td></td>
+												<td colspan="2" align="right" id="communityBlackManage"><span><input type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#communityBlackManageModal" value="차단회원관리" /></span></td>
 											</tr>
 											<tr>
 												<td>가입신청</td>
-												<td>${comminfo.comm_sign_request} 명</td>
+												<td id="commRequestCount">${comminfo.comm_sign_request} 명</td>
 												<td></td>
-												<td colspan="2" align="right"><span><input id="communityRequestListView" type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#requestUserListModal"value="목록보기" /></span></td>
+												<td colspan="2" align="right"><span><input id="communityRequestListView" type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#requestUserListModal" value="목록보기" /></span></td>
 											</tr>
 											<tr>
 												<td>게시글 수</td>
 												<td>${comminfo.total_board} 개</td>
 												<td></td>
+												<td colspan="2" align="right"><span><input id="communityActiveBoardview" type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#activeBoardListModal" value="게시글관리" /></span></td>
+											</tr>
+											<tr>
+												<td>차단게시글 수</td>
+												<td>${comminfo.total_black_board} 개</td>
 												<td></td>
-												<td align="right"></td>
+												<td colspan="2" align="right"><span><input id="communityBlackBoardview" type="button" style="background-color:#4acaa8;" data-bs-toggle="modal" data-bs-target="#blackBoardListModal" value="차단글관리" /></span></td>
 											</tr>
 										</tbody>
 									</table>
@@ -390,7 +428,7 @@
 	</div>
 </div>
 <!-- 관리자 위임 모달 -->
-<div class="modal fade" id="proxyManagerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="proxyManagerModal" tabindex="-1" aria-labelledby="proxyManagerModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -426,12 +464,12 @@
 	</div>
 </div>
 <!-- 가입신청자 확인 모달 -->
-<div class="modal fade" id="requestUserListModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="requestUserListModal" tabindex="-1" aria-labelledby="requestUserListModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="requestUserListModalLabel">커뮤니티 가입신청 리스트</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
 			</div>
 			<div class="modal-body">
 				<c:if test="${not empty comminfo.reqUserList}">
@@ -468,13 +506,301 @@
 				</c:if>
 			</div>
 			<div class="modal-footer">
-				<button type="button" id="reqUserListCloseBtn" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				<button type="button" id="reqUserListCloseBtn" class="btn btn-secondary" data-bs-dismiss="modal" onclick="ManageModalClose();">닫기</button>
 				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
 			</div>
 		</div>
 	</div>
 </div>
-			
+<!-- 커뮤니티 회원 관리 -->
+<div class="modal fade" id="communityMemberManageModal" tabindex="-1" aria-labelledby="communityMemberManageLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="communityMemberManageLabel">회원 관리</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="memberManageClose();"></button>
+			</div>
+			<div class="modal-body">
+				<c:if test="${not empty cmUserList}">
+				<table style="margin:0.25em;">
+					<thead>
+						<tr>
+							<th style="text-align:center; width:7%;">프로필</th>
+							<th style="text-align:center; width:15%;">닉네임</th>
+							<th style="text-align:center; width:10%;">상태</th>
+							<th style="text-align:center; width:20%;">가입일</th>
+							<th style="text-align:center; width:20%;">최근 로그인 일자</th>
+							<th style="text-align:center; width:15%;">게시글 수</th>
+							<th style="text-align:center; width:10%;">&nbsp;</th>
+						</tr>
+					</thead>
+				</table>
+					<c:forEach items="${cmUserList}" var="manageUsers" varStatus="manageUserStatus">
+						<table style="margin:0.25em;" id="manageUser_${manageUsers.user_idx}" name="manageUserTables">
+							<tbody>
+								<tr>
+									<td align="center" style="padding:0.1em 0.1em; width:7%;">
+										<c:if test="${manageUsers.profile_src == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;"/></span></c:if>
+										<c:if test="${manageUsers.profile_src != null}"><span><img class="commUserListImg" src="${manageUsers.profile_src}" style="width:30px; height:30px;"/></span></c:if>
+									</td>
+									<td align="center" style="padding:0.1em 0.1em; width:15%;">${manageUsers.nick_name}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;">${manageUsers.user_stat_nm}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:20%;">${fn:substring(manageUsers.user_comm_req_date, 2, 16)}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:20%;">${fn:substring(manageUsers.user_comm_login_date, 2, 16)}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:15%;">${manageUsers.user_comm_board_count} 개</td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;" onclick="cmUsersBlockShow('${manageUsers.user_idx}');"><span><a><input type="button" value="차단설정" style="background-color:#4acaa8;"/></a></span></td>
+								</tr>
+								<tr id="cmUserBlockScope_${manageUsers.user_idx}" name="cmUserBlockScopes" style="display:none;">
+									<td colspan="4" align="right">차단 기간을 설정해주세요.</td>
+									<td colspan="3">
+										<input type="radio" id="${manageUsers.user_idx}_blackScope_7" name="bScopes" value="7"><label for="${manageUsers.user_idx}_blackScope_7">7 일</label>
+										<input type="radio" id="${manageUsers.user_idx}_blackScope_15" name="bScopes" value="15"><label for="${manageUsers.user_idx}_blackScope_15">15 일</label>
+										<input type="radio" id="${manageUsers.user_idx}_blackScope_30" name="bScopes" value="30"><label for="${manageUsers.user_idx}_blackScope_30">30 일</label>
+										<input type="radio" id="${manageUsers.user_idx}_blackScope_999" name="bScopes" value="999"><label for="${manageUsers.user_idx}_blackScope_999">무기한</label>
+									</td>
+								</tr>
+								<tr id="cmUserBlockCont_${manageUsers.user_idx}" name="cmUserBlockConts" style="display:none; background-color:white;">
+									<td colspan="4" align="right">차단 사유를 입력해주세요.</td>
+									<td colspan="3"><textarea id="blockCont_${manageUsers.user_idx}" name="blockContTxts" style="resize:none;"></textarea></td>
+								</tr>
+								<tr id="cmUserBlockBtn" name="cmUserBlockBtns" style="display:none;">
+									<td colspan="4"></td>
+									<td colspan="3" align="right">
+										<span onclick="communityUserBlock('${manageUsers.user_idx}');"><a><input type="button" value="차단하기" style="background-color:#4acaa8;"/></a></span>&nbsp;&nbsp;&nbsp;&nbsp;
+										<span onclick="closureBlock('${manageUsers.user_idx}');"><a><input type="button" value="취소" style="background-color:#4acaa8;"/></a></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</c:forEach>
+				</c:if>
+				<c:if test="${empty cmUserList}">
+					<div><span> * 회원 리스트가 없습니다.</span></div>
+				</c:if>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="memberManageClose();">닫기</button>
+				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 커뮤니티 차단 회원 관리 -->
+<div class="modal fade" id="communityBlackManageModal" tabindex="-1" aria-labelledby="communityBlackModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="communityBlackModalLabel">차단회원 관리</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ManageModalClose();"></button>
+			</div>
+			<div class="modal-body">
+				<c:if test="${not empty comminfo.blackUserList}">
+				<table style="margin:0.25em;">
+					<thead>
+						<tr>
+							<th style="text-align:center; width:7%;">프로필</th>
+							<th style="text-align:center; width:15%;">닉네임</th>
+							<th style="text-align:center; width:10%;">상태</th>
+							<th style="text-align:center; width:20%;">차단사유</th>
+							<th style="text-align:center; width:15%;">차단 시작일</th>
+							<th style="text-align:center; width:15%;">차단 종료일</th>
+							<th style="text-align:center; width:10%;">&nbsp;</th>
+						</tr>
+					</thead>
+				</table>
+					<c:forEach items="${comminfo.blackUserList}" var="commBlackList" varStatus="commBlackStatus">
+						<table style="margin:0.25em;" id="commBlackLists_${commBlackList.user_idx}" name="commBlackTables">
+							<tbody>
+								<tr>
+									<td align="center" style="padding:0.1em 0.1em; width:7%;">
+										<c:if test="${commBlackList.profile_src == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;"/></span></c:if>
+										<c:if test="${commBlackList.profile_src != null}"><span><img class="commUserListImg" src="${commBlackList.profile_src}" style="width:30px; height:30px;"/></span></c:if>
+									</td>
+									<td align="center" style="padding:0.1em 0.1em; width:15%;">${commBlackList.nick_name}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;">${commBlackList.user_comm_stat_nm}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:20%;">${commBlackList.black_cont}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:15%;">${fn:substring(commBlackList.black_sdate, 2, 16)}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:15%;">${fn:substring(commBlackList.black_edate, 2, 16)}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;" onclick="communityBlackUserRelease('${commBlackList.user_idx}');">
+										<span><a><input type="button" value="차단해제" style="background-color:#4acaa8;"/></a></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</c:forEach>
+				</c:if>
+				<c:if test="${empty comminfo.blackUserList}">
+					<div><span> * 차단 회원 리스트가 없습니다.</span></div>
+				</c:if>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="ManageModalClose();">닫기</button>
+				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 일반 게시글 -->
+<div class="modal fade" id="activeBoardListModal" tabindex="-1" aria-labelledby="activeBoardListModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="activeBoardListModalLabel">게시글 관리</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ablistModalClose();"></button>
+			</div>
+			<div class="modal-body">
+				<c:if test="${not empty comminfo.boardList}">
+					<table style="margin:0.25em;">
+						<thead>
+							<tr>
+								<th style="text-align:center; width:5%;">No.</th>
+								<th style="text-align:center; width:10%;">작성자</th>
+								<th style="text-align:center; width:auto;">제목</th>
+								<th style="text-align:center; width:10%;">공개범위</th>
+								<th style="text-align:center; width:10%;">상태</th>
+								<th style="text-align:center; width:12%;">작성일</th>
+								<th style="text-align:center; width:8%;">댓글수</th>
+								<th style="text-align:center; width:7.5%;">&nbsp;</th>
+								<!-- <th style="text-align:center; width:7.5%;">&nbsp;</th> -->
+							</tr>
+						</thead>
+					</table>
+					<c:forEach items="${comminfo.boardList}" var="ablist" varStatus="abStatus">
+						<table style="margin:0.25em;" id="abLists_${ablist.board_idx}" name="ablistTables">
+							<tbody>
+								<tr>
+									<td align="center" style="padding:0.1em 0.1em; width:5%;">${ablist.board_idx}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;">${ablist.writer_nick}</td>
+									<td class="ablist_titles" style="padding:0.1em 0.1em; width:auto;" onclick="ablistBoardShowContent('${ablist.board_idx}');"><span><a>${ablist.board_title}</a></span></td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;"><c:if test="${ablist.board_scope_nm == 'All'}">전체</c:if><c:if test="${ablist.board_scope_nm == 'Communityonly'}">커뮤니티</c:if></td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;" id="ablistStatus_${ablist.board_idx}" name="ablistStatuss">${ablist.board_stat_nm}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:12%;">${fn:substring(ablist.reg_date, 2, 16)}</td>
+									<c:if test="${ablist.reply_total > 0}"><td class="ablist_replytotal" align="center" style="padding:0.1em 0.1em; width:8%;" onclick="ablistBoardReplyShow('${ablist.board_idx}');"><span><a>${ablist.reply_total} 개</a></span></td></c:if>
+									<c:if test="${ablist.reply_total == 0}"><td align="center" style="padding:0.1em 0.1em; width:8%;">${ablist.reply_total} 개</td></c:if>
+									<td class="ablist_black" align="center" style="padding:0.1em 0.1em; width:5%;" onclick="ablistBoardBlack('${ablist.board_idx}');"><input type="button" value="차단" style="background-color:#4acaa8;"/></td>
+									<!-- <td class="ablist_delete" id="ablistDeletes_${ablist.board_idx}" name="ablistDels" align="center" style="padding:0.1em 0.1em; width:5%;" onclick="ablistBoardDelete('${ablist.board_idx}');"><input type="button" value="삭제" style="background-color:#4acaa8;"/></td> -->
+								</tr>
+								<tr id="ablistContent_${ablist.board_idx}" name="ablistContents" style="display:none;">
+									<td colspan="2" align="center" style="vertical-align:middle;"><span>내용</span></td>
+									<td>${ablist.board_content}</td>
+									<td colspan="5"></td>
+								</tr>
+								<tr id="ablistReplys_${ablist.board_idx}" name="ablistReplys" style="display:none; background-color:#ffffff;">
+									<td colspan="8" style="vertical-align:middle;">
+									<c:if test="${not empty ablist.replyList}">
+										<c:forEach items="${ablist.replyList}" var="ablistReply" varStatus="abReplyStatus">
+											<table style="margin:0.25em;">
+												<tbody>
+													<tr style="background-color:#ffffff; border-top:solid 0px aliceblue; border-bottom:solid 0px aliceblue;">
+														<td align="center" style="width:5%;">
+															<c:if test="${ablistReply.reply_res_path == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;"/></span></c:if>
+															<c:if test="${ablistReply.reply_res_path != null}"><span><img class="commUserListImg" src="${ablistReply.reply_res_path}" style="width:30px; height:30px;"/></span></c:if>
+														</td>
+														<td align="center" style="width:10%;">${ablistReply.reply_nick}</td>
+														<td align="left" style="width:auto;">${ablistReply.reply_content}</td>
+														<td colspan="2" align="center" style="width:15%;">${fn:substring(ablistReply.reg_date, 2, 16)}</td>
+													</tr>
+												</tbody>
+											</table>
+										</c:forEach>
+									</c:if>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</c:forEach>
+				</c:if>
+				<c:if test="${empty comminfo.boardList}">
+					<div><span> * 작성된 게시글이 없습니다.</span></div>
+				</c:if>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="ablistModalClose();">닫기</button>
+				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 차단 게시글 -->
+<div class="modal fade" id="blackBoardListModal" tabindex="-1" aria-labelledby="blackBoardListModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="blackBoardListModalLabel">차단 게시글 관리</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ManageModalClose();"></button>
+			</div>
+			<div class="modal-body">
+				<c:if test="${not empty comminfo.blackBoardList}">
+					<table style="margin:0.25em;">
+						<thead>
+							<tr>
+								<th style="text-align:center; width:5%;">No.</th>
+								<th style="text-align:center; width:10%;">작성자</th>
+								<th style="text-align:center; width:auto;">제목</th>
+								<th style="text-align:center; width:10%;">공개범위</th>
+								<th style="text-align:center; width:10%;">상태</th>
+								<th style="text-align:center; width:12%;">작성일</th>
+								<th style="text-align:center; width:8%;">댓글수</th>
+								<th style="text-align:center; width:7.5%;">&nbsp;</th>
+							</tr>
+						</thead>
+					</table>
+					<c:forEach items="${comminfo.blackBoardList}" var="bblist" varStatus="bbStatus">
+						<table style="margin:0.25em;" id="bbLists_${bblist.board_idx}" name="bblistTables">
+							<tbody>
+								<tr>
+									<td align="center" style="padding:0.1em 0.1em; width:5%;">${bblist.board_idx}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;">${bblist.writer_nick}</td>
+									<td class="bblist_titles" style="padding:0.1em 0.1em; width:auto;" onclick="bblistBoardShowContent('${bblist.board_idx}');"><span><a>${bblist.board_title}</a></span></td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;"><c:if test="${bblist.board_scope_nm == 'All'}">전체</c:if><c:if test="${bblist.board_scope_nm == 'Communityonly'}">커뮤니티</c:if></td>
+									<td align="center" style="padding:0.1em 0.1em; width:10%;" id="bblistStatus_${bblist.board_idx}" name="ablistStatuss">${bblist.board_stat_nm}</td>
+									<td align="center" style="padding:0.1em 0.1em; width:12%;">${fn:substring(bblist.reg_date, 2, 16)}</td>
+									<c:if test="${bblist.reply_total > 0}"><td class="bblist_replytotal" align="center" style="padding:0.1em 0.1em; width:8%;" onclick="bblistBoardReplyShow('${bblist.board_idx}');"><span><a>${bblist.reply_total} 개</a></span></td></c:if>
+									<c:if test="${bblist.reply_total == 0}"><td align="center" style="padding:0.1em 0.1em; width:8%;">${bblist.reply_total} 개</td></c:if>
+									<td class="bblist_black" align="center" style="padding:0.1em 0.1em; width:5%;" onclick="bblistBoardActive('${bblist.board_idx}');"><input type="button" value="활성" style="background-color:#4acaa8;"/></td>
+								</tr>
+								<tr id="bblistContent_${bblist.board_idx}" name="bblistContents" style="display:none;">
+									<td colspan="2" align="center" style="vertical-align:middle; border-right:1px groove aliceblue;"><span>내용</span></td>
+									<td>${bblist.board_content}</td>
+									<td colspan="5"></td>
+								</tr>
+								<tr id="bblistReplys_${bblist.board_idx}" name="bblistReplys" style="display:none; background-color:#ffffff;">
+									<td colspan="8" style="vertical-align:middle;">
+									<c:if test="${not empty bblist.replyList}">
+										<c:forEach items="${bblist.replyList}" var="bblistReply" varStatus="bbReplyStatus">
+											<table style="margin:0.25em;">
+												<tbody>
+													<tr style="background-color:#ffffff; border-top:solid 0px aliceblue; border-bottom:solid 0px aliceblue;">
+														<td align="center" style="width:5%;">
+															<c:if test="${bblistReply.reply_res_path == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;"/></span></c:if>
+															<c:if test="${bblistReply.reply_res_path != null}"><span><img class="commUserListImg" src="${bblistReply.reply_res_path}" style="width:30px; height:30px;"/></span></c:if>
+														</td>
+														<td align="center" style="width:10%;">${bblistReply.reply_nick}</td>
+														<td align="left" style="width:auto;">${bblistReply.reply_content}</td>
+														<td colspan="2" align="center" style="width:15%;">${fn:substring(bblistReply.reg_date, 2, 16)}</td>
+													</tr>
+												</tbody>
+											</table>
+										</c:forEach>
+									</c:if>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</c:forEach>
+				</c:if>
+				<c:if test="${empty comminfo.blackBoardList}">
+					<div><span> * 차단 게시글이 없습니다.</span></div>
+				</c:if>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="ManageModalClose();">닫기</button>
+				<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+			</div>
+		</div>
+	</div>
+</div>			
 	<script type="text/javascript">
 		function mandateCommunityManager(comm_idx, user_idx, nick){ 
 			const manager_idx = "${comminfo.manager_idx}";
@@ -544,7 +870,34 @@
 				});
 		}
 		
-		function reqUsersHide(uidx){
+		function communityManageUserHide(uidx){
+			var tid;
+			var tables = document.getElementsByName("manageUserTables");
+			for(var i = 0; i < tables.length; i++){
+				tid = tables[i].id.substring(tables[i].id.indexOf("_")+1);
+				if(uidx == tid){
+					tables[i].style.display = "none";
+				}
+			}
+		}
+		
+		function blackReleaseUserHide(uidx){
+			var tid;
+			var tables = document.getElementsByName("commBlackTables");
+			for(var i = 0; i < tables.length; i++){
+				tid = tables[i].id.substring(tables[i].id.indexOf("_")+1);
+				if(uidx == tid){
+					tables[i].style.display = "none";
+				}
+			}
+		}
+		
+		function reqUsersHide(uidx, flag){
+			var counting = "${comminfo.comm_sign_request}";
+			if(counting > 0 && flag == "settle"){
+				counting = counting - 1;
+				document.querySelector("#commRequestCount").innerHTML = counting + '명';
+			}
 			var tid;
 			var tables = document.getElementsByName("reqTables");
 			for(var i = 0; i < tables.length; i++){
@@ -572,7 +925,7 @@
 				.then((data) => {
 					if(data.result) {
 						alert("성공했습니다.");
-						reqUsersHide(data.uidx);
+						reqUsersHide(data.uidx, "settle");
 					}
 				});
 		}
@@ -592,10 +945,329 @@
 				.then((data) => {
 					if(data.result){
 						alert("성공했습니다.");
-						reqUsersHide(data.uidx);
+						reqUsersHide(data.uidx, "reject");
 					}
 				});
 		}
+		
+		function cmUsersBlockShow(uidx){
+			var cmBlockScopes = document.getElementsByName("cmUserBlockScopes");
+			var cmBlockConts = document.getElementsByName("cmUserBlockConts");
+			var cmBlockBtns = document.getElementsByName("cmUserBlockBtns");
+			var cmBlockTxts = document.getElementsByName("blockContTxts");
+			var blockArea = document.getElementsByName("bScopes");
+			var tempid;
+			
+			for(var i = 0; i < blockArea.length; i++){
+				tempid = blockArea[i].id.substring(0, blockArea[i].id.indexOf("_"));
+				if(uidx == tempid){
+					blockArea[i].checked = true;
+					break;
+				}
+			}
+			
+			for(var i = 0; i < cmBlockScopes.length; i++){
+				cmBlockScopes[i].style.display = "none";
+				cmBlockConts[i].style.display = "none";
+				cmBlockBtns[i].style.display = "none";
+				cmBlockTxts[i].value = "";
+			}
+			
+			for(var i = 0; i < cmBlockScopes.length; i++){
+				tempid = cmBlockScopes[i].id.substring(cmBlockScopes[i].id.indexOf("_")+1);
+				if(uidx == tempid){
+					cmBlockScopes[i].style.display = "";
+					cmBlockScopes[i].style.border = "solid 2px #ffffff";
+					cmBlockConts[i].style.display = "";
+					cmBlockConts[i].style.border = "solid 2px #ffffff";
+					cmBlockBtns[i].style.display = "";
+				}
+			}
+		}
+		
+		function closureBlock(uidx){
+			var cmBlockScopes = document.getElementsByName("cmUserBlockScopes");
+			var cmBlockConts = document.getElementsByName("cmUserBlockConts");
+			var cmBlockBtns = document.getElementsByName("cmUserBlockBtns");
+			var cmBlockTxts = document.getElementsByName("blockContTxts");
+			var blockArea = document.getElementsByName("bScopes");
+			var tempid;
+			for(var i = 0; i < blockArea.length; i++){
+				tempid = blockArea[i].id.substring(0, blockArea[i].id.indexOf("_"));
+				if(uidx == tempid){
+					blockArea[i].checked = true;
+					break;
+				}
+			}
+			for(var i = 0; i < cmBlockScopes.length; i++){
+				tempid = cmBlockScopes[i].id.substring(cmBlockScopes[i].id.indexOf("_")+1);
+				if(uidx == tempid){
+					cmBlockScopes[i].style.display = "none";
+					cmBlockConts[i].style.display = "none";
+					cmBlockTxts[i].value = "";
+					cmBlockBtns[i].style.display = "none";
+					break;
+				}
+			}
+		}
+		
+		function memberManageClose(){
+			location.reload();
+			var cmBlockScopes = document.getElementsByName("cmUserBlockScopes");
+			var cmBlockConts = document.getElementsByName("cmUserBlockConts");
+			var cmBlockBtns = document.getElementsByName("cmUserBlockBtns");
+			var cmBlockTxts = document.getElementsByName("blockContTxts");
+			for(var i = 0; i < cmBlockScopes.length; i++){
+				if(cmBlockScopes[i].style.display == ""){
+					cmBlockScopes[i].style.display = "none";
+					cmBlockConts[i].style.display = "none";
+					cmBlockTxts[i].value = "";
+					cmBlockBtns[i].style.display = "none";
+				}
+			}
+			
+		}
+		
+		function communityUserBlock(uidx){
+			var blockConts = document.getElementsByName("blockContTxts");
+			var blockArea = document.getElementsByName("bScopes");
+			var cidx = "${comminfo.comm_idx}";
+			var cmUserBlockScope = null;
+			var cmUserBlockCont;
+			var tempid;
+			
+			for(var i = 0; i < blockArea.length; i++){
+				tempid = blockArea[i].id.substring(0, blockArea[i].id.indexOf("_"));
+				if(uidx == tempid){
+					if(blockArea[i].checked == true){
+						cmUserBlockScope = blockArea[i].value;
+						break;
+					}
+				}
+			}
+			/* for(var i = 0; i < blockArea.length; i++){
+				if(blockArea[i].checked == true){
+					cmUserBlockScope = blockArea[i].value;
+					break;
+				}
+			} */
+			for(var i = 0; i < blockConts.length; i++){
+				tempid = blockConts[i].id.substring(blockConts[i].id.indexOf("_")+1);
+				if(uidx == tempid){
+					cmUserBlockCont = blockConts[i].value;
+					break;
+				}
+			}
+			if(!cmUserBlockCont) { alert("사유를 작성해주세요."); return;}
+			
+			if(confirm("차단하시겠습니까?")){
+				const communityBlockData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({uidx, cmUserBlockScope, cmUserBlockCont, cidx})
+				};
+				fetch("/community/communityUserBlock.do", communityBlockData)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result){
+							alert("성공했습니다.");
+							communityManageUserHide(data.uidx);
+						}
+					});
+			}
+		}
+		
+		function communityBlackUserRelease(uidx){
+			if(confirm("해당 사용자를 차단해제 하시겠습니까?")){
+				var cidx = "${comminfo.comm_idx}";
+				const communityBlackReleaseData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({uidx, cidx})
+				};
+				fetch("/community/communityBlackUserRelease.do", communityBlackReleaseData)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result){
+							alert(data.msg);
+							blackReleaseUserHide(data.uidx);
+						}
+					});
+			}
+		}
+		
+		
+		function ablistBoardShowContent(bidx){
+			var trs = document.getElementsByName("ablistContents");
+			var trid;
+			
+			for(var i = 0; i < trs.length; i++){
+				trid = trs[i].id.substring(trs[i].id.indexOf("_")+1);
+				if(bidx == trid){
+					if(trs[i].style.display == "") trs[i].style.display = "none";
+					else trs[i].style.display = "";
+				}else{
+					trs[i].style.display = "none";
+				}
+			}
+		}
+		
+		function bblistBoardShowContent(bidx){
+			var trs = document.getElementsByName("bblistContents");
+			var trid;
+			
+			for(var i = 0; i < trs.length; i++){
+				trid = trs[i].id.substring(trs[i].id.indexOf("_")+1);
+				if(bidx == trid){
+					if(trs[i].style.display == "") trs[i].style.display = "none";
+					else trs[i].style.display = "";
+				}else{
+					trs[i].style.display = "none";
+				}
+			}
+		}
+		
+		function ablistModalClose(){
+			var trs = document.getElementsByName("ablistContents");
+			for(var i = 0; i < trs.length; i++){
+				trs[i].style.display = "none";
+			}
+			location.reload();
+		}
+		
+		function removeActiveBoardList(bidx){
+			var abtbs = document.getElementsByName("ablistTables");
+			var tbid;
+			for(var i = 0; i < abtbs.length; i++){
+				tbid = abtbs[i].id.substring(abtbs[i].id.indexOf("_")+1);
+				if(bidx == tbid){
+					abtbs[i].style.display = "none";
+				}
+			}
+		}
+		
+		function removeBlackBoardList(bidx){
+			var bbtbs = document.getElementsByName("bblistTables");
+			var tbid;
+			for(var i = 0; i < bbtbs.length; i++){
+				tbid = bbtbs[i].id.substring(bbtbs[i].id.indexOf("_")+1);
+				if(bidx == tbid){
+					bbtbs[i].style.display = "none";
+				}
+			}
+		}
+		
+		function statusChangeActiveBoardList(bidx){ // deprecated..
+			var statTds = document.getElementsByName("ablistStatuss");
+			var abDels = document.getElementsByName("ablistDels");
+			var abAct = document.getElementsByName("abActives");
+			var tdid;
+			for(var i = 0; i < statTds.length; i++){
+				tdid = statTds[i].id.substring(statTds[i].id.indexOf("_")+1);
+				if(bidx == tdid){
+					statTds[i].innerHTML = "삭제";
+				}
+			}
+		}
+		
+		function ablistBoardBlack(bidx){
+			if(confirm("해당 게시글을 차단하시겠습니까?")){
+				const abBoardBlackData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({bidx})
+				};
+				fetch("/board/communityActiveBoardToBlack.do", abBoardBlackData)
+					.then(res => res.json())
+					.then((data) => {
+						alert(data.msg);
+						removeActiveBoardList(data.bidx);
+					});
+			}
+		}
+		
+		function bblistBoardActive(bidx){
+			if(confirm("해당 게시글을 활성화하시겠습니까?")){
+				const bbBoardActiveData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({bidx})
+				};
+				fetch("/board/communityBlackBoardToActive.do", bbBoardActiveData)
+					.then(res => res.json())
+					.then((data) => {
+						alert(data.msg);
+						removeBlackBoardList(data.bidx);
+					});
+			}
+		}
+		
+		function ablistBoardDelete(bidx){
+			if(confirm("해당 게시글을 삭제처리 하시겠습니까?")){
+				const abBoardDelData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body:JSON.stringify({bidx})
+				};
+				fetch("/board/communityActiveBoardToDelete.do", abBoardDelData)
+					.then(res => res.json())
+					.then((data) => {
+						alert(data.msg);
+						statusChangeActiveBoardList(data.bidx);
+						//removeActiveBoardList(data.bidx);
+					});
+			}
+		}
+		
+		function ablistBoardReplyShow(bidx){
+			var trs = document.getElementsByName("ablistReplys");
+			var trid;
+			for(var i = 0; i < trs.length; i++){
+				trid = trs[i].id.substring(trs[i].id.indexOf("_")+1);
+				if(trid == bidx){
+					if(trs[i].style.display == "none") trs[i].style.display = "";
+					else trs[i].style.display = "none";
+				}else{
+					trs[i].style.display = "none";
+				}
+			}
+		}
+		
+		function bblistBoardReplyShow(bidx){
+			var trs = document.getElementsByName("bblistReplys");
+			var trid;
+			for(var i = 0; i < trs.length; i++){
+				trid = trs[i].id.substring(trs[i].id.indexOf("_")+1);
+				if(trid == bidx){
+					if(trs[i].style.display == "none") trs[i].style.display = "";
+					else trs[i].style.display = "none";
+				}else{
+					trs[i].style.display = "none";
+				}
+			}
+		}
+		
+		function ManageModalClose(){
+			location.reload();
+		}
+		
+		function closureCommunity(cidx, cname){
+			const reg_uidx = "${comminfo.manager_idx}";
+			if(confirm(cname +" 커뮤니티 강제폐쇄를 진행하시겠습니까?\n7일 뒤 반영되며 커뮤니티 회원들에게 알림메일이 발송됩니다.")){
+				const communityClosureData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({reg_uidx, cidx})
+				};
+				fetch("/community/communityManagerCommunityClosure.do", communityClosureData)
+					.then(res => res.json())
+					.then((data) => {
+						
+					});
+			}
+		}
+		
+		
 		
 	</script>
 

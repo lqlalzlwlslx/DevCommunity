@@ -17,17 +17,28 @@ public class User {
 	private String login_date;
 	private String pwd_date;
 	private String profile_src;
+	private String login_flag;
+	
+	private String user_comm_idxs;
+	private String user_comm_req_idxs;
 	
 	private String user_stat_nm;
 	
 	private String access_status;
 	private String access_ip;
 	
+	private String black_cont;
+	private int black_scope;
 	private String black_sdate;
 	private String black_edate;
 	
 	private int user_comm_role;
 	private String user_comm_req_date;
+	private String user_comm_login_date;
+	private String user_comm_stat_cd;
+	private String user_comm_stat_nm;
+	
+	private int user_comm_board_count;
 	
 	private int tryed;
 	
@@ -195,6 +206,78 @@ public class User {
 		this.second_mail = second_mail;
 	}
 
+	public String getUser_comm_login_date() {
+		return user_comm_login_date;
+	}
+
+	public void setUser_comm_login_date(String user_comm_login_date) {
+		this.user_comm_login_date = user_comm_login_date;
+	}
+
+	public int getUser_comm_board_count() {
+		return user_comm_board_count;
+	}
+
+	public void setUser_comm_board_count(int user_comm_board_count) {
+		this.user_comm_board_count = user_comm_board_count;
+	}
+
+	public String getBlack_cont() {
+		return black_cont;
+	}
+
+	public void setBlack_cont(String black_cont) {
+		this.black_cont = black_cont;
+	}
+
+	public int getBlack_scope() {
+		return black_scope;
+	}
+
+	public void setBlack_scope(int black_scope) {
+		this.black_scope = black_scope;
+	}
+
+	public String getUser_comm_stat_cd() {
+		return user_comm_stat_cd;
+	}
+
+	public void setUser_comm_stat_cd(String user_comm_stat_cd) {
+		this.user_comm_stat_cd = user_comm_stat_cd;
+	}
+
+	public String getUser_comm_stat_nm() {
+		return user_comm_stat_nm;
+	}
+
+	public void setUser_comm_stat_nm(String user_comm_stat_nm) {
+		this.user_comm_stat_nm = user_comm_stat_nm;
+	}
+
+	public String getUser_comm_idxs() {
+		return user_comm_idxs;
+	}
+
+	public void setUser_comm_idxs(String user_comm_idxs) {
+		this.user_comm_idxs = user_comm_idxs;
+	}
+
+	public String getLogin_flag() {
+		return login_flag;
+	}
+
+	public void setLogin_flag(String login_flag) {
+		this.login_flag = login_flag;
+	}
+
+	public String getUser_comm_req_idxs() {
+		return user_comm_req_idxs;
+	}
+
+	public void setUser_comm_req_idxs(String user_comm_req_idxs) {
+		this.user_comm_req_idxs = user_comm_req_idxs;
+	}
+
 	@Override
 	public String toString() {
 		return "User [user_idx=" + user_idx + ", comm_idx=" + comm_idx + ", user_stat_cd=" + user_stat_cd
@@ -203,8 +286,8 @@ public class User {
 				+ ", pwd_date=" + pwd_date + ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm
 				+ ", access_status=" + access_status + ", access_ip=" + access_ip + ", black_sdate=" + black_sdate
 				+ ", black_edate=" + black_edate + ", user_comm_role=" + user_comm_role + ", user_comm_req_date="
-				+ user_comm_req_date + ", tryed=" + tryed + ", second_mail=" + second_mail + ", bl_scope=" + bl_scope
-				+ "]";
+				+ user_comm_req_date + ", user_comm_login_date=" + user_comm_login_date + ", tryed=" + tryed
+				+ ", second_mail=" + second_mail + ", bl_scope=" + bl_scope + "]";
 	}
 
 }

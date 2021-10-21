@@ -123,4 +123,14 @@ public class BoardServiceImpl implements BoardService {
 		boardDao.adminDeleteCommunityBoardAsIdx(board);
 	}
 
+	@Override
+	public void updateCommunityBoardToFlagAsCommunityManager(int bidx, String flag) throws Exception {
+		boardDao.updateCommunityBoardToFlagAsCommunityManager(bidx, flag);
+	}
+
+	@Override
+	public int updateCommunityBlackBoardToActiveAsCommunityManager(int bidx) throws Exception {
+		return boardDao.updateCommunityBlackBoardToActiveAsCommunityManager(bidx);
+	}
+
 }

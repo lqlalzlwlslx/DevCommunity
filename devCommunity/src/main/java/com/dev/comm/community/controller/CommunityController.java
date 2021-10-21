@@ -1,6 +1,8 @@
 package com.dev.comm.community.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +26,10 @@ import com.dev.comm.common.base.Email;
 import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.community.service.CommunityService;
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.user.service.UserService;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.SessionManager;
-import com.dev.comm.util.StringUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -369,6 +371,8 @@ public class CommunityController {
 				}
 				mp.addAttribute("result", true);
 				mp.addAttribute("status", "COMMUNITY_SEARCH");
+				mp.addAttribute("condition", condition);
+				mp.addAttribute("searchValue", searchTxt);
 				mp.addAttribute("searchDataList", searchCommunityResult);
 			}else { //결과가 없을때.
 				mp.addAttribute("result", false);
@@ -514,13 +518,23 @@ public class CommunityController {
 			comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
 			comm.setUserList(communityService.selectCommunityAllMembers(comm));
 			comm.setReqUserList(communityService.selectCommunitySignRequestUsers(comm));
+			comm.setTotal_black(communityService.selectCountCommunityBlack(comm));
+			comm.setBlackUserList(communityService.selectCommunityBlackListUser(comm));
+			comm.setTotal_black_board(communityService.selectCountCommunityBlackBoard(comm));
+			comm.setBlackBoardList(communityService.selectCommunityBlackBoardList(comm));
+			comm.setBoardList(communityService.selectCommunityActiveBoardList(comm));
 			
 			ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+			ArrayList<User> communityManageUserList = userService.selectCommunityMemberManage(cidx);
+			
+			for(int i = 0; i < comm.getBoardList().size(); i++) comm.getBoardList().get(i).setReplyList(boardService.selectBoardReplyListAsBidx(comm.getBoardList().get(i).getBoard_idx()));
+			for(int i = 0; i < comm.getBlackBoardList().size(); i++) comm.getBlackBoardList().get(i).setReplyList(boardService.selectBoardReplyListAsBidx(comm.getBlackBoardList().get(i).getBoard_idx()));
 			
 			if(comm.getManager_idx() != user.getUser_idx()) return new ModelAndView("error");
 			else {
 				model.addAttribute("comminfo", comm);
 				if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+				if(communityManageUserList != null) model.addAttribute("cmUserList", communityManageUserList);
 				return new ModelAndView("communityManage/communityManageMain");
 			}
 		}catch(Exception e) {
@@ -550,6 +564,10 @@ public class CommunityController {
 			int fromIdx = element.getAsJsonObject().get("manager_idx").getAsInt();
 			String toNick = element.getAsJsonObject().get("nick").getAsString();
 			
+			User fromUser = userService.selectUserInfoAsIdx(fromIdx);
+			User toUser = userService.selectUserInfoAsIdx(toIdx);
+			Community comminfo = communityService.selectCommunityDetailView(commIdx);
+			
 			try {
 				ArrayList<User> communityUsers = communityService.selectCommunityUsersAsCommIdx(commIdx);
 				if(communityUsers != null && communityUsers.size() > 0) {
@@ -567,7 +585,17 @@ public class CommunityController {
 				communityService.updateCommunityManagerInfoAsMandate(commIdx, toIdx, toNick);
 				
 				//위임받는 사람 정보 가지고 sendMail 구현하자..
+				mailFrom = fromUser.getLogin_id();
+				mailTo = toUser.getLogin_id();
+				mailSubject = "[DevCommunity] ["+comminfo.getComm_name()+"] 매니저 위임 안내";
+				mailContent = "";
+				mailContent += "<h2>커뮤니티 관리자 위임 안내</h2>";
+				mailContent += comminfo.getComm_name() +" 커뮤니티 매니저 권한이 위임되었습니다.<br /><br />";
+				mailContent += "기존 매니저: " + fromUser.getNick_name() + "<br />";
+				mailContent += "위임 대상자: " + toUser.getNick_name() + "<br /><br />";
+				mailContent += "감사합니다.";
 				
+				mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
 				
 				obj.addProperty("result", true);
 				obj.addProperty("comm_idx", commIdx);
@@ -633,15 +661,28 @@ public class CommunityController {
 			int uidx = element.getAsJsonObject().get("idx").getAsInt();
 			String status = element.getAsJsonObject().get("confirmStatus").getAsString();
 			
+			Community comminfo = communityService.selectCommunityDetailView(cidx);
+			User manager = userService.selectUserInfoAsIdx(comminfo.getManager_idx());
+			User confirmUser = userService.selectUserInfoAsIdx(uidx);
+			
 			if(status.equals("A")) {
 				//update...
 				communityService.updateCommunityConfirmUserStatus(cidx, uidx, status);
+				mailFrom = manager.getLogin_id();
+				mailTo = confirmUser.getLogin_id();
+				mailSubject = "[DevCommunity] ["+comminfo.getComm_name()+"] 가입 승인 안내";
+				mailContent = "<h2>"+comminfo.getComm_name()+" 커뮤니티 가입이 승인되었습니다.</h2>";
 				result = true;
 			}else {
 				//delete...
 				communityService.deleteCommunityRejectUserStatus(cidx, uidx);
+				mailFrom = manager.getLogin_id();
+				mailTo = confirmUser.getLogin_id();
+				mailSubject = "[DevCommunity] ["+comminfo.getComm_name()+"] 가입 반려 안내";
+				mailContent = "<h2>"+comminfo.getComm_name()+ "커뮤니티 가입이 반려되었습니다.<h2>";
 				result = true;
 			}
+			mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
 			
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -686,6 +727,176 @@ public class CommunityController {
 		return obj.toString();
 	}
 	
+	@RequestMapping(value = "/community/communityUserBlock", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityUserBlock(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int user_idx = element.getAsJsonObject().get("uidx").getAsInt();
+			int black_scope = element.getAsJsonObject().get("cmUserBlockScope").getAsInt();
+			String block_cont = element.getAsJsonObject().get("cmUserBlockCont").getAsString();
+			int comm_idx = element.getAsJsonObject().get("cidx").getAsInt();
+			
+			Community comm = communityService.selectCommunityDetailView(comm_idx);
+			User managerinfo = userService.selectUserInfoAsIdx(comm.getManager_idx());
+			User blackinfo = userService.selectUserInfoAsIdx(user_idx);
+			
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String endDate = "";
+			if(black_scope == 7) {
+				cal.add(Calendar.DATE, black_scope);
+				endDate = sdf.format(cal.getTime());
+			}else if(black_scope == 15) {
+				cal.add(Calendar.DATE, black_scope);
+				endDate = sdf.format(cal.getTime());
+			}else if(black_scope == 30) {
+				cal.add(Calendar.DATE, black_scope);
+				endDate = sdf.format(cal.getTime());
+			}else {
+				endDate = "9999-12-31 23:59:59";
+			}
+			
+			CommunityBlackList cbl = new CommunityBlackList();
+			cbl.setUser_idx(user_idx);
+			cbl.setComm_idx(comm_idx);
+			cbl.setEnd_date(endDate);
+			cbl.setBl_comm_cont(block_cont);
+			cbl.setBl_comm_scope(black_scope);
+//			cbl.setBl_scope(black_scope);
+			cbl.setBl_flag("C");
+			
+			try {
+				cbl = communityService.insertCommunityBlackListUser(cbl);
+				if(cbl != null) {
+					userService.updateCommunityUserBlackListStatus(cbl.getComm_idx(), cbl.getUser_idx());
+					userService.inserCommunityBlackListUserLog(cbl);
+					
+					mailFrom = managerinfo.getLogin_id();
+					mailTo = blackinfo.getLogin_id();
+					mailSubject = "["+comm.getComm_name()+"] 커뮤니티 활동 정지 안내";
+					mailContent = "안녕하세요.<br />";
+					mailContent += comm.getComm_name() + "커뮤니티 관리자입니다.<br />";
+					mailContent += "활동 규칙에 의해 현재 시간부터 ";
+					mailContent += endDate + " 기간까지 활동정지 되었습니다.<br />";
+					mailContent += "감사합니다.";
+					
+					mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+					obj.addProperty("result", true);
+					obj.addProperty("msg", "성공했습니다.");
+					obj.addProperty("uidx", user_idx);
+					return obj.toString();
+				}
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("COMMUNITY BLACKLIST QUERY FAIL");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY MANAGE AS USER BLOCK VALUE PARSING FAIL");
+		}
+		return null;
+	}
+	
+	@RequestMapping(value ="/community/communityBlackUserRelease", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityBlackUserRelease(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== communityManage blackListUserRelease ===");
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int uidx = element.getAsJsonObject().get("uidx").getAsInt();
+			int cidx = element.getAsJsonObject().get("cidx").getAsInt();
+			
+			User toUser = userService.selectUserInfoAsIdx(uidx);
+			Community comm = communityService.selectCommunityDetailView(cidx);
+			
+			CommunityBlackList comBlinfo = communityService.selectCommunityBlackListUserInfo(uidx, cidx);
+			if(comBlinfo != null) {
+				communityService.deleteCommunityUserBlackList(comBlinfo);
+				communityService.updateCommunityUserBlackListLogRelease(comBlinfo);
+				communityService.updateCommunityUserBlackListReleaseStatus(uidx, cidx);
+				
+				mailFrom = user.getLogin_id();
+				mailTo = toUser.getLogin_id();
+				mailSubject = "["+comm.getComm_name()+"] 커뮤니티 활동정지 해제 알림";
+				mailContent = "안녕하세요.<br />";
+				mailContent += comm.getComm_name() + "커뮤니티 관리자입니다.<br />";
+				mailContent += "현재 시간부터";
+				mailContent += " 활동정지가 해제 되었음을 알려드립니다.<br />";
+				mailContent += "감사합니다.";
+				
+				mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+				
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다.");
+				obj.addProperty("uidx",  uidx);
+				return obj.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY MANAGE BLACK USER RELEASE VALUE PARSING ERROR.");
+		}
+		return null;
+	}
+	
+	private boolean communityClosureRequestAsFlag(HttpServletRequest request, HttpServletResponse response, String data, String flag) throws Exception {
+		boolean result = false;
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY CLOSURE REQUEST VALUE PARSING FAIL");
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping(value = "/console/adminCommunityClosure", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String adminCommunityClosureRequest(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== adminCommunityClosureRequest ===");
+		JsonObject obj = new JsonObject();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		if(communityClosureRequestAsFlag(request, response, data, "admin")) {
+			
+		}
+		
+		return null;
+	}
+	
+	@RequestMapping(value = "/community/communityManagerCommunityClosure", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityManagerCommunityClosureRequest(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== communityManagerCommunityClosureRequest ===");
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		if(communityClosureRequestAsFlag(request, response, data, "manager")) {
+			
+		}
+		
+		
+		return null;
+	}
 	
 	
 	

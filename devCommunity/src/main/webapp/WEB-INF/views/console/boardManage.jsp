@@ -97,32 +97,63 @@
 					</colgroup>
 							<thead>
 								<tr>
-									<th>No.</th>
-									<th>작성자</th>
-									<th>제목</th>
-									<th>공개범위</th>
-									<th>작성일</th>
-									<th>댓글 수</th>
-									<th></th>
-									<th></th>
+									<th style="text-align:center;">No.</th>
+									<th style="text-align:center;">작성자</th>
+									<th style="text-align:center;">제목</th>
+									<th style="text-align:center;">공개범위</th>
+									<th style="text-align:center;">상태</th>
+									<th style="text-align:center;">작성일</th>
+									<th style="text-align:center;">댓글 수</th>
+									<th style="text-align:center;"></th>
+									<th style="text-align:center;"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<c:forEach items="${bbList}" var="bbList" varStatus="bbStatus">
 								<tr>
-									<td>${bbList.board_idx}</td>
-									<td>${bbList.writer_nick}</td>
+									<td align="center">${bbList.board_idx}</td>
+									<td align="center">${bbList.writer_nick}</td>
 									<td onclick="adminShowBoardContent('bb', '${bbList.board_idx}');"><span><a>${bbList.board_title}</a></span></td>
-									<td><c:if test="${bbList.board_scope_nm == 'All'}">전체</c:if><c:if test="${bbList.board_scope_nm == 'Communityonly'}">커뮤니티</c:if></td>
-									<td>${fn:substring(bbList.reg_date, 2, 16)}</td>
-									<c:if test="${bbList.reply_total > 0}"><td><span><a>${bbList.reply_total} 개</a></span></td></c:if><c:if test="${bbList.reply_total == 0}"><td>${bbList.reply_total} 개</td></c:if>
-									<td onclick="blockBoardToRelease('${bbList.board_idx}');"><span><a href="#">활성</a></span></td>
-									<td onclick="blockBoardToDelete('${bbList.board_idx}');"><span><a href="#">삭제</a></span></td>
+									<td align="center"><c:if test="${bbList.board_scope_nm == 'All'}">전체</c:if><c:if test="${bbList.board_scope_nm == 'Communityonly'}">커뮤니티</c:if></td>
+									<td align="center">${bbList.board_stat_nm}</td>
+									<td align="center" style="width:12%;">${fn:substring(bbList.reg_date, 2, 16)}</td>
+									<c:if test="${bbList.reply_total > 0}"><td align="center" style="width:8%;"><span><a>${bbList.reply_total} 개</a></span></td></c:if><c:if test="${bbList.reply_total == 0}"><td align="center" style="width:8%;">${bbList.reply_total} 개</td></c:if>
+									<td align="center" style="width:5%;" onclick="blockBoardToRelease('${bbList.board_idx}');"><span><a href="#">활성</a></span></td>
+									<td align="center" style="width:5%;" onclick="blockBoardToDelete('${bbList.board_idx}');"><span><a href="#">삭제</a></span></td>
 								</tr>
 								<tr id="bbList_${bbList.board_idx}" name="blockLists" style="display:none;">
 									<td colspan="2" align="center" style="vertical-align:middle; border-right:1px groove aliceblue;"><span>내용</span></td>
 									<td>${bbList.board_content}</td>
 									<td colspan="5"></td>
+								</tr>
+								<tr id="bbReplyList_${bbList.board_idx}" name="blockReplyLists" style="display:none;">
+									<td colspan="8">
+										<c:if test="${not empty bbList.replyList}">
+											<c:forEach items="${bbList.replyList}" var="bbReplyList" varStatus="bbReplyStatus">
+												<table style="margin:0.25em;">
+													<tr>
+														<td align="center" style="width:5%;">
+															<c:if test="${bbReplyList.reply_res_path == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;"/></span></c:if>
+															<c:if test="${bbReplyList.reply_res_path != null}"><span><img class="commUserListImg" src="${bbReplyList.reply_res_path}" style="width:30px; height:30px;"/></span></c:if>
+														</td>
+														<td align="center" style="width:10%; border-right:1px groove aliceblue;">${bbReplyList.reply_nick}</td>
+														<td style="width:auto;">${bbReplyList.reply_content}</td>
+														<td align="center" style="width:15%;">${fn:substring(bbReplyList.reg_date, 2, 16)}</td>
+													</tr>
+												</table>
+											</c:forEach>
+										</c:if>
+										<c:if test="${empty bbList.replyList}">
+											<table style="margin:0.25em;">
+												<tr>
+													<td style="width:5%;"></td>
+													<td style="width:10%;"></td>
+													<td style="width:auto;"><div><span> * 작성된 댓글이 없습니다.</span></div></td>
+													<td style="width:15%;"></td>
+												</tr>
+											</table>
+										</c:if>
+									</td>
 								</tr>
 								</c:forEach>
 							</tbody>
@@ -147,32 +178,63 @@
 					</colgroup>
 						<thead>
 							<tr>
-								<th>No.</th>
-								<th>작성자</th>
-								<th>제목</th>
-								<th>공개범위</th>
-								<th>작성일</th>
-								<th>댓글 수</th>
-								<th></th>
-								<th></th>
+								<th style="text-align:center;">No.</th>
+								<th style="text-align:center;">작성자</th>
+								<th style="text-align:center;">제목</th>
+								<th style="text-align:center;">공개범위</th>
+								<th style="text-align:center;">상태</th>
+								<th style="text-align:center;">작성일</th>
+								<th style="text-align:center;">댓글 수</th>
+								<th style="text-align:center;"></th>
+								<th style="text-align:center;"></th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach items="${abList}" var="abList" varStatus="abStatus">
 								<tr>
-									<td>${abList.board_idx}</td>
-									<td>${abList.writer_nick}</td>
+									<td align="center">${abList.board_idx}</td>
+									<td align="center">${abList.writer_nick}</td>
 									<td onclick="adminShowBoardContent('ab', '${abList.board_idx}');"><span><a>${abList.board_title}</a></span></td>
-									<td><c:if test="${abList.board_scope_nm == 'All'}">전체</c:if><c:if test="${abList.board_scope_nm == 'Communityonly'}">커뮤니티</c:if></td>
-									<td>${fn:substring(abList.reg_date, 2, 16)}</td>
-									<c:if test="${abList.reply_total > 0}"><td ><span><a>${abList.reply_total} 개</a></span></td></c:if><c:if test="${abList.reply_total == 0}"><td>${abList.reply_total} 개</td></c:if></td>
-									<td onclick="activeBoardToBlock('${abList.board_idx}');"><span><a href="#">차단</a></span></td>
-									<td onclick="activeBoardToDelete('${abList.board_idx}')"><span><a href="#">삭제</a></span></td>
+									<td align="center"><c:if test="${abList.board_scope_nm == 'All'}">전체</c:if><c:if test="${abList.board_scope_nm == 'Communityonly'}">커뮤니티</c:if></td>
+									<td align="center">${abList.board_stat_nm}</td>
+									<td align="center" style="width:12%;">${fn:substring(abList.reg_date, 2, 16)}</td>
+									<c:if test="${abList.reply_total > 0}"><td align="center" style="width:8%;"><span><a>${abList.reply_total} 개</a></span></td></c:if><c:if test="${abList.reply_total == 0}"><td align="center" style="width:8%;">${abList.reply_total} 개</td></c:if>
+									<td align="center" style="width:5%;" onclick="activeBoardToBlock('${abList.board_idx}');"><span><a href="#">차단</a></span></td>
+									<td align="center" style="width:5%;" onclick="activeBoardToDelete('${abList.board_idx}')"><span><a href="#">삭제</a></span></td>
 								</tr>
 								<tr id="abList_${abList.board_idx}" name="activeLists" style="display:none;">
 									<td colspan="2" align="center" style="vertical-align:middle; border-right:1px groove aliceblue;"><span>내용</span></td>
-									<td>${abList.board_content}</td>
-									<td colspan="5"></td>
+									<td colspan="3" >${abList.board_content}</td>
+									<td colspan="4"></td>
+								</tr>
+								<tr id="abReplyList_${abList.board_idx}" name="activeReplyLists" style="display:none;">
+									<td colspan="9">
+										<c:if test="${not empty abList.replyList}">
+											<c:forEach items="${abList.replyList}" var="abReplyList" varStatus="abReplyStatus">
+												<table style="margin:0.25em;">
+													<tr>
+														<td align="center" style="width:5%;">
+															<c:if test="${abReplyList.reply_res_path == null}"><span><img class="commUserListImg" src="/resources/images/default_profile.png" style="width:30px; height:30px;"/></span></c:if>
+															<c:if test="${abReplyList.reply_res_path != null}"><span><img class="commUserListImg" src="${abReplyList.reply_res_path}" style="width:30px; height:30px;"/></span></c:if>
+														</td>
+														<td align="center" style="width:9.2%; border-right:1px groove aliceblue;">${abReplyList.reply_nick}</td>
+														<td style="width:auto;">${abReplyList.reply_content}</td>
+														<td align="center" style="width:15%;">${fn:substring(abReplyList.reg_date, 2, 16)}</td>
+													</tr>
+												</table>
+											</c:forEach>
+										</c:if>
+										<c:if test="${empty abList.replyList}">
+											<table style="margin:0.25em;">
+												<tr>
+													<td style="width:5%;"></td>
+													<td style="width:9.2%;"></td>
+													<td style="width:auto;"><div><span> * 작성된 댓글이 없습니다.</span></div></td>
+													<td style="width:15%;"></td>
+												</tr>
+											</table>
+										</c:if>
+									</td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -268,25 +330,38 @@
 	
 	function adminShowBoardContent(stat, idx){
 		var trs;
+		var ctrs;
 		var listtmp;
 		if(stat == 'bb'){
 			trs = document.getElementsByName("blockLists");
+			ctrs = document.getElementsByName("blockReplyLists");
 			for(var i = 0; i < trs.length; i++){
 				listtmp = trs[i].id.substring(trs[i].id.indexOf("_")+1);
 				if(idx == listtmp && trs[i].style.display == "none"){
 					trs[i].style.display = "";
+					ctrs[i].style.display = "";
 				}else if(idx == listtmp && trs[i].style.display == ""){
 					trs[i].style.display = "none";
+					ctrs[i].style.display = "none";
+				}else{
+					trs[i].style.display = "none";
+					ctrs[i].style.display = "none";
 				}
 			}
 		}else if(stat == 'ab'){
 			trs = document.getElementsByName("activeLists");
+			ctrs = document.getElementsByName("activeReplyLists");
 			for(var i = 0; i < trs.length; i++){
 				listtmp = trs[i].id.substring(trs[i].id.indexOf("_")+1);
 				if(idx == listtmp && trs[i].style.display == "none"){
 					trs[i].style.display = "";
+					ctrs[i].style.display = "";
 				}else if(idx == listtmp && trs[i].style.display == ""){
 					trs[i].style.display = "none";
+					ctrs[i].style.display = "none";
+				}else{
+					trs[i].style.display = "none";
+					ctrs[i].style.display = "none";
 				}
 			}
 		}

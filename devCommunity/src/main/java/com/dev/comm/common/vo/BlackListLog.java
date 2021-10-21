@@ -9,6 +9,7 @@ public class BlackListLog {
 	private int bl_idx;
 	private int user_idx;
 	private String bl_cont;
+	private int bl_scope;
 	private String start_date;
 	private String end_date;
 	private String release_date;
@@ -53,6 +54,12 @@ public class BlackListLog {
 	}
 	public void setRelease_date(String release_date) {
 		this.release_date = release_date;
+	}
+	public int getBl_scope() {
+		return bl_scope;
+	}
+	public void setBl_scope(int bl_scope) {
+		this.bl_scope = bl_scope;
 	}
 	@Override
 	public String toString() {

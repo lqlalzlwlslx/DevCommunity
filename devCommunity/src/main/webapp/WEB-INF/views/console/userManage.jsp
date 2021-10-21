@@ -120,11 +120,11 @@
 									<td class="umTd"><img class="uList_img" src="${bList.profile_src}" alt="" /></td>
 									<td class="umTd">${bList.login_id}</td>
 									<td class="umTd">${bList.nick_name}</td>
-									<td class="umTd">${bList.reg_date}</td>
+									<td class="umTd">${fn:substring(bList.reg_date, 2, 16)}</td>
 									<td class="umTd">${bList.user_stat_nm}</td>
-									<td class="umTd">${bList.login_date}</td>
-									<td class="umTd">${bList.black_sdate}</td>
-									<td class="umTd">${bList.black_edate}</td>
+									<td class="umTd">${fn:substring(bList.login_date, 2, 16)}</td>
+									<td class="umTd">${fn:substring(bList.black_sdate, 2, 16)}</td>
+									<td class="umTd">${fn:substring(bList.black_edate, 2, 16)}</td>
 									<td class="umTd" id="userRelease"><span onclick="userBlackListRelease(${bList.user_idx})">차단 즉시해제</span></td>
 								</tr>
 							</c:forEach>
@@ -157,7 +157,7 @@
 									<td class="umTd"><img class="uList_img" src="${uList.profile_src}" alt="" /></td>
 									<td class="umTd">${uList.login_id}</td>
 									<td class="umTd">${uList.nick_name}</td>
-									<td class="umTd">${uList.reg_date}</td>
+									<td class="umTd">${fn:substring(uList.reg_date, 2, 16)}</td>
 									<td class="umTd">${uList.user_stat_nm}</td>
 									<td class="umTd">${uList.login_date}</td>
 									<td class="umTd" id="userDetail"><span onclick="userDetailView('${uList.user_idx}');" data-bs-toggle="modal" data-bs-target="#userView">정보보기</span></td>
@@ -338,7 +338,6 @@
 						.then((data) => {
 							if(data.result == true){
 								alert(data.msg);
-								<% try{Thread.sleep(100L);}catch(InterruptedException e){} %>
 								location.reload();
 							}else{
 								alert(data.msg);
@@ -359,7 +358,6 @@
 					.then((data) => {
 						if(data.result == true){
 							alert(data.msg);
-							<% try{Thread.sleep(100L);}catch(InterruptedException e){} %>
 							location.relead();
 						}else{
 							alert(data.msg);

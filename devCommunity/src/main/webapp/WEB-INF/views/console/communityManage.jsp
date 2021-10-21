@@ -174,8 +174,8 @@
 									<td>${commList.comm_stat_nm}</td>
 									<td>${commList.comm_intro}</td>
 									<td>${commList.reg_date}</td>
-									<td id="detailCommunity"><span onclick="communityDetailView(${commList.comm_idx});" data-bs-toggle="modal" data-bs-target="#communityView">상세정보</span></td>
-									<td id="closureCommunity"><span onclick="closureCommunity(${commList.comm_idx})" data-bs-toggle="modal" data-bs-target="#communityView">강제폐쇄</span></td>
+									<td id="detailCommunity"><span onclick="communityDetailView('${commList.comm_idx}');" data-bs-toggle="modal" data-bs-target="#communityView">상세정보</span></td>
+									<td id="closureCommunity"><span onclick="closureCommunity('${commList.comm_idx}', '${commList.comm_name}');">강제폐쇄</span></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -252,7 +252,6 @@
 		}
 		
 		function showWinCommunity(res){
-			console.log(res);
 			let community = res.community;
 			if(res.result == true){
 				document.querySelector("#titleField").innerHTML = "커뮤니티 상세조회";
@@ -268,10 +267,20 @@
 			}
 		}
 		
-		function closureCommunity(cIdx, cname, mIdx){
-			/* if(confirm(cname + "커뮤니티 강제폐쇄를 진행하시겠습니까?\n")){
-				
-			} */
+		function closureCommunity(cidx, cname){
+			const reg_uidx = "${adminBean.user_idx}";
+			if(confirm(cname + "커뮤니티 강제폐쇄를 진행하시겠습니까?\n즉시 반영되며 커뮤니티 회원들에게 알림메일이 발송됩니다.")){
+				const communityClosureData = {
+						method: "POST",
+						headers: {},
+						body:JSON.stringify({reg_uidx, cidx})
+				};
+				fetch("/console/adminCommunityClosure.do", communityClosureData)
+					.then(res => res.json())
+					.then((data) => {
+						
+					});
+			}
 			
 		}
 		

@@ -53,4 +53,8 @@ public interface BoardDao {
 
 	void adminDeleteCommunityBoardAsIdx(Board board) throws Exception;
 
+	void updateCommunityBoardToFlagAsCommunityManager(int bidx, String flag) throws Exception;
+
+	int updateCommunityBlackBoardToActiveAsCommunityManager(int bidx) throws Exception;
+
 }

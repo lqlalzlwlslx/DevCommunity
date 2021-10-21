@@ -5,10 +5,9 @@
 	
 	<select id="selectUserInfoAsLogin" parameterType="user" resultType="user">
 	<![CDATA[
-		SELECT user_idx,
+		SELECT u.user_idx,
 			user_stat_cd,
 			(SELECT conf_name FROM dec_conf WHERE CONF_TYPE = 'USER_STAT' AND user_stat_cd = conf_type_cd) as user_stat_nm,
-			user_name,
 			login_id,
 			nick_name,
 			password,
@@ -19,8 +18,11 @@
 			access_ip,
 			tryed,
 			profile_src,
-			second_mail
-		FROM dec_user
+			second_mail,
+			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd IN ('A', 'CB')) as user_comm_idxs,
+			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd = 'R') as user_comm_req_idxs,
+			login_flag
+		FROM dec_user u
 		WHERE login_id = #{login_id}
 	]]>
 	</select>
@@ -30,7 +32,6 @@
 		SELECT user_idx,
 			user_stat_cd,
 			(SELECT conf_name FROM dec_conf WHERE CONF_TYPE = 'USER_STAT' AND user_stat_cd = conf_type_cd) as user_stat_nm,
-			user_name,
 			login_id,
 			nick_name,
 			password,
@@ -41,7 +42,8 @@
 			access_ip,
 			tryed,
 			profile_src,
-			second_mail
+			second_mail,
+			login_flag
 		FROM dec_user
 		WHERE user_idx = #{user_idx}
 	]]>
@@ -57,8 +59,8 @@
 	
 	<insert id="insertUser" parameterType="user">
 	<![CDATA[
-		INSERT INTO dec_user(user_stat_cd, user_name, login_id, nick_name, password, user_role_cd, reg_date, profile_src, second_mail)
-		VALUES(#{user_stat_cd}, #{user_name}, #{login_id}, #{nick_name}, #{password}, #{user_role_cd}, NOW(), ]]>
+		INSERT INTO dec_user(user_stat_cd, login_id, nick_name, password, user_role_cd, reg_date, profile_src, second_mail)
+		VALUES(#{user_stat_cd}, #{login_id}, #{nick_name}, #{password}, #{user_role_cd}, NOW(), ]]>
 		<if test='profile_src == ""'><![CDATA[NULL]]></if>
 		<if test='profile_src != ""'><![CDATA[#{profile_src}]]></if><![CDATA[, #{second_mail}
 		)
@@ -68,7 +70,7 @@
 	<update id="updateUserLogin" parameterType="user">
 	<![CDATA[
 		UPDATE dec_user
-		SET access_ip = #{access_ip}, login_date = NOW(), tryed = #{tryed}
+		SET access_ip = #{access_ip}, login_date = NOW(), tryed = #{tryed}, login_flag = #{login_flag}
 		WHERE user_idx = #{user_idx}
 	]]>
 	</update>
@@ -84,7 +86,7 @@
 	<update id="updateUserProfile" parameterType="user">
 	<![CDATA[
 		UPDATE dec_user
-		SET user_name = #{user_name}, nick_name = #{nick_name}, password = #{password}, profile_src = #{profile_src}, second_mail = #{second_mail}
+		SET nick_name = #{nick_name}, password = #{password}, profile_src = #{profile_src}, second_mail = #{second_mail}
 		WHERE user_idx = #{user_idx}
 	]]>
 	</update>
@@ -194,7 +196,7 @@
 			]]>
 		</selectKey>
 	<![CDATA[
-		INSERT dec_blacklist(user_idx, bl_cont, start_date, end_date)
+		INSERT INTO dec_blacklist(user_idx, bl_cont, start_date, end_date)
 		VALUES(#{user_idx}, #{bl_cont}, NOW(), #{end_date})
 	]]>
 	</insert>
@@ -219,22 +221,24 @@
 	]]>
 	</update>
 	
-	<insert id="insertBlackListUserLog" parameterType="blackListLog">
+	<insert id="insertBlackListUserLog" parameterType="blackList">
 	<![CDATA[
-		INSERT INTO dec_blacklist_log(bl_idx, user_idx, bl_cont, start_date, end_date, release_date)
-		VALUES(#{bl_idx}, #{user_idx}, #{bl_cont}, #{start_date}, #{end_date}, NULL)
+		INSERT INTO dec_blacklist_log(bl_flag, bl_idx, user_idx, bl_cont, bl_scope, start_date, end_date, release_date)
+		VALUES('S', #{bl_idx}, #{user_idx}, #{bl_cont}, #{bl_scope}, #{start_date}, #{end_date}, NULL)
 	]]>
 	</insert>
 	
 	<select id="selectOneUserBlackListInfo" parameterType="_int" resultType="blackList">
 	<![CDATA[   
 		SELECT bl_idx,
+			bl_flag,
 			user_idx,
 			bl_cont,
 			start_date,
 			end_date
 		FROM dec_blacklist
 		WHERE user_idx = #{user_idx}
+		AND bl_flag = 'S'
 	]]>
 	</select>
 	
@@ -284,6 +288,63 @@
 		WHERE user_idx = #{user_idx}
 	]]>
 	</update>
+	
+	<select id="selectCommunityMemberManage" parameterType="_int" resultType="user">
+	<![CDATA[
+		SELECT cu.user_idx,
+			(SELECT user_stat_cd FROM dec_user u WHERE u.user_idx = cu.user_idx) as user_stat_cd,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'USER_STAT' AND conf_type_cd = (SELECT user_stat_cd FROM dec_user u WHERE u.user_idx = cu.user_idx)) as user_stat_nm,
+			(SELECT login_id FROM dec_user u WHERE u.user_idx = cu.user_idx) as login_id,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = cu.user_idx) as nick_name,
+			cu.reg_date as user_comm_req_date,
+			cu.login_date as user_comm_login_date,
+			IFNULL((SELECT count(*) FROM dec_community_board cb WHERE cu.user_idx = cb.board_uidx), 0) as user_comm_board_count,
+			(SELECT profile_src FROM dec_user u WHERE u.user_idx = cu.user_idx) as profile_src
+		FROM dec_community_user cu
+		WHERE cu.comm_idx = #{comm_idx}
+		AND cu.comm_role_cd <> 9
+		AND cu.comm_user_stat_cd = 'A'
+	]]>
+	</select>
+	
+	<select id="selectBlackListUserInfo" parameterType="user" resultType="blackList">
+	<![CDATA[
+		SELECT bl_idx,
+			user_idx,
+			bl_cont,
+			bl_scope,
+			DATE_FORMAT(start_date, '%y-%m-%d') as start_date,
+			DATE_FORMAT(end_date, '%y-%m-%d') as end_date
+		FROM dec_blacklist
+		WHERE user_idx = #{user_idx}
+	]]>
+	</select>
+	
+	<update id="updateCommunityUserBlackListStatus" parameterType="java.util.HashMap">
+	<![CDATA[
+		UPDATE dec_community_user
+		SET comm_user_stat_cd = 'CB'
+		WHERE comm_idx = #{comm_idx}
+		AND user_idx = #{user_idx}
+	]]>
+	</update>
+	
+	<insert id="insertCommunityBlackListUserLog" parameterType="communityBlackList">
+	<![CDATA[
+		INSERT INTO dec_blacklist_log(bl_flag, bl_idx, user_idx, bl_cont, bl_scope, start_date, end_date, release_date)
+		VALUES('C', #{bl_idx}, #{user_idx}, #{bl_comm_cont}, #{bl_comm_scope}, #{start_date}, #{end_date}, NULL)
+	]]>
+	</insert>
+	
+	<select id="getUserCommunityStatus" parameterType="java.util.HashMap" resultType="java.lang.String">
+	<![CDATA[
+		SELECT comm_user_stat_cd
+		FROM dec_community_user
+		WHERE comm_idx = #{comm_idx}
+		AND user_idx = #{user_idx}
+	]]>
+	</select>
+	
 	
 	
 	

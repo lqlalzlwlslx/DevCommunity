@@ -6,8 +6,10 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.dao.CommunityDao;
 import com.dev.comm.community.vo.Community;
+import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
@@ -140,6 +142,66 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	public void updateCommunityConfirmUserStatus(int cidx, int uidx, String status) throws Exception {
 		communityDao.updateCommunityConfirmUserStatus(cidx, uidx, status);
+	}
+
+	@Override
+	public void deleteCommunitySignUserCancel(int user_idx, int comm_idx) throws Exception {
+		communityDao.deleteCommunitySignUserCancel(user_idx, comm_idx);
+	}
+
+	@Override
+	public void updateUserCommunityLoginDate(int user_idx, long comm_idx) throws Exception {
+		communityDao.updateUserCommunityLoginDate(user_idx, comm_idx);
+	}
+
+	@Override
+	public int selectCountCommunityBlack(Community comm) throws Exception {
+		return communityDao.selectCountCommunityBlack(comm);
+	}
+
+	@Override
+	public ArrayList<User> selectCommunityBlackListUser(Community comm) throws Exception {
+		return communityDao.selectCommunityBlackListUser(comm);
+	}
+
+	@Override
+	public CommunityBlackList insertCommunityBlackListUser(CommunityBlackList cbl) throws Exception {
+		return communityDao.insertCommunityBlackListUser(cbl);
+	}
+
+	@Override
+	public CommunityBlackList selectCommunityBlackListUserInfo(int uidx, int cidx) throws Exception {
+		return communityDao.selectCommunityBlackListUserInfo(uidx, cidx);
+	}
+
+	@Override
+	public void deleteCommunityUserBlackList(CommunityBlackList comBlinfo) throws Exception {
+		communityDao.deleteCommunityUserBlackList(comBlinfo);
+	}
+
+	@Override
+	public void updateCommunityUserBlackListLogRelease(CommunityBlackList comBlinfo) throws Exception {
+		communityDao.updateCommunityUserBlackListLogRelease(comBlinfo);
+	}
+
+	@Override
+	public void updateCommunityUserBlackListReleaseStatus(int uidx, int cidx) throws Exception {
+		communityDao.updateCommunityUserBlackListReleaseStatus(uidx, cidx);
+	}
+
+	@Override
+	public int selectCountCommunityBlackBoard(Community comm) throws Exception {
+		return communityDao.selectCountCommunityBlackBoard(comm);
+	}
+
+	@Override
+	public ArrayList<Board> selectCommunityBlackBoardList(Community comm) throws Exception {
+		return communityDao.selectCommunityBlackBoardList(comm);
+	}
+
+	@Override
+	public ArrayList<Board> selectCommunityActiveBoardList(Community comm) throws Exception {
+		return communityDao.selectCommunityActiveBoardList(comm);
 	}
 	
 }

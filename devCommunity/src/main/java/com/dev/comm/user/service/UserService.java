@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
+import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.user.vo.User;
 
 public interface UserService {
@@ -57,5 +58,15 @@ public interface UserService {
 	int changePasswdAsFindNewPasswd(User usr) throws Exception;
 
 	void updateUserStatusAsOverTryedLogin(User tUser) throws Exception;
+
+	ArrayList<User> selectCommunityMemberManage(int cidx) throws Exception;
+
+	BlackList selectBlackListUserInfo(User tUser) throws Exception;
+
+	void updateCommunityUserBlackListStatus(long comm_idx, int user_idx) throws Exception;
+
+	void inserCommunityBlackListUserLog(CommunityBlackList cbl) throws Exception;
+
+	String getUserCommunityStatus(int user_idx, long comm_idx) throws Exception;
 
 }

@@ -15,13 +15,14 @@
   		height: 150px;
   		object-fit: cover;
 	}
+	#ucLi:hover{cursor:pointer; }
 	span.image.avatar{width:150px !important;}
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
 	input[type="radio"] + label{padding-right:2em !important;}
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
-	.signUpCommunity:hover{cursor:pointer;}
+	.signUpCommunity:hover, .signCancelCommunity:hover{cursor:pointer;}
 	.communityList { color: #333; text-decoration: none; display: inline-block; padding: 15px 0; position: relative; }
 	.communityList:after { background: none repeat scroll 0 0 transparent; bottom: 0; content: ""; display: block; height: 2px;
 		left: 50%; position: absolute; background: #b9f; transition: width 0.3s ease 0s, left 0.3s ease 0s; width: 0;
@@ -190,7 +191,7 @@
 					<ul>
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
-						<li id="ucLi"><a href="#" id="ucListView">커뮤니티</a></li>
+						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
 						<li id="ucEmpty"style="display:none;"><a>현재 가입된 커뮤니티가 없습니다.</a></li>
 						</c:if>
@@ -760,7 +761,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 </div>
 			
 	<script type="text/javascript">
-		function uSearch(list){
+		function uSearch(list, condition, searchValue){
 			var contentArea = document.querySelector(".main-content-area");
 			contentArea.innerHTML = "";
 			var output;
@@ -782,9 +783,9 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
 					output += "";
 				}else if(list[i].comm_user_stat_cd == "R"){
-					output += "<span style='float:right; margin-top:2.5em;'>승인 대기 중</span>";
+					output += "<span class='signCancelCommunity' style='float:right; margin-top:2.5em;' id='signCommunityCancel_"+list[i].comm_idx+"' name='signCancels' onclick='signCancel("+list[i].comm_idx+")' ><a>승인 대기 중</a></span>";
 				}else{
-					output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
+					output += "<span class='signUpCommunity' id='signUpCommunity_"+list[i].comm_idx+"' name='signUpSpans' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'><a>커뮤니티 가입신청</a></span>";
 				}
 				output += "</header><br />";
 				output += "<table><tbody>"
@@ -823,6 +824,8 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				let ubList = res.ubList;
 				const login_id = "${userBean.login_id}";
 				const user_idx = "${userBean.user_idx}";
+				const usercommidxs = "${userBean.user_comm_idxs}";
+				const usercommreqidxs = "${userBean.user_comm_req_idxs}";
 				let board_writerId;
 				let boardReplyList;
 				//console.log(ubList);
@@ -839,7 +842,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					output += "</header>";
 					output += "</div>";
 					output += "<div style='width:23em;'>";
-					output += "<span style='float:right;'>작성일 &nbsp;&nbsp;"+ubList[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+ubList[i].writer_nick;
+					output += "<span style='float:right;'>커뮤니티 &nbsp;&nbsp;"+ubList[i].comm_name+"<br />작성일 &nbsp;&nbsp;"+ubList[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+ubList[i].writer_nick;
 					if(login_id == board_writerId){
 						output += "<span onclick='modifyBoard("+ubList[i].board_idx+")'><a href='#'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>";
 						output += "<span onclick='deleteBoard("+ubList[i].board_idx+")'><a href='#'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>";
@@ -849,8 +852,16 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					output += "</div>";	//content_inner.
 					output += "<div class='content-area'><p>"+ubList[i].board_content+"</p></div>";
 					output += "<div class='container_outer'>";
+					/* if(usercommidxs.indexOf(ubList[i].comm_idx) > -1){
+						output += "<div style='float:right; padding:0.75em;'></div>";
+					}else if(usercommreqidxs.indexOf(ubList[i].comm_idx) > -1){
+						output += "<div style='float:right; padding:0.75em; cursor:pointer;' onclick='signCancel("+ubList[i].comm_idx+");'><span><a></a>승인 대기 중</span></div>";
+					}else{
+						output += "<div style='float:right; padding:0.75em; cursor:pointer;' onclick='signUpCommunity("+ubList[i].comm_idx+");'><span><a></a>커뮤니티 가입신청</span></div>";
+					} */
+					//output += "<div style='float:right; padding:0.25em;'>bbb</div>";
 					output += "<table><tbody><tr>";
-					output += "<td style='width:12%;'>댓글작성</td>";
+					output += "<td style='width:12%;' align='center'>댓글<br />작성</td>";
 					output += "<td><textarea id='txtArea_"+ubList[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
 					output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+ubList[i].board_idx+");'><input type='button' value='등록' /></td>";
 					output += "</tr></tbody></table>";
@@ -1006,6 +1017,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					break;
 				}
 			}
+			if(!replyContent || replyContent.trim().length == 0) {alert("내용을 입력해주세요."); return;}
 			const replyInsertData = {
 					method: "POST",
 					headers: {"Content-Type": "application/json"},
@@ -1119,6 +1131,23 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 						}
 					});
 			}
+		}
+		
+		function statusTxt(cidx){	//가입신청 -> 승인대기 텍스트 변경
+			if(con && val){
+				searchCondition(con, val); //임시방편...
+			}else{
+				location.reload();
+			}
+			/* var signSpans = document.getElementsByName("signUpSpans");
+			var signSpansIdx;
+			for(var i = 0; i < signSpans.length; i++){
+				signSpansIdx = signSpans[i].id.substring(signSpans[i].id.indexOf("_")+1);
+				if(cidx == signSpansIdx){
+					signSpans[i].style.display = "none";
+					break;
+				}
+			} */
 		}
 		
 	</script>
