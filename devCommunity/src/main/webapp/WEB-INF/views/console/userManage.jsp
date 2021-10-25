@@ -47,6 +47,8 @@
 	function pageHandler(value){
 		if(value == "communityStatus"){ //communityStatus.
 			location.href="<%=request.getContextPath()%>/console/mainAdmin.do";
+		} else if(value == "inquiryStatus"){
+			location.href="<%=request.getContextPath()%>/console/board/inquiryManage.do";
 		} else if(value == "userStatus"){ //userStatus.
 			//current page. nothing.
 		} else if(value == "boardStatus"){
@@ -81,6 +83,7 @@
 		<nav id="nav">
 			<ul>
 				<li><a href="#" id="communityStatus" onclick="pageHandler(this.id);">커뮤니티 현황</a></li>
+				<li><a href="#" id="inquiryStatus" onclick="pageHandler(this.id);">1:1 문의 관리</a></li>
 				<li><a href="#" id="userStatus" onclick="pageHandler(this.id);">회원정보 관리</a></li>
 				<li><a href="#" id="boardStatus" onclick="pageHandler(this.id);">게시글 관리</a></li>
 				<li><a href="#" id="communityManage" onclick="pageHandler(this.id);">커뮤니티 관리</a></li>

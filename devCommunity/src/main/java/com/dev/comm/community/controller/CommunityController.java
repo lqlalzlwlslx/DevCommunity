@@ -27,6 +27,7 @@ import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.community.service.CommunityService;
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.community.vo.CommunityBlackList;
+import com.dev.comm.community.vo.CommunityClosure;
 import com.dev.comm.user.service.UserService;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.SessionManager;
@@ -530,6 +531,9 @@ public class CommunityController {
 			for(int i = 0; i < comm.getBoardList().size(); i++) comm.getBoardList().get(i).setReplyList(boardService.selectBoardReplyListAsBidx(comm.getBoardList().get(i).getBoard_idx()));
 			for(int i = 0; i < comm.getBlackBoardList().size(); i++) comm.getBlackBoardList().get(i).setReplyList(boardService.selectBoardReplyListAsBidx(comm.getBlackBoardList().get(i).getBoard_idx()));
 			
+			CommunityClosure closureinfo = communityService.selectCommunityClosureRequestDataAsCidx(comm.getComm_idx());
+			model.addAttribute("closureinfo", closureinfo);
+			
 			if(comm.getManager_idx() != user.getUser_idx()) return new ModelAndView("error");
 			else {
 				model.addAttribute("comminfo", comm);
@@ -858,6 +862,21 @@ public class CommunityController {
 		JsonElement element = parser.parse(data);
 		
 		try {
+			int regIdx = element.getAsJsonObject().get("reg_uidx").getAsInt();
+			int commIdx = element.getAsJsonObject().get("cidx").getAsInt();
+			
+			CommunityClosure cc = new CommunityClosure();
+			cc.setComm_idx(commIdx);
+			cc.setReg_uidx(regIdx);
+			cc.setReg_flag(flag);
+			try {
+				communityService.insertCommunityClosureRequestAsFlag(cc);
+				result = true;
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("COMMUNITY CLOSURE REQUEST QUERY FAIL");
+			}
 			
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -876,10 +895,15 @@ public class CommunityController {
 		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
 		
 		if(communityClosureRequestAsFlag(request, response, data, "admin")) {
-			
+			communityClosureinfoSendMail(new JsonParser().parse(data).getAsJsonObject().get("cidx").getAsInt(), "admin", false);
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			obj.addProperty("cidx", new JsonParser().parse(data).getAsJsonObject().get("cidx").getAsInt());
+			return obj.toString();
 		}
-		
-		return null;
+		obj.addProperty("result", false);
+		obj.addProperty("msg", "실패했습니다.");
+		return obj.toString();
 	}
 	
 	@RequestMapping(value = "/community/communityManagerCommunityClosure", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
@@ -891,11 +915,137 @@ public class CommunityController {
 		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
 		
 		if(communityClosureRequestAsFlag(request, response, data, "manager")) {
+			communityClosureinfoSendMail(new JsonParser().parse(data).getAsJsonObject().get("cidx").getAsInt(), "manager", false);
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			return obj.toString();
+		}
+		obj.addProperty("result", false);
+		obj.addProperty("msg", "실패했습니다.");
+		return obj.toString();
+	}
+	
+	private void communityClosureinfoSendMail(int cidx, String flag, boolean canceled) throws Exception {
+		try {
+			CommunityClosure closureinfo = communityService.selectCommunityClosureRequestDataAsCidx(cidx);
+			ArrayList<User> communityUsers = userService.selectCommunityUsersLoginIdAsClosure(closureinfo.getComm_idx());
+			if(closureinfo != null && flag.equals("manager")) {
+				User manager = userService.selectUserInfoAsIdx(closureinfo.getReg_uidx());
+				
+				
+				if(communityUsers.size() > 0 && communityUsers != null) {
+					for(int i = 0; i < communityUsers.size(); i++) {
+						mailFrom = manager.getLogin_id();
+						mailTo = communityUsers.get(i).getLogin_id();
+						mailSubject = "[devCommunity] 커뮤니티 폐쇄 알림";
+						mailContent = "안녕하세요 " + communityUsers.get(i).getNick_name() +"님.<br />";
+						mailContent += "[" + closureinfo.getComm_name() + "] 커뮤니티가 커뮤니티 관리자에 의해 폐쇄신청 되었습니다.";
+						mailContent += "<br /><br />";
+						mailContent += "커뮤니티는 " + closureinfo.getRemaining_period() +"일 뒤 폐쇄됩니다.<br />";
+						mailContent += "커뮤니티 폐쇄신청은 커뮤니티 관리자만 가능하며 추가 문의는 커뮤니티 관리자에게 문의해주세요.";
+						mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+					}
+				}else {
+					// nothing..없어도 상관없다..
+				}
+			}else if(closureinfo != null && flag.equals("manager") && canceled){
+				// 매니저가 취소신청한 경우.
+				User manager = userService.selectUserInfoAsIdx(closureinfo.getReg_uidx());
+				if(communityUsers.size() > 0 && communityUsers != null) {
+					for(int i = 0; i < communityUsers.size(); i++) {
+						mailFrom = manager.getLogin_id();
+						mailTo = communityUsers.get(i).getLogin_id();
+						mailSubject = "[devCommunity] 커뮤니티 폐쇄 취소 알림";
+						mailContent = "안녕하세요 " + communityUsers.get(i).getNick_name() +"님.<br />";
+						mailContent += "[" + closureinfo.getComm_name() + "] 커뮤니티가 커뮤니티 관리자에 의해 폐쇄신청이 취소되었습니다.";
+						mailContent += "<br /><br />";
+						mailContent += "커뮤니티는 정상적으로 이용이 가능합니다.<br />";
+						mailContent += "기타 문의사항은 커뮤니티 관리자에게 문의해주세요.";
+						mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+					}
+				}else {
+					// nothing..없어도 상관없다..
+				}
+			}else if(closureinfo != null && flag.equals("admin")) {
+				//관리자가 폐쇄한 경우...
+				if(communityUsers.size() > 0 && communityUsers != null) {
+					for(int i = 0; i < communityUsers.size(); i++) {
+						mailFrom = userService.selectAdminEmail();
+						mailTo = communityUsers.get(i).getLogin_id();
+						mailSubject = "[devCommunity] 커뮤니티 폐쇄 알림";
+						mailContent = "안녕하세요 " + communityUsers.get(i).getNick_name() +"님.<br />";
+						mailContent += "[" + closureinfo.getComm_name() + "] 커뮤니티가 운영자에 의해 폐쇄되었습니다.";
+						//mailContent += "<br /><br />";
+						//mailContent += "커뮤니티는 정상적으로 이용이 가능합니다.<br />";
+						mailContent += "기타 문의사항은 운영자에게 문의해주세요.";
+						mailSender.sendMail(new Email(mailFrom, mailTo, mailSubject, mailContent, mailContentType));
+					}
+				}else {
+					// nothing..없어도 상관없다..
+				}
+				
+			}else {
+				// 관리자가 살려주는경우? 버튼은 만들지 말고 db로살려주는 것만..?
+				
+				
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY CLOSUREINFO SEND FAIL");
+		}
+	}
+	
+	@RequestMapping(value = "/community/communityClosureCancelAsManager", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String communityClosureCancelAsManager(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		JsonObject obj = new JsonObject();
+		User manager = SessionManager.getUserSession(request);
+		if(manager == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		try {
+			int cidx = new JsonParser().parse(data).getAsJsonObject().get("cidx").getAsInt();
+			CommunityClosure ccinfo = communityService.deleteCommunityClosureAsManager(cidx);
+			if(ccinfo != null) {
+				communityClosureinfoSendMail(new JsonParser().parse(data).getAsJsonObject().get("cidx").getAsInt(), "manager", true);
+			}
+			obj.addProperty("result", true);
+			obj.addProperty("msg", "성공했습니다.");
+			return obj.toString();
 			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("COMMUNITY CLOSURE CANCEL DATA PARSING ERROR.");
+		}
+		obj.addProperty("result", false);
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/community/userCommunityExit", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String userCommunityExit(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== user community exit ===");
+		JsonObject obj = new JsonObject();
+		User user = SessionManager.getUserSession(request);
+		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		
+		try {
+			int uidx = new JsonParser().parse(data).getAsJsonObject().get("uidx").getAsInt();
+			int cidx = new JsonParser().parse(data).getAsJsonObject().get("cidx").getAsInt();
+			
+			if(communityService.userCommunityExit(cidx, uidx) > 0) {
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다.\n메인화면으로 이동합니다.");
+			}else {
+				obj.addProperty("result", false);
+				obj.addProperty("msg", "처리에 실패했습니다.");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("USER COMMUNITY EXIT DATA VALUE PARSING ERROR.");
 		}
 		
-		
-		return null;
+		return obj.toString();
 	}
 	
 	

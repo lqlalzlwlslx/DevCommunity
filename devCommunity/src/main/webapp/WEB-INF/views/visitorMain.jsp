@@ -203,7 +203,7 @@
 							output += "<div class='container_outer'>";
 							output += "<table><tbody><tr>";
 							output += "<td style='width:12%' align='center'>댓글<br />작성</td>";
-							output += "<td><textArea id='txtArea_"+vbList[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
+							output += "<td><textArea id='txtArea_"+vbList[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;' placeholder='댓글 작성은 회원만 가능합니다.'></textarea></td>";
 							output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+vbList[i].board_idx+");'><input type='button' value='등록' /></td>";
 							output += "</tr></tboby></table>";
 							output += "</div>";	//container_outer.

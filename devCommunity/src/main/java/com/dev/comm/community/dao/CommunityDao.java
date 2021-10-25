@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.community.vo.CommunityBlackList;
+import com.dev.comm.community.vo.CommunityClosure;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
@@ -84,5 +85,13 @@ public interface CommunityDao {
 	ArrayList<Board> selectCommunityBlackBoardList(Community comm) throws Exception;
 
 	ArrayList<Board> selectCommunityActiveBoardList(Community comm) throws Exception;
+
+	void insertCommunityClosureRequestAsFlag(CommunityClosure cc) throws Exception;
+
+	CommunityClosure selectCommunityClosureRequestDataAsCidx(long comm_idx) throws Exception;
+
+	CommunityClosure deleteCommunityClosureAsManager(int cidx) throws Exception;
+
+	int userCommunityExit(int cidx, int uidx) throws Exception;
 
 }

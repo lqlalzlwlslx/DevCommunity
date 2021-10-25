@@ -167,5 +167,10 @@ public class UserServiceImpl implements UserService {
 		return userDao.getUserCommunityStatus(user_idx, comm_idx);
 	}
 
+	@Override
+	public ArrayList<User> selectCommunityUsersLoginIdAsClosure(int comm_idx) throws Exception {
+		return userDao.selectCommunityUsersLoginIdAsClosure(comm_idx);
+	}
+
 	
 }

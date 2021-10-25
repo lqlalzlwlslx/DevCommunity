@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dev.comm.board.service.BoardService;
 import com.dev.comm.board.vo.Board;
+import com.dev.comm.board.vo.Inquiry;
 import com.dev.comm.common.base.Email;
 import com.dev.comm.common.base.EmailSender;
 import com.dev.comm.common.service.UserAccessLogService;
@@ -973,6 +974,33 @@ public class UserController {
 		}
 		
 		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/user/inquiryToAdmin", method = RequestMethod.GET)
+	public ModelAndView userInquiryToAdmin(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) return new ModelAndView("redirect:/");
+		
+		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+		if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+		
+		
+		
+		return new ModelAndView("config/inquiry");
+	}
+	
+	@RequestMapping(value = "/user/inquiryView", method = RequestMethod.GET)
+	public ModelAndView userInquiryView(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) return new ModelAndView("redirect:/");
+		
+		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+		if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+		
+		ArrayList<Inquiry> inquiryList = boardService.selectUserInquiryList(user);
+		model.addAttribute("inquiryList", inquiryList);
+		
+		return new ModelAndView("config/inquiryList");
 	}
 	
 	/*

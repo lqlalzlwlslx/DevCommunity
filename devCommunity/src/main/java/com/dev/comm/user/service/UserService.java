@@ -69,4 +69,6 @@ public interface UserService {
 
 	String getUserCommunityStatus(int user_idx, long comm_idx) throws Exception;
 
+	ArrayList<User> selectCommunityUsersLoginIdAsClosure(int comm_idx) throws Exception;
+
 }

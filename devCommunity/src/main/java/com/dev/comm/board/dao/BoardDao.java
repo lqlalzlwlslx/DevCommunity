@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Inquiry;
+import com.dev.comm.board.vo.InquiryFile;
 import com.dev.comm.board.vo.Reply;
 import com.dev.comm.user.vo.User;
 
@@ -56,5 +58,19 @@ public interface BoardDao {
 	void updateCommunityBoardToFlagAsCommunityManager(int bidx, String flag) throws Exception;
 
 	int updateCommunityBlackBoardToActiveAsCommunityManager(int bidx) throws Exception;
+
+	Inquiry insertCommunityInquiryToAdmin(Inquiry inquiry) throws Exception;
+
+	void insertCommunityInquiryFile(InquiryFile inquiryFile) throws Exception;
+
+	ArrayList<Inquiry> selectUserInquiryList(User user) throws Exception;
+
+	ArrayList<Inquiry> selectAdminBoardInquiryManageList() throws Exception;
+
+	Inquiry selectAdminBoardInquiryInfo(int inquiry_idx) throws Exception;
+
+	void updateBoardInquiryAnswerFromAdmin(Inquiry inquiryInfo) throws Exception;
+
+	void modifyBoardInquiryAnswerFromAdmin(Inquiry inquiryInfo) throws Exception;
 
 }

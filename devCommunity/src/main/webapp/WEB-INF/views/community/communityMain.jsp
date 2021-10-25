@@ -196,10 +196,11 @@
 				<nav id="nav">
 					<ul>
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
+						<li onclick="moveToFaQ();" style="cursor:pointer;"><a> 1:1 문의하기 </a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
 						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
-						<li id="ucEmpty"style="display:none;"><a>현재 가입된 커뮤니티가 없습니다.</a></li>
+						<li id="ucEmpty"style="display:none;"><a>가입된 커뮤니티가 없습니다.</a></li>
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
@@ -271,7 +272,10 @@
 										<c:if test="${not empty commInfo}">
 											<div style="display:flex;">
 											<div style="width:90%;"><h2 style="margin: 0; font-size:3.5em;">${commInfo.comm_name}</h2></div>
-											<div align="right" style="padding-top: 1em;"><c:if test="${commInfo.manager_idx == userBean.user_idx}"><span style="float:right;" onclick="communityManagerSettings('${commInfo.comm_idx}');"><input type="button" value="커뮤니티 관리" style="background-color:#4acaa8;"/></span></c:if></div>
+											<div align="right" style="padding-top: 1em;">
+												<c:if test="${commInfo.manager_idx == userBean.user_idx}"><span style="float:right;" onclick="communityManagerSettings('${commInfo.comm_idx}');"><input type="button" value="커뮤니티 관리" style="background-color:#4acaa8;"/></span></c:if>
+												<c:if test="${commInfo.manager_idx != userBean.user_idx}"><span style="float:right;" onclick="communityExits('${commInfo.comm_idx}')"><input type="button" value="커뮤니티탈퇴" style="background-color:#4acaa8;" /></span></c:if>
+											</div>
 											</div>
 											<table>
 												<tbody>
@@ -546,7 +550,7 @@
 			for(var i = 0; i < txtAreas.length; i++){
 				tmp = txtAreas[i].id.substring(txtAreas[i].id.indexOf("_")+1);
 				if(bidx == tmp){
-					replyContent = txtAreas[i].value;
+					replyContent = txtAreas[i].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
 					break;
 				}
 			}
@@ -601,7 +605,7 @@
 			for(var i = 0; i < modiTxtAreas.length; i++){
 				retmp = modiTxtAreas[i].id.substring(modiTxtAreas[i].id.indexOf("_")+1);
 				if(idx == retmp){
-					replyModifyContent = modiTxtAreas[i].value;
+					replyModifyContent = modiTxtAreas[i].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
 				}
 			}
 			const replyModifyData = {
@@ -680,6 +684,29 @@
 		
 		function communityManagerSettings(idx){
 			location.href="<%=request.getContextPath()%>/community/communityManagerSettingsView.do?idx="+idx;
+		}
+		
+		function communityExits(cidx){
+			if(!confirm("커뮤니티를 탈퇴하시겠습니까?")){
+				return;
+			}
+			
+			const uidx = "${userBean.user_idx}";
+			const communityExitData = {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({uidx, cidx})
+			};
+			fetch("/community/userCommunityExit.do", communityExitData)
+				.then(res => res.json())
+				.then((data) => {
+					if(data.result){
+						alert(data.msg);
+						moveToMain();
+					}else{
+						alert(data.msg);
+					}
+				});
 		}
 	</script>
 

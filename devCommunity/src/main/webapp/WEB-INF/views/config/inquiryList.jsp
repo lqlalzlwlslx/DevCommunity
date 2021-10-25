@@ -39,28 +39,6 @@
 		location.href="<%=request.getContextPath()%>/";
 	</c:if>
 	
-	<c:if test="${not empty result}">
-		<c:if test="${result == true}">
-			<c:if test="${status == 'UPDATE'}">
-				alert("성공했습니다.");
-				top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx=${moveToValue}";
-			</c:if>
-		</c:if>
-		
-		<c:if test="${result == false}">
-			<c:if test="${not empty msg}">
-				alert("${msg}");
-			</c:if>
-			<c:if test="${status == 'SESSION_TIMEOUT'}">
-				alert("세션이 만료되어 메인페이지로 이동합니다.");
-				moveToMain();
-			</c:if>
-			<c:if test="${status == 'UPDATE_FAILED'}">
-				alert("실패했습니다.");
-			</c:if>
-		</c:if>
-	</c:if>
-	
 	var communityPassed = false;
 	window.onload = function (){
 		const userInfoBtn = document.querySelector("#userMyPage");
@@ -217,61 +195,84 @@
 					<div id="main">
 
 							<section id="one">
-								<div class="image main" data-position="center">
-									<div style="width:10%;"></div>
-									<div style="width:2%;"></div>
-									<div style="width:20%; margin:auto;">
-										<select id="searchTxt">
-											<option value="0">=== 선택 ===</option>
-											<option value="content">내용</option>
-											<option value="title">제목</option>
-											<option value="writer">작성자</option>
-											<option value="community">커뮤니티</option>
-										</select>
-									</div>
-									<div style="width:2%;"></div>
-									<div style="width:40%; margin:auto;">
-										<input type="text" id="searchInputTxt" onKeyPress="if(event.keyCode==13) searchCondition();" placeholder="검색할 단어를 입력하세요." />
-									</div>
-									<div style="width:2%;"></div>
-									<div style="width:20%; margin:auto;">
-										<input type="button" id="searchBtn" onclick="searchCondition();" value="검색" />
-									</div>
+								<div class="image main" data-position="center" align="center">
+									<div style="width:50%; line-height:5.8em; cursor:pointer; font-size:1.5em; display:table-cell; vertical-align:middle;"><span onclick="inquiryView();"><a>문의 내용 작성</a></span></div>
+									<div style="width:50%; line-height:5.8em; cursor:pointer; font-size:1.5em; display:table-cell; vertical-align:middle;"><span onclick="inquiryListView();"><a>문의 내역 확인</a></span></div>
 								</div>
 								
 								<div class="container" style="width:60em;">
 								<br /><br />
-								<form name="boardFrm" id="boardFrm" action="<%=request.getContextPath()%>/board/modifyCommunityBoard.do" method="POST" enctype="multipart/form-data" >
-								<input type="hidden" name="cidx" value="${boardInfo.comm_idx}" />
-								<input type="hidden" name="bidx" value="${boardInfo.board_idx}" />
+								<c:if test="${not empty inquiryList}">
+								<c:set var="inquiryIndex" value="0" />
+									<table style="margin:0.25em;">
+										<thead>
+											<tr>
+												<th style="text-align:center; width:6%;">No.</th>
+												<th style="text-align:center; width:auto;">제목</th>
+												<th style="text-align:center; width:15%;">작성일</th>
+												<th style="text-align:center; width:12%;">처리상태</th>
+												<th style="text-align:center; width:15%;">답변등록일</th>
+											</tr>
+										</thead>
+									</table>
+									<c:forEach items="${inquiryList}" var="inquiryList" varStatus="inquiryStatus">
+									<c:set var="inquiryIndex" value="${inquiryIndex + 1}" />
+									<table style='margin:0.25em;'>
+										<tbody>
+											<tr>
+												<td align="center" style="width:6%; border-right:1px groove aliceblue;">${inquiryIndex}</td>
+												<td style="width:auto;"><span style="cursor:pointer;" onclick="showInquiryContent('${inquiryList.inquiry_idx}')"><a><c:if test="${inquiryList.inquiry_stat == 'M'}">[답변이 수정되었습니다]&nbsp;&nbsp;</c:if><c:if test="${inquiryList.inquiry_stat == 'S'}">[답변이 등록되었습니다]&nbsp;&nbsp;</c:if>${inquiryList.inquiry_title}</a></span></td>
+												<td align="center" style="width:15%;">${fn:substring(inquiryList.reg_date, 2, 16)}</td>
+												<td align="center" style="width:12%;">${inquiryList.inquiry_stat_nm}</td>
+												<td align="center" style="width:15%;">${fn:substring(inquiryList.answer_date, 2, 16)}</td>
+											</tr>
+											<tr style="display:none;" id="inquiryContents_${inquiryList.inquiry_idx}" name="inquiryContents">
+												<td align="center" style="border-right:1px groove aliceblue;">내용</td>
+												<td colspan="3">${inquiryList.inquiry_content}</td>
+											</tr>
+											<tr style="display:none;" id="inquiryAnswers_${inquiryList.inquiry_idx}" name="inquiryAnswers">
+												<td align="center" style="border-right:1px groove aliceblue;">답변</td>
+												<td colspan="3"><c:if test="${inquiryList.inquiry_stat == 'R'}"> * 아직 답변이 등록되지 않았습니다.</c:if><c:if test="${inquiryList.inquiry_stat == 'S' || inquiryList.inquiry_stat == 'M'}">${inquiryList.inquiry_answer}</c:if></td>
+											</tr>
+										</tbody>
+									</table>
+									</c:forEach>
+								</c:if>
+								<c:if test="${empty inquiryList}">
+									<header class="major">
+										<h2 style="font-size:3.5em;"> * 작성된 문의글이 없습니다.</h2>
+									</header>
+								</c:if>
+								<!-- <form name="faqFrm" id="faqFrm" action="<%=request.getContextPath()%>/board/insertFaq.do" method="POST" enctype="multipart/form-data" >
+								<input type="hidden" name="uidx" value="${userBean.user_idx}" />
 								<div id="loadValues"></div>
 								<table>
 									<tbody>
 										<tr>
 											<td class="boardLeft">제목</td>
-											<td><input type="text" id="board_title" name="board_title" value="${boardInfo.board_title}"/></td>
+											<td><input type="text" id="faq_title" name="faq_title"/></td>
 										</tr>
 										<tr>
-											<td class="boardLeft">내용</td>
-											<td><textarea name="board_content" id="summernote" rows="8" cols="90" style="resize:none;">${boardInfo.board_content}</textarea></td>
+											<td class="boardLeft">문의<br />내용</td>
+											<td><textarea name="faq_content" id="summernote" rows="8" cols="90" style="resize:none;"></textarea></td>
 										</tr>
 										<tr style="vertical-align:middle;">
-											<td>공개범위</td>
+											<td></td>
 											<td>
 												<span style="float:left;">
-												<input type="radio" name="boardScope" id="boardScopeA" value="A" <c:if test="${boardInfo.board_scope == 'A'}">checked</c:if> /><label for="boardScopeA">전체공개</label>
-												<input type="radio" name="boardScope" id="boardScopeC" value="C" <c:if test="${boardInfo.board_scope == 'C'}">checked</c:if>/><label for="boardScopeC">커뮤니티공개</label>
+												<input type="radio" name="boardScope" id="boardScopeA" value="A" checked/><label for="boardScopeA">전체공개</label>
+												<input type="radio" name="boardScope" id="boardScopeC" value="C" /><label for="boardScopeC">커뮤니티공개</label>
 												<input type="hidden" name="boardScopeValue" value="" />
 												</span>
 												<span style="float:right;">
-													<input onclick="cancelBoard();" type="button" value="취소"/>&nbsp;&nbsp;&nbsp;&nbsp;
-													<input onclick="modifyCommunityBoard();" type="button" value="저장" />
+													<input onclick="cancelFaq();" type="button" value="취소"/>&nbsp;&nbsp;&nbsp;&nbsp;
+													<input onclick="insertFaq();" type="button" value="등록" />
 												</span>
 											</td>
 										</tr>
 									</tbody>
 								</table>
-								</form>
+								</form> -->
 								</div>
 							</section>
 
@@ -360,9 +361,25 @@
 			      lineNumbers: true,
 			      theme: 'monokai'
 			},
+			/* toolbar: [
+                // [groupName, [list of button]]
+                ['Font Style', ['fontname']],
+                ['style', ['bold', 'italic', 'underline']],
+                ['font', ['strikethrough']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['paragraph']],
+                ['height', ['height']],
+                ['Insert', ['picture']],
+                ['Insert', ['link']],
+                ['Misc', ['fullscreen']]
+            ], */
+            
             callbacks: {	//여기 부분이 이미지를 첨부하는 부분
 				onImageUpload : function(files) {
-					uploadSummernoteImageFile(files[0],this);
+					for(var i = 0; i < files.length; i++){
+						uploadSummernoteImageFile(files[i],this);
+					}
 				},
 				onPaste: function (e) {
 					var clipboardData = e.originalEvent.clipboardData;
@@ -379,22 +396,6 @@
 		var containerDiv = document.getElementById("loadValues");
 		var ul = document.createElement("ul");
 		var li = document.createElement("li");
-		li.style.display = "none";
-		
-		<c:if test="${not empty boardInfo.real_file_name}">
-			var fileNames = "${boardInfo.real_file_name}";
-			var resPaths = "${boardInfo.res_path}";
-			
-			var fns = fileNames.split(",");
-			var rps = resPaths.split(",");
-			
-			for(var i = 0; i < fns.length; i++){
-				li.innerHTML += '<input type="hidden" name="realFileName" value="'+fns[i]+'" />';
-				li.innerHTML += '<input type="hidden" name="resPathValue" value="'+rps[i]+'" />';
-				ul.appendChild(li);
-				containerDiv.appendChild(ul);
-			}
-		</c:if>
 		
 		function uploadSummernoteImageFile(file, editor) { // 이미지 파일 업로드..
 			const frmData = new FormData();
@@ -410,12 +411,13 @@
 				}
 				$(editor).summernote('insertImage', data.url);
 				
+				li.style.display = "none";
 				li.innerHTML += '<input type="hidden" name="realFileName" value="'+data.realFileName+'" />';
 				li.innerHTML += '<input type="hidden" name="resPathValue" value="'+data.url+'" />';
 				ul.appendChild(li);
 				containerDiv.appendChild(ul);
 				
-				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="480" height="auto"/></li>');
+				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="40%;" height="auto"/></li>');
 
 			});
 			
@@ -436,79 +438,61 @@
 </script>
 
 	<script type="text/javascript">
-		function uSearch(list){
-			var contentArea = document.querySelector(".main-content-area");
-			contentArea.innerHTML = "";
-			var output;
-			var reqDate;
-			var ucIdxs = "";
-			<c:if test="${not empty ucList}">
-			<c:forEach items="${ucList}" var="ucLists" varStatus="status">
-				if(ucIdxs.trim() == "") {}
-				else {ucIdxs += ",";}
-				ucIdxs += "${ucLists.comm_idx}";
-			</c:forEach>
-			</c:if>
-			for(var i = 0; i < list.length; i++){
-				reqDate = list[i].reg_date.split(" ")[0];
-				output = "";
-				output += "<div class='container container-solid'>";
-				output += "<header class='major'>";
-				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
-				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
-					output += "";
-				}else if(list[i].comm_user_stat_cd == "R"){
-					output += "<span style='float:right; margin-top:2.5em;'>승인 대기 중</span>";
-				}else{
-					output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
-				}
-				output += "</header><br />";
-				output += "<table><tbody>"
-				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
-				output += "<td>개설일</td><td>"+reqDate+"</td>";
-				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
-				output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
-				output += "</tbody></table>";
-				output += "</div>";
-				contentArea.innerHTML += output;
-			}
-			
-		}
-		
 		function moveToCommunityView(value){
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
 		
-		function cancelBoard(){
-			//location.href = history.back();
-			<c:if test="${enFlag == 'cm'}">
-				top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+${boardInfo.comm_idx};
-			</c:if>
-			<c:if test="${enFlag == 'um'}">
+		/* function cancelFaq(){
+			if(confirm("작성을 취소하고 메인페이지로 돌아갑니다.")){
 				moveToMain();
-			</c:if>
+			}
 		}
 		
-		function modifyCommunityBoard(){ // 제목, 내용 등 검증하고 submit 처리 해야함.
-			const frm = document.boardFrm;
-			const title = frm.board_title.value;
-			const content = frm.board_content.value;
+		function insertFaq(){ // 제목, 내용 등 검증하고 submit 처리 해야함.
+			const frm = document.faqFrm;
+			const title = frm.faq_title.value;
+			const content = frm.faq_content.value;
 			
-			const cidx = frm.cidx.value;
-			const bidx = frm.bidx.value;
-			
-			var scopes = document.getElementsByName("boardScope");
-			for(var i = 0; i < scopes.length; i++){
-				if(scopes[i].checked == true){
-					frm.boardScopeValue.value = scopes[i].value;
-				}
-			}
+			const uidx = frm.uidx.value;
 			
 			if(!title) { alert("제목을 입력해주세요."); document.querySelector("#board_title").focus(); return; }
 			if(!content) { alert("내용을 입력해주세요."); document.querySelector("#summernote").focus(); return; }
 			
 			frm.submit();
 			
+		} */
+		
+		
+		function inquiryView(){
+			location.href="<%=request.getContextPath()%>/user/inquiryToAdmin.do";
+		}
+		
+		function inquiryListView(){
+			//current page...
+			//const uidx = "${userBean.user_idx}";
+			//location.href="<%=request.getContextPath()%>/user/inquiryView.do?uidx="+uidx;
+		}
+		
+		function showInquiryContent(idx, stat){
+			var trs = document.getElementsByName("inquiryContents");
+			var ans = document.getElementsByName("inquiryAnswers");
+			var trid;
+			for(var i = 0; i < ans.length; i++) ans[i].style.display = "none";
+			for(var i = 0; i < trs.length; i++){
+				trid = trs[i].id.substring(trs[i].id.indexOf("_")+1);
+				if(idx == trid){
+					if(trs[i].style.display == "none") {
+						trs[i].style.display = "";
+						ans[i].style.display = "";
+					}else{
+						trs[i].style.display = "none";
+						ns[i].style.display = "none";
+					}
+				}else{
+					trs[i].style.display = "none";
+					ans[i].style.display = "none";
+				}
+			}
 		}
 		
 		

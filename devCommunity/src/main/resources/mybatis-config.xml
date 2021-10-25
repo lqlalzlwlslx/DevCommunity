@@ -21,6 +21,9 @@
 		<typeAlias alias="communityUser" type="com.dev.comm.community.vo.CommunityUser" />
 		<typeAlias alias="userAccessLog" type="com.dev.comm.common.vo.UserAccessLog" />
 		<typeAlias alias="blackListLog" type="com.dev.comm.common.vo.BlackListLog" />
+		<typeAlias alias="communityClosure" type="com.dev.comm.community.vo.CommunityClosure" />
+		<typeAlias alias="inquiry" type="com.dev.comm.board.vo.Inquiry" />
+		<typeAlias alias="inquiryFile" type="com.dev.comm.board.vo.InquiryFile" />
 	</typeAliases>
 	
 	<mappers>

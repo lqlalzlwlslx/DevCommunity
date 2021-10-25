@@ -209,10 +209,11 @@
 				<nav id="nav">
 					<ul>
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
+						<li onclick="moveToFaQ();" style="cursor:pointer;"><a> 1:1 문의하기 </a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
 						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
-						<li id="ucEmpty"style="display:none;"><a>현재 가입된 커뮤니티가 없습니다.</a></li>
+						<li id="ucEmpty"style="display:none;"><a>가입된 커뮤니티가 없습니다.</a></li>
 						</c:if>
 						<c:if test="${not empty ucList}">
 						<c:forEach items="${ucList}" var="ucList" varStatus="status">
@@ -254,9 +255,18 @@
 									<header class="major">
 										<h2 style="font-size:3.5em;">${comminfo.comm_name}</h2>
 									</header>
-									<div>
+									<div style="padding-bottom:1em;">
 										<span>* 기본정보</span>
-										<span style="float:right; cursor:pointer; font-size:1.25em;" onclick="closureCommunity('${comminfo.comm_idx}', '${comminfo.comm_name}');"><a>커뮤니티 폐쇄신청</a></span>
+										<c:if test="${empty closureinfo}">
+										<span id="closureCommuntiyArea" style="float:right; cursor:pointer; font-size:1.25em;" onclick="closureCommunity('${comminfo.comm_idx}', '${comminfo.comm_name}');"><a>커뮤니티 폐쇄신청</a></span>
+										<!-- <span id="closureCommunityCancelArea" style="float:right; display:none; cursor:pointer; font-size:1.25em;" onclick="closureCommunityCancel('${comminfo.comm_idx}');"><a>폐쇄신청 취소</a></span> -->
+										</c:if>
+										<c:if test="${not empty closureinfo}">
+										<span style="float:right;">* ${closureinfo.remaining_period}일 뒤 커뮤니티가 폐쇄됩니다.</span><br />
+										<span id="closureCommunityCancelArea" style="float:right; cursor:pointer; font-size:1.25em;" onclick="closureCommunityCancel('${comminfo.comm_idx}');">
+										<a>폐쇄신청 취소</a>
+										</span>
+										</c:if>
 									</div>
 									<br />
 									<table>
@@ -1253,7 +1263,9 @@
 		
 		function closureCommunity(cidx, cname){
 			const reg_uidx = "${comminfo.manager_idx}";
-			if(confirm(cname +" 커뮤니티 강제폐쇄를 진행하시겠습니까?\n7일 뒤 반영되며 커뮤니티 회원들에게 알림메일이 발송됩니다.")){
+			if(confirm(cname +" 커뮤니티 강제폐쇄를 진행하시겠습니까?\n7일 뒤 반영되며 커뮤니티 회원들에게 알림메일이 발송됩니다.\n메일 발송 처리에 시간이 소요될 수 있습니다.")){
+				var win = window.open("<%=request.getContextPath()%>/common/showMessageBox.do", "msgBox", "width=500,height=150,toolbar=0,menubar=no,location=no,scrollbars=no,resizeable=no,status=no");
+				win.focus();
 				const communityClosureData = {
 						method: "POST",
 						headers: {"Content-Type": "application/json"},
@@ -1262,7 +1274,37 @@
 				fetch("/community/communityManagerCommunityClosure.do", communityClosureData)
 					.then(res => res.json())
 					.then((data) => {
-						
+						win.close();
+						if(data.result){
+							alert(data.msg);
+							location.reload();
+							//document.querySelector("#closureCommuntiyArea").style.display = "none";
+							//document.querySelector("#closureCommunityCancelArea").style.display = "";
+						}else{
+							alert(data.msg);
+						}
+					});
+			}
+			
+		}
+		
+		function closureCommunityCancel(cidx){
+			if(confirm("폐쇄신청을 취소하시겠습니까?\n커뮤니티 회원들에게 알림메일이 발송됩니다.")){
+				var win = window.open("<%=request.getContextPath()%>/common/showMessageBox.do", "msgBox", "width=500,height=150,toolbar=0,menubar=no,location=no,scrollbars=no,resizeable=no,status=no");
+				win.focus();
+				const closureCancelData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({cidx})
+				};
+				fetch("/community/communityClosureCancelAsManager.do", closureCancelData)
+					.then(res => res.json())
+					.then((data) => {
+						win.close();
+						if(data.result){
+							alert(data.msg);
+							location.reload();
+						}
 					});
 			}
 		}

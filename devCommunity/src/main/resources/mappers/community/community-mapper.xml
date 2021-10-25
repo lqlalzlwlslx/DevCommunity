@@ -475,6 +475,44 @@
 		ORDER BY reg_date DESC
 	]]>
 	</select>
+	
+	<insert id="insertCommunityClosureRequestAsFlag" parameterType="communityClosure">
+	<![CDATA[
+		INSERT INTO dec_community_closure(comm_idx, reg_uidx, reg_date, closure_date)
+		VALUES(#{comm_idx}, #{reg_uidx}, NOW(), ]]>
+		<if test='reg_flag.equals("admin") and reg_flag != null'><![CDATA[ NOW()) ]]></if>
+		<if test='reg_flag.equals("manager") and reg_flag != null'><![CDATA[ DATE_ADD(NOW(), INTERVAL 7 DAY)) ]]></if>
+	</insert>
+	
+	<select id="selectCommunityClosureRequestDataAsCidx" parameterType="_int" resultType="communityClosure">
+	<![CDATA[
+		SELECT comm_idx,
+			(SELECT comm_name FROM dec_community c WHERE c.comm_idx = cc.comm_idx) as comm_name,
+			reg_uidx, 
+			reg_date, 
+			closure_date,
+			DATEDIFF(closure_date, reg_date) as remaining_period
+		FROM dec_community_closure cc
+		WHERE comm_idx = #{comm_idx}
+	]]>
+	</select>
+	
+	<delete id="deleteCommunityClosureAsManager" parameterType="_int">
+	<![CDATA[
+		DELETE FROM dec_community_closure
+		WHERE comm_idx = #{comm_idx}
+	]]>
+	</delete>
+	
+	<delete id="userCommunityExit" parameterType="java.util.HashMap">
+	<![CDATA[
+		DELETE FROM dec_community_user
+		WHERE comm_idx = #{cidx}
+		AND user_idx = #{uidx}
+	]]>
+	</delete>
+	
+	
 
 
 

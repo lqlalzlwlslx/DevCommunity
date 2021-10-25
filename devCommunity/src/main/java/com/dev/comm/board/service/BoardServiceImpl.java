@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.dev.comm.board.dao.BoardDao;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Inquiry;
+import com.dev.comm.board.vo.InquiryFile;
 import com.dev.comm.board.vo.Reply;
 import com.dev.comm.user.vo.User;
 
@@ -131,6 +133,41 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public int updateCommunityBlackBoardToActiveAsCommunityManager(int bidx) throws Exception {
 		return boardDao.updateCommunityBlackBoardToActiveAsCommunityManager(bidx);
+	}
+
+	@Override
+	public Inquiry insertCommunityInquiryToAdmin(Inquiry inquiry) throws Exception {
+		return boardDao.insertCommunityInquiryToAdmin(inquiry);
+	}
+
+	@Override
+	public void insertCommunityInquiryFile(InquiryFile inquiryFile) throws Exception {
+		boardDao.insertCommunityInquiryFile(inquiryFile);
+	}
+
+	@Override
+	public ArrayList<Inquiry> selectUserInquiryList(User user) throws Exception {
+		return boardDao.selectUserInquiryList(user);
+	}
+
+	@Override
+	public ArrayList<Inquiry> selectAdminBoardInquiryManageList() throws Exception {
+		return boardDao.selectAdminBoardInquiryManageList();
+	}
+
+	@Override
+	public Inquiry selectAdminBoardInquiryInfo(int inquiry_idx) throws Exception {
+		return boardDao.selectAdminBoardInquiryInfo(inquiry_idx);
+	}
+
+	@Override
+	public void updateBoardInquiryAnswerFromAdmin(Inquiry inquiryInfo) throws Exception {
+		boardDao.updateBoardInquiryAnswerFromAdmin(inquiryInfo);
+	}
+
+	@Override
+	public void modifyBoardInquiryAnswerFromAdmin(Inquiry inquiryInfo) throws Exception {
+		boardDao.modifyBoardInquiryAnswerFromAdmin(inquiryInfo);
 	}
 
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.community.vo.CommunityBlackList;
+import com.dev.comm.community.vo.CommunityClosure;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
@@ -256,6 +257,31 @@ public class CommunityDaoImpl implements CommunityDao {
 	@Override
 	public ArrayList<Board> selectCommunityActiveBoardList(Community comm) throws Exception {
 		return (ArrayList) sqlSession.selectList("community.selectCommunityActiveBoardList", comm);
+	}
+
+	@Override
+	public void insertCommunityClosureRequestAsFlag(CommunityClosure cc) throws Exception {
+		sqlSession.insert("community.insertCommunityClosureRequestAsFlag", cc);
+	}
+
+	@Override
+	public CommunityClosure selectCommunityClosureRequestDataAsCidx(long comm_idx) throws Exception {
+		return sqlSession.selectOne("community.selectCommunityClosureRequestDataAsCidx", (int)comm_idx);
+	}
+
+	@Override
+	public CommunityClosure deleteCommunityClosureAsManager(int comm_idx) throws Exception {
+		CommunityClosure ccinfo = sqlSession.selectOne("community.selectCommunityClosureRequestDataAsCidx", comm_idx);
+		sqlSession.delete("community.deleteCommunityClosureAsManager", comm_idx);
+		return ccinfo;
+	}
+
+	@Override
+	public int userCommunityExit(int cidx, int uidx) throws Exception {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		map.put("cidx", cidx);
+		map.put("uidx", uidx);
+		return sqlSession.delete("community.userCommunityExit", map);
 	}
 	
 }

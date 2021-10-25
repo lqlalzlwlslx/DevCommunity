@@ -10,6 +10,7 @@ import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.dao.CommunityDao;
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.community.vo.CommunityBlackList;
+import com.dev.comm.community.vo.CommunityClosure;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
@@ -202,6 +203,26 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	public ArrayList<Board> selectCommunityActiveBoardList(Community comm) throws Exception {
 		return communityDao.selectCommunityActiveBoardList(comm);
+	}
+
+	@Override
+	public void insertCommunityClosureRequestAsFlag(CommunityClosure cc) throws Exception {
+		communityDao.insertCommunityClosureRequestAsFlag(cc);
+	}
+
+	@Override
+	public CommunityClosure selectCommunityClosureRequestDataAsCidx(long comm_idx) throws Exception {
+		return communityDao.selectCommunityClosureRequestDataAsCidx(comm_idx);
+	}
+
+	@Override
+	public CommunityClosure deleteCommunityClosureAsManager(int cidx) throws Exception {
+		return communityDao.deleteCommunityClosureAsManager(cidx);
+	}
+
+	@Override
+	public int userCommunityExit(int cidx, int uidx) throws Exception {
+		return communityDao.userCommunityExit(cidx, uidx);
 	}
 	
 }

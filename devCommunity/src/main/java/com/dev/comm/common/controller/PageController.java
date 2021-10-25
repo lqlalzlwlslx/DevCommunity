@@ -100,6 +100,11 @@ public class PageController {
 		return new ModelAndView("config/findPasswd");
 	}
 	
+	@RequestMapping(value = "/common/showMessageBox", method = RequestMethod.GET)
+	public ModelAndView showMessageBox(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		return new ModelAndView("communityManage/msgBox");
+	}
+	
 	
 
 }

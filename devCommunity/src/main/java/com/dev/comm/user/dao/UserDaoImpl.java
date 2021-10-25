@@ -189,6 +189,12 @@ public class UserDaoImpl implements UserDao {
 		return sqlSession.selectOne("user.getUserCommunityStatus", map);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<User> selectCommunityUsersLoginIdAsClosure(int comm_idx) throws Exception {
+		return (ArrayList) sqlSession.selectList("user.selectCommunityUsersLoginIdAsClosure", comm_idx);
+	}
+
 
 	
 }

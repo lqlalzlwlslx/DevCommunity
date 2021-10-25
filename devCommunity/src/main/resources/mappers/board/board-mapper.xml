@@ -468,6 +468,113 @@
 	]]>
 	</update>
 	
+	<insert id="insertCommunityInquiryToAdmin" parameterType="inquiry">
+		<selectKey keyProperty="inquiry_idx" resultType="_int" order="AFTER">
+			<![CDATA[
+				SELECT LAST_INSERT_ID()
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO dec_inquiry(reg_uidx, inquiry_title, inquiry_content, inquiry_answer, inquiry_stat, reg_date, answer_date)
+			VALUES(#{reg_uidx}, #{inquiry_title}, #{inquiry_content}, NULL, 'R', NOW(), NULL)
+		]]>
+	</insert>
+	
+	<select id="selectCommunityInquiryinfo" parameterType="inquiry" resultType="inquiry">
+	<![CDATA[
+		SELECT inquiry_idx,
+			reg_uidx,
+			inquiry_title,
+			inquiry_content,
+			inquiry_answer,
+			inquiry_stat,
+			reg_date,
+			answer_date
+		FROM dec_inquiry
+		WHERE inquiry_idx = #{inquiry_idx}
+	]]>
+	</select>
+	
+	<insert id="insertCommunityInquiryFile" parameterType="inquiryFile">
+	<![CDATA[
+		INSERT INTO dec_inquiry_file(inquiry_idx, org_file_name, real_file_path)
+		VALUES(#{inquiry_idx}, #{org_file_name}, #{real_file_path})
+	]]>
+	</insert>
+	
+	<select id="selectUserInquiryList" parameterType="user" resultType="inquiry">
+	<![CDATA[
+		SELECT i.*
+		FROM (
+			SELECT inquiry_idx,
+				reg_uidx,
+				(SELECT nick_name FROM dec_user WHERE user_idx = reg_uidx) as reg_nick,
+				inquiry_title,
+				inquiry_content,
+				inquiry_answer,
+				inquiry_stat,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'INQUIRY_STAT' AND conf_type_cd = inquiry_stat) as inquiry_stat_nm,
+				reg_date,
+				answer_date
+			FROM dec_inquiry
+			WHERE reg_uidx = #{user_idx}
+		) i
+		ORDER BY reg_date DESC
+	]]>
+	</select>
+	
+	<select id="selectAdminBoardInquiryManageList" resultType="inquiry">
+	<![CDATA[
+		SELECT i.*
+		FROM (
+			SELECT inquiry_idx,
+				reg_uidx,
+				(SELECT nick_name FROM dec_user WHERE user_idx = reg_uidx) as reg_nick,
+				inquiry_title,
+				inquiry_content,
+				inquiry_answer,
+				inquiry_stat,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'INQUIRY_STAT' AND conf_type_cd = inquiry_stat) as inquiry_stat_nm,
+				reg_date,
+				answer_date
+			FROM dec_inquiry
+		) i
+		ORDER BY reg_date DESC
+	]]>
+	</select>
+	
+	<select id="selectAdminBoardInquiryInfo" parameterType="_int" resultType="inquiry">
+	<![CDATA[
+		SELECT inquiry_idx,
+			reg_uidx,
+			(SELECT nick_name FROM dec_user WHERE user_idx = reg_uidx) as reg_nick,
+			inquiry_title,
+			inquiry_content,
+			inquiry_answer,
+			inquiry_stat,
+			(SELECT conf_name FROM dec_conf WHERE conf_type = 'INQUIRY_STAT' AND conf_type_cd = inquiry_stat) as inquiry_stat_nm,
+			reg_date,
+			answer_date
+		FROM dec_inquiry
+		WHERE inquiry_idx = #{inquiry_idx}
+	]]>
+	</select>
+	
+	<update id="updateBoardInquiryAnswerFromAdmin" parameterType="inquiry">
+	<![CDATA[
+		UPDATE dec_inquiry
+		SET inquiry_answer = #{inquiry_answer}, inquiry_stat = #{inquiry_stat}, answer_date = NOW()
+		WHERE inquiry_idx = #{inquiry_idx}
+	]]>
+	</update>
+	
+	<update id="modifyBoardInquiryAnswerFromAdmin" parameterType="inquiry">
+	<![CDATA[
+		UPDATE dec_inquiry
+		SET inquiry_answer = #{inquiry_answer}, inquiry_stat = #{inquiry_stat}, answer_date = NOW()
+		WHERE inquiry_idx = #{inquiry_idx}
+	]]>
+	</update>
 	
 
 

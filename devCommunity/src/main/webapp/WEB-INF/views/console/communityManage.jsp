@@ -62,6 +62,8 @@
 	function pageHandler(value){
 		if(value == "communityStatus"){ //communityStatus.
 			location.href="<%=request.getContextPath()%>/console/mainAdmin.do";
+		} else if(value == "inquiryStatus"){
+			location.href="<%=request.getContextPath()%>/console/board/inquiryManage.do";
 		} else if(value == "userStatus"){ //userStatus.
 			location.href="<%=request.getContextPath()%>/console/user/userManage.do";
 		} else if(value == "boardStatus"){
@@ -96,6 +98,7 @@
 		<nav id="nav">
 			<ul>
 				<li><a href="#" id="communityStatus" onclick="pageHandler(this.id);">커뮤니티 현황</a></li>
+				<li><a href="#" id="inquiryStatus" onclick="pageHandler(this.id);">1:1 문의 관리</a></li>
 				<li><a href="#" id="userStatus" onclick="pageHandler(this.id);">회원정보 관리</a></li>
 				<li><a href="#" id="boardStatus" onclick="pageHandler(this.id);">게시글 관리</a></li>
 				<li><a href="#" id="communityManage" onclick="pageHandler(this.id);">커뮤니티 관리</a></li>
@@ -270,15 +273,21 @@
 		function closureCommunity(cidx, cname){
 			const reg_uidx = "${adminBean.user_idx}";
 			if(confirm(cname + "커뮤니티 강제폐쇄를 진행하시겠습니까?\n즉시 반영되며 커뮤니티 회원들에게 알림메일이 발송됩니다.")){
+				var win = window.open("<%=request.getContextPath()%>/common/showMessageBox.do", "msgBox", "width=500,height=150,toolbar=0,menubar=no,location=no,scrollbars=no,resizeable=no,status=no");
+				win.focus();
 				const communityClosureData = {
 						method: "POST",
-						headers: {},
+						headers: {"Content-Type": "application/json"},
 						body:JSON.stringify({reg_uidx, cidx})
 				};
 				fetch("/console/adminCommunityClosure.do", communityClosureData)
 					.then(res => res.json())
 					.then((data) => {
-						
+						win.close();
+						if(data.result){
+							alert(data.msg);
+							location.reload();
+						}
 					});
 			}
 			

@@ -168,7 +168,18 @@
 		<c:if test="${not empty userBean}">
 			location.href="<%=request.getContextPath()%>/user/mainUser.do";
 		</c:if>
-		location.href="<%=request.getContextPath()%>/";
+		<c:if test="${empty userBean}">
+			location.href="<%=request.getContextPath()%>/";
+		</c:if>
+	}
+	
+	function moveToFaQ(){
+		<c:if test="${not empty userBean}">
+			location.href="<%=request.getContextPath()%>/user/inquiryToAdmin.do";
+		</c:if>
+		<c:if test="${empty userBean}">
+			location.href="<%=request.getContextPath()%>/";
+		</c:if>
 	}
 	
 	function findPasswd(){

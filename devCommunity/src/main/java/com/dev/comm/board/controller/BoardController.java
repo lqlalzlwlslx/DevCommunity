@@ -27,6 +27,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dev.comm.board.service.BoardService;
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Inquiry;
+import com.dev.comm.board.vo.InquiryFile;
 import com.dev.comm.board.vo.Reply;
 import com.dev.comm.community.service.CommunityService;
 import com.dev.comm.community.vo.Community;
@@ -120,7 +122,6 @@ public class BoardController {
 	public ModelAndView insertCommunityBoard(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		User user = SessionManager.getUserSession(request);
 		if(user == null) {
-			model.addAttribute("msg", "세션이 만료되었습니다.");
 			return new ModelAndView("redirect:/");
 		}
 		
@@ -749,6 +750,172 @@ public class BoardController {
 			log.error("COMMUNITY BLACK BOARD TO ACTIVE VALUE PARSING FAIL");
 		}
 		
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/board/insertFaq", method = RequestMethod.POST)
+	@ResponseBody
+	public ModelAndView insertBoardFaq(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		User user = SessionManager.getUserSession(request);
+		if(user == null) return new ModelAndView("redirect:/");
+		
+		//faq insert 구현하자..
+		try {
+			Inquiry inquiry = new Inquiry();
+			InquiryFile inquiryFile = null;
+			
+			int uidx = user.getUser_idx();
+			String title = request.getParameter("faq_title");
+			String content = request.getParameter("faq_content");
+			
+			String[] realFileNames = request.getParameterValues("realFileName") == null ? null : request.getParameterValues("realFileName");
+			String[] resPathValues = request.getParameterValues("resPathValue") == null ? null : request.getParameterValues("resPathValue");
+			
+			content = content.replaceAll("<p>", "");
+			content = content.replaceAll("<br>", "");
+			content = content.replaceAll("</p>", "<br />");
+			
+			if(content.isEmpty()) {
+				model.addAttribute("result", false);
+				model.addAttribute("msg", "내용을 작성해주세요.");
+				return new ModelAndView("config/inquiry");
+			}
+			
+			try {
+				inquiry.setReg_uidx(uidx);
+				inquiry.setInquiry_title(title);
+				inquiry.setInquiry_content(content);
+				
+				Inquiry inquiryinfo = boardService.insertCommunityInquiryToAdmin(inquiry);
+				if(inquiryinfo != null) {
+					if(realFileNames == null) {
+						model.addAttribute("result", true);
+						return new ModelAndView("config/inquiry");
+					}else {
+						boolean[] brr = new boolean[realFileNames.length];
+						Arrays.fill(brr, false);
+						for(int i = 0; i < resPathValues.length; i++) if(inquiryinfo.getInquiry_content().indexOf(resPathValues[i]) > -1) brr[i] = true;
+						
+						try {
+							for(int i = 0; i < brr.length; i++) {
+								if(brr[i]) {
+									inquiryFile = new InquiryFile();
+									inquiryFile.setInquiry_idx(inquiryinfo.getInquiry_idx());
+									inquiryFile.setOrg_file_name(realFileNames[i]);
+									inquiryFile.setReal_file_path(resPathValues[i]);
+									
+									boardService.insertCommunityInquiryFile(inquiryFile);
+								}
+							}
+							model.addAttribute("result", true);
+							return new ModelAndView("config/inquiry");
+						}catch(Exception e) {
+							e.printStackTrace();
+							log.error("INQUIRY INFO FILE QUERY FAIL");
+						}
+					}
+				}else {
+					model.addAttribute("result", false);
+					model.addAttribute("msg", "처리에 실패했습니다.");
+					return new ModelAndView("config/inquiry");
+				}
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+				log.error("INQUIRY QUERY FAIL");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("INQUIRY DATA PARSING FAIL");
+		}
+		
+		return new ModelAndView("config/inquiry");
+	}
+	
+	@RequestMapping(value = "/console/board/inquiryManage", method = RequestMethod.GET)
+	public ModelAndView adminBoardInquiryManage(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		log.info("== adminBoardInquiryManage ===");
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) return new ModelAndView("redirect:/console/logout.do");
+		
+		try {
+			ArrayList<Inquiry> inquiryList = boardService.selectAdminBoardInquiryManageList();
+			model.addAttribute("inquiryList", inquiryList);
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("INQUIRY DATA LOAD FAIL");
+		}
+		
+		return new ModelAndView("console/inquiryManage");
+	}
+	
+	@RequestMapping(value = "/console/board/updateInquiryAnswerAsIdx", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String adminUpdateInquiryAnswerAsIdx(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== adminUpdateInquiryAnswer ===");
+		JsonObject obj = new JsonObject();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(data);
+		
+		try {
+			int inquiry_idx = element.getAsJsonObject().get("idx").getAsInt();
+			String inquiry_answer = element.getAsJsonObject().get("inquiryAnswer").getAsString();
+			
+			Inquiry inquiryInfo = boardService.selectAdminBoardInquiryInfo(inquiry_idx);
+			if(inquiryInfo != null && inquiryInfo.getInquiry_stat().equals("R")) {
+				inquiryInfo.setInquiry_answer(inquiry_answer);
+				inquiryInfo.setInquiry_stat("S");
+				
+				boardService.updateBoardInquiryAnswerFromAdmin(inquiryInfo);
+				
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다.");
+			}else if(inquiryInfo != null && inquiryInfo.getInquiry_stat().equals("S")){
+				obj.addProperty("result", false);
+				obj.addProperty("msg", "답변이 완료된 문의입니다.");
+			}else {
+				obj.addProperty("result", false);
+				obj.addProperty("msg", "조회결과가 없습니다.");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("ADMIN INQUIRY ANSWER DATA PARSING FAIL");
+		}
+		return obj.toString();
+	}
+	
+	@RequestMapping(value = "/console/board/modifyInquiryAnswerAsIdx", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
+	@ResponseBody
+	public String adminModifyInquiryAnswerAsIdx(HttpServletRequest request, HttpServletResponse response, @RequestBody String data) throws Exception {
+		log.info("=== adminModifyInquiryAnswer ===");
+		JsonObject obj = new JsonObject();
+		User admin = SessionManager.getAdminSession(request);
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
+		
+		try {
+			int inquiry_idx = new JsonParser().parse(data).getAsJsonObject().get("idx").getAsInt();
+			String modifyAnswer = new JsonParser().parse(data).getAsJsonObject().get("modifyAnswerTxt").getAsString();
+			
+			Inquiry inquiryInfo = boardService.selectAdminBoardInquiryInfo(inquiry_idx);
+			if(inquiryInfo != null && (inquiryInfo.getInquiry_stat().equals("S") || inquiryInfo.getInquiry_stat().equals("M"))) {
+				inquiryInfo.setInquiry_stat("M");
+				inquiryInfo.setInquiry_answer(modifyAnswer);
+				
+				boardService.modifyBoardInquiryAnswerFromAdmin(inquiryInfo);
+				obj.addProperty("result", true);
+				obj.addProperty("msg", "성공했습니다.");
+			}else {
+				obj.addProperty("result", false);
+				obj.addProperty("msg", "답변이 등록되지 않은 문의입니다.");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			log.error("ADMIN INQUIRY ANSWER MODIFY DATA PARSING FAIL");
+		}
 		return obj.toString();
 	}
 	

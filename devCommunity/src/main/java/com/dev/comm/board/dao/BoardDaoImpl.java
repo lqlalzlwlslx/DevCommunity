@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.board.vo.BoardFile;
+import com.dev.comm.board.vo.Inquiry;
+import com.dev.comm.board.vo.InquiryFile;
 import com.dev.comm.board.vo.Reply;
 import com.dev.comm.user.vo.User;
 
@@ -195,6 +197,47 @@ public class BoardDaoImpl implements BoardDao {
 	@Override
 	public int updateCommunityBlackBoardToActiveAsCommunityManager(int bidx) throws Exception {
 		return sqlSession.update("board.updateCommunityBlackBoardToActiveAsCommunityManager", bidx);
+	}
+
+	@Override
+	public Inquiry insertCommunityInquiryToAdmin(Inquiry inquiry) throws Exception {
+		Inquiry inquiryinfo = new Inquiry();
+		sqlSession.insert("board.insertCommunityInquiryToAdmin", inquiry);
+		inquiryinfo = sqlSession.selectOne("board.selectCommunityInquiryinfo", inquiry);
+		if(inquiryinfo != null) return inquiryinfo;
+		else return null;
+	}
+
+	@Override
+	public void insertCommunityInquiryFile(InquiryFile inquiryFile) throws Exception {
+		sqlSession.insert("board.insertCommunityInquiryFile", inquiryFile);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Inquiry> selectUserInquiryList(User user) throws Exception {
+		return (ArrayList) sqlSession.selectList("board.selectUserInquiryList", user);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Inquiry> selectAdminBoardInquiryManageList() throws Exception {
+		return (ArrayList) sqlSession.selectList("board.selectAdminBoardInquiryManageList");
+	}
+
+	@Override
+	public Inquiry selectAdminBoardInquiryInfo(int inquiry_idx) throws Exception {
+		return sqlSession.selectOne("board.selectAdminBoardInquiryInfo", inquiry_idx);
+	}
+
+	@Override
+	public void updateBoardInquiryAnswerFromAdmin(Inquiry inquiryInfo) throws Exception {
+		sqlSession.update("board.updateBoardInquiryAnswerFromAdmin", inquiryInfo);
+	}
+
+	@Override
+	public void modifyBoardInquiryAnswerFromAdmin(Inquiry inquiryInfo) throws Exception {
+		sqlSession.update("board.modifyBoardInquiryAnswerFromAdmin", inquiryInfo);
 	}
 
 

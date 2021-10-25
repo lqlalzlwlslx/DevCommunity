@@ -112,6 +112,7 @@
 		SELECT GROUP_CONCAT(login_id)
 		FROM dec_user
 		WHERE user_role_cd = 99
+		AND user_stat_cd = 'A'
 	]]>
 	</select>
 	
@@ -342,6 +343,17 @@
 		FROM dec_community_user
 		WHERE comm_idx = #{comm_idx}
 		AND user_idx = #{user_idx}
+	]]>
+	</select>
+	
+	<select id="selectCommunityUsersLoginIdAsClosure" parameterType="_int" resultType="user">
+	<![CDATA[
+		SELECT cu.user_idx,
+			(SELECT login_id FROM dec_user u WHERE u.user_idx = cu.user_idx) as login_id,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = cu.user_idx) as nick_name
+		FROM dec_community_user cu
+		WHERE cu.comm_idx = #{comm_idx}
+		AND cu.comm_role_cd = 7
 	]]>
 	</select>
 	

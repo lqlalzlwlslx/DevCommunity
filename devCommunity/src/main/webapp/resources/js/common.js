@@ -27,7 +27,6 @@ function kakaoLogin(){
 						fetch("/userLoginIdCheckAsKakao.do?", checkData) //체크하고 없으면 insert.
 							.then(res => res.json())
 							.then((data) => {
-								console.log(data);
 								if(data.result == false) location.href="/";
 							});
 						const loginFlag = "kakao";
@@ -54,6 +53,7 @@ function kakaoLogin(){
 		})
 	
 }
+
 
 
 /*
