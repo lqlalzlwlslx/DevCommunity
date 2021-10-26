@@ -309,10 +309,21 @@ public class UserController {
 		if(user == null) response.sendRedirect(request.getContextPath() + "/logout.do");
 		
 		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
-		//ArrayList<Board> mainBoardList = communityService.selectMainBoardList();
-		if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+		ArrayList<Board> selectMainBoardList = boardService.selectUserMainBoardList(user);
+		ArrayList<Board> userMainBoardList = new ArrayList<Board>();
 		
-		return new ModelAndView("user/mainUser");
+		Board b = null;
+		if(selectMainBoardList != null) {
+			for(int i = 0; i < selectMainBoardList.size(); i++) {
+				b = selectMainBoardList.get(i);
+				b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+				userMainBoardList.add(b);
+			}
+			model.addAttribute("ubList", userMainBoardList);
+		}
+		model.addAttribute("ucList", userCommunityList);
+		
+		return new ModelAndView("user/mainUser2");
 	}
 	
 	@RequestMapping(value = "/user/userMyPage")

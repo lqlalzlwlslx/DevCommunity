@@ -43,6 +43,8 @@
 			tryed,
 			profile_src,
 			second_mail,
+			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd IN ('A', 'CB')) as user_comm_idxs,
+			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd = 'R') as user_comm_req_idxs,
 			login_flag
 		FROM dec_user
 		WHERE user_idx = #{user_idx}
@@ -162,8 +164,12 @@
 			reg_date,
 			login_date,
 			access_ip,
+			pwd_date,
 			profile_src,
-			profile_src
+			second_mail,
+			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd IN ('A', 'CB')) as user_comm_idxs,
+			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd = 'R') as user_comm_req_idxs,
+			login_flag
 		FROM dec_user
 		WHERE user_role_cd <> 99
 	]]>

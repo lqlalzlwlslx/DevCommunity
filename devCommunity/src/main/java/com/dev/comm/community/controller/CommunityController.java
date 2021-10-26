@@ -266,6 +266,7 @@ public class CommunityController {
 		return mp;
 	}
 	
+	//deprecated....
 	@RequestMapping(value = "/community/searchAsValues", method = RequestMethod.GET)
 	@ResponseBody
 	public ModelMap visitSearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -332,14 +333,78 @@ public class CommunityController {
 		return mp;
 	}
 	
+	@RequestMapping(value = "visitor/community/searchAsValues", method = RequestMethod.GET)
+	@ResponseBody
+	public ModelAndView visitorSearchAsValues(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		String condition = request.getParameter("condition");
+		String searchTxt = request.getParameter("searchValue");
+		
+		log.debug("condition: " + condition);
+		log.debug("searchValue: " + searchTxt);
+		
+		ArrayList<Community> searchValues = null;
+		ArrayList<Board> boardValues = null;
+		
+		ArrayList<Community> searchCommunityResult = null;
+		ArrayList<Board> searchBoardResult = null;
+		
+		if(condition.equals("community")) { //커뮤니티 검색. condition: community
+			searchValues = new ArrayList<Community>();
+			searchValues = communityService.selectCommunityListAsSearchValues(searchTxt);
+			
+			if(searchValues.size() > 0) { //여기서 토탈 회원 가공하는 걸 추가적으로 하면 될듯...
+				Community comm = null;
+				searchCommunityResult = new ArrayList<Community>();
+				for(int i = 0; i < searchValues.size(); i++) {
+					comm = searchValues.get(i);
+					comm.setTotal_member(communityService.selectCountCommunityUser(comm));
+					comm.setTotal_board(communityService.selectCountCommunityBoard(comm));
+//					if(user != null){
+//						comm.setComm_user_stat_cd(communityService.selectCommunityUserStatusAsIdx(comm.getComm_idx(), user.getUser_idx()));
+//					}
+					searchCommunityResult.add(comm);
+				}
+				model.addAttribute("result", true);
+				model.addAttribute("status", "COMMUNITY_SEARCH");
+				model.addAttribute("vcList", searchCommunityResult);
+				return new ModelAndView("visitor/visitorCommunitySearch");
+			}else { //결과가 없을때.
+				model.addAttribute("result", false);
+				model.addAttribute("msg", "검색 결과가 없습니다.");
+				return new ModelAndView("visitor/visitorMain2");
+			}
+			
+		}else { // 글 검색. condition: content or title, writer 
+			boardValues = new ArrayList<Board>();
+			boardValues = boardService.selectBoardListAsSearchValues(condition, searchTxt);
+			
+			if(boardValues.size() > 0) {
+				Board b = null;
+				searchBoardResult = new ArrayList<Board>();
+				for(int i = 0; i < boardValues.size(); i++) {
+					b = boardValues.get(i);
+					b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
+					
+					searchBoardResult.add(b);
+				}
+				model.addAttribute("result", true);
+				model.addAttribute("status", "BOARD_SEARCH");
+				model.addAttribute("vbList", searchBoardResult);
+				return new ModelAndView("visitor/visitorBoardSearch");
+			}else {
+				model.addAttribute("result", false);
+				model.addAttribute("msg", "검색 결과가 없습니다.");
+				return new ModelAndView("visitor/visitorMain2");
+			}
+		}
+	}
+	
 	@RequestMapping(value = "/community/userSearchAsValues", method = RequestMethod.GET)
 	@ResponseBody
-	public ModelMap userSearchAsValues(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ModelMap mp = new ModelMap();
+	public ModelAndView userSearchAsValues(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		User user = SessionManager.getUserSession(request);
 		if(user == null) {
-			mp.addAttribute("result", false);
-			mp.addAttribute("status", "SESSION_TIMEOUT");
+			return new ModelAndView("redirect:/");
 		}
 		
 		String condition = request.getParameter("condition");
@@ -370,14 +435,14 @@ public class CommunityController {
 					}
 					searchCommunityResult.add(comm);
 				}
-				mp.addAttribute("result", true);
-				mp.addAttribute("status", "COMMUNITY_SEARCH");
-				mp.addAttribute("condition", condition);
-				mp.addAttribute("searchValue", searchTxt);
-				mp.addAttribute("searchDataList", searchCommunityResult);
+				ArrayList<Community> userSignCommunity = communityService.selectUserSignCommunityList(user.getUser_idx());
+				model.addAttribute("userSignCommunity", userSignCommunity);
+				model.addAttribute("status", "COMMUNITY_SEARCH");
+				model.addAttribute("uscList", searchCommunityResult);
+				return new ModelAndView("user/userCommunitySearch");
 			}else { //결과가 없을때.
-				mp.addAttribute("result", false);
-				mp.addAttribute("msg", "검색 결과가 없습니다.");
+				model.addAttribute("msg", "검색 결과가 없습니다.");
+				return new ModelAndView("user/mainUser2");
 			}
 		}else { // boardList..
 			boardValues = new ArrayList<Board>();
@@ -391,16 +456,14 @@ public class CommunityController {
 					b.setReplyList(boardService.selectBoardReplyListAsBidx(b.getBoard_idx()));
 					searchBoardResult.add(b);
 				}
-				mp.addAttribute("result", true);
-				mp.addAttribute("status", "BOARD_SEARCH");
-				mp.addAttribute("searchDataList", searchBoardResult);
+				model.addAttribute("status", "BOARD_SEARCH");
+				model.addAttribute("usbList", searchBoardResult);
+				return new ModelAndView("user/userBoardSearch");
 			}else {
-				mp.addAttribute("result", false);
-				mp.addAttribute("msg", "검색 결과가 없습니다.");
+				model.addAttribute("msg", "검색 결과가 없습니다.");
+				return new ModelAndView("user/mainUser2");
 			}
 		}
-		
-		return mp;
 	}
 	
 	@RequestMapping(value = "/console/community/communityDetail", method = RequestMethod.GET)
@@ -1048,6 +1111,25 @@ public class CommunityController {
 		return obj.toString();
 	}
 	
+	@RequestMapping(value = "/community/allCommunityView", method = RequestMethod.GET)
+	public ModelAndView allCommunityView(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+		log.info("=== allCommunityView ===");
+		User user = SessionManager.getUserSession(request);
+		if(user == null) return new ModelAndView("redirect:/");
+		
+		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
+		ArrayList<Community> allCommList = communityService.selectUserAllCommunityList();
+		if(allCommList != null && allCommList.size() > 0) {
+			for(int i = 0; i < allCommList.size(); i++) {
+				allCommList.get(i).setTotal_member(communityService.selectCountCommunityUser(allCommList.get(i)));
+				allCommList.get(i).setTotal_board(communityService.selectCountCommunityBoard(allCommList.get(i)));
+			}
+		}
+		model.addAttribute("acList", allCommList);
+		model.addAttribute("ucList", userCommunityList);
+		
+		return new ModelAndView("community/communityAllList");
+	}
 	
 	
 	

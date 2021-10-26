@@ -224,5 +224,15 @@ public class CommunityServiceImpl implements CommunityService {
 	public int userCommunityExit(int cidx, int uidx) throws Exception {
 		return communityDao.userCommunityExit(cidx, uidx);
 	}
+
+	@Override
+	public ArrayList<Community> selectUserSignCommunityList(int user_idx) throws Exception {
+		return communityDao.selectUserSignCommunityList(user_idx);
+	}
+
+	@Override
+	public ArrayList<Community> selectUserAllCommunityList() throws Exception {
+		return communityDao.selectUserAllCommunityList();
+	}
 	
 }

@@ -10,6 +10,6 @@
 </head>
 <body>
 	<c:set var="contextPath" value="${pageContext.servletContext.contextPath}" scope="application" />
-	<jsp:forward page="/WEB-INF/views/visitorMain.jsp" />
+	<script type="text/javascript">location.href="<%=request.getContextPath()%>/visitorMain.do";</script>
 </body>
 </html>

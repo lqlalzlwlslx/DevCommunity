@@ -110,11 +110,15 @@
 								</div>
 								<div class="container">
 									<header class="major">
-										<h2 style="font-size:3.5em;">공지사항</h2>
-										<p>DevCoummunity에 오신 것을 환영합니다.<br />
-										이용 수칙에 관해 잘 읽어주시고 활동해주세요.</p>
+										<h2 style="font-size:3.5em;">DevCommunity</h2>
+										<p>DevCoummunity에 오신 것을 환영합니다.<!-- <br />
+										이용 수칙에 관해 잘 읽어주시고 활동해주세요. --></p>
 									</header>
-									<p>공지사항 블라블라<br />이용수칙 블라블라<br /></p>
+									<!-- <p style="margin:-1em 0 1em 0;">
+									1. 다른 회원을 비하하는 내용의 게시글은 차단대상입니다.<br />
+									2. 사이트 내 운영방침과 관계없는 게시글은 차단대상입니다.<br />
+									3. 
+									</p> -->
 								</div>
 							</section>
 							

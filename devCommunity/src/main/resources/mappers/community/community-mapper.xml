@@ -145,7 +145,7 @@
 		WHERE c.comm_idx = cu.comm_idx
 		AND c.comm_idx = #{comm_idx}
 		AND cu.comm_user_stat_cd = 'A'
-		AND cu.comm_role_cd = 7
+		AND cu.comm_role_cd IN (7, 9)
 	]]>
 	</select>
 	
@@ -511,6 +511,37 @@
 		AND user_idx = #{uidx}
 	]]>
 	</delete>
+	
+	<select id="selectUserSignCommunityList" parameterType="_int" resultType="community">
+	<![CDATA[
+		SELECT cu.comm_idx,
+			(SELECT comm_name FROM dec_community c WHERE c.comm_idx = cu.comm_idx) as comm_name
+		FROM dec_community_user cu
+		WHERE cu.user_idx = #{user_idx}
+		
+	]]>
+	</select>
+	
+	<select id="selectUserAllCommunityList" resultType="community">
+	<![CDATA[
+		SELECT c.*
+		FROM (
+			SELECT comm_idx,
+				comm_name,
+				manager_idx,
+				manager_name,
+				comm_type_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_TYPE' AND conf_type_cd = comm_type_cd) as comm_type_nm,
+				comm_stat_cd,
+				(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
+				comm_intro,
+				reg_date
+			FROM dec_community
+			WHERE comm_stat_cd = 'A'
+		) c
+		ORDER BY reg_date ASC
+	]]>
+	</select>
 	
 	
 

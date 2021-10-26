@@ -1,5 +1,7 @@
 package com.dev.comm.common.controller;
 
+import java.util.ArrayList;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dev.comm.board.service.BoardService;
+import com.dev.comm.board.vo.Board;
 import com.dev.comm.user.vo.User;
 import com.dev.comm.util.Constants;
 import com.dev.comm.util.SessionManager;
@@ -31,6 +35,9 @@ public class PageController {
 	
 	@Autowired
 	private ServletContext servletContext;
+	
+	@Autowired
+	private BoardService boardService;
 	
 	@RequestMapping("/console")
 	public ModelAndView mainAdmin(HttpServletRequest request, Model model) throws Exception {
@@ -104,6 +111,7 @@ public class PageController {
 	public ModelAndView showMessageBox(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		return new ModelAndView("communityManage/msgBox");
 	}
+	
 	
 	
 

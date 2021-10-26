@@ -3,7 +3,6 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <%@ include file="/WEB-INF/views/include/header.jsp" %>
-
 <style>
 	#loginbtn:hover{pointer-events: none !important;}
 	div.image.main{
@@ -20,35 +19,37 @@
 	span.image.avatar{width:150px !important;}
 	table>tbody>tr>td{vertical-align:middle;}
 	table>tbody>tr>td>input[type="button"]:hover{pointer-events: none;}
-	input[type="radio"] + label{padding-right:1em !important;}
+	input[type="radio"] + label{padding-right:2em !important;}
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
-	.signUpCommunity:hover{cursor:pointer;}
+	.signUpCommunity:hover, .signCancelCommunity:hover{cursor:pointer;}
 	.communityList { color: #333; text-decoration: none; display: inline-block; padding: 15px 0; position: relative; }
 	.communityList:after { background: none repeat scroll 0 0 transparent; bottom: 0; content: ""; display: block; height: 2px;
 		left: 50%; position: absolute; background: #b9f; transition: width 0.3s ease 0s, left 0.3s ease 0s; width: 0;
 	}
 	.communityList:hover:after { width: 100%; left: 0; }
-	.communitySearchTd:hover{cursor:pointer;}
-	.communitySearchTd{padding: 0.25em 0.25em;}
-	.boardLeft{width:5em;}
-	p{margin: 0;}
+	.replyBtn:hover, .replyspan:hover{cursor: pointer !important;}
+	.replytb{padding:0; }
+	.replyModify:hover, .replyDelete:hover, .replyModifySave:hover, .replyCancel:hover{cursor:pointer;}
 </style>
 <script type="text/javascript">
 	<c:if test="${empty userBean}">
 		location.href="<%=request.getContextPath()%>/";
 	</c:if>
-	
 	<c:if test="${not empty result}">
-		<c:if test="${result == true}">
-			<c:if test="${not empty moveToValue}">
-				top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx=${moveToValue}";
+		<c:if test="${result == false}">
+			<c:if test="${status == 'SESSION_TIMEOUT'}">
+				moveToMain();
 			</c:if>
 		</c:if>
-		
-		<c:if test="${result == false}">
-			<c:if test="${not empty msg}">
-				alert("${msg}");
+		<c:if test="${result == true}">
+			<c:if test="${status == 'UPDATE'}">
+				alert("성공했습니다.");
+				location.reload();
+			</c:if>
+			<c:if test="${status == 'DELETE'}">
+				alert("성공했습니다.");
+				location.href="<%=request.getContextPath()%>/";
 			</c:if>
 		</c:if>
 	</c:if>
@@ -73,7 +74,7 @@
 			document.querySelector(".modal-open").style.overflow = "auto";
 		});
 		
-	}		
+	}
 	
 	function ucListview(){
 		<c:if test="${not empty ucList}">
@@ -209,6 +210,7 @@
 				<!-- Main -->
 					<div id="main">
 
+						<!-- One -->
 							<section id="one">
 								<div class="image main" data-position="center">
 									<div style="width:10%;"></div>
@@ -216,9 +218,9 @@
 									<div style="width:20%; margin:auto;">
 										<select id="searchTxt">
 											<option value="0">=== 선택 ===</option>
-											<option value="content">내용</option>
-											<option value="title">제목</option>
-											<option value="writer">작성자</option>
+											<option value="board_content">내용</option>
+											<option value="board_title">제목</option>
+											<option value="board_writer">작성자</option>
 											<option value="community">커뮤니티</option>
 										</select>
 									</div>
@@ -231,45 +233,67 @@
 										<input type="button" id="searchBtn" onclick="searchCondition();" value="검색" />
 									</div>
 								</div>
-								
-								<div class="container" style="width:60em;">
-								<br /><br />
-								<form name="boardFrm" id="boardFrm" action="<%=request.getContextPath()%>/board/insertCommunityBoard.do" method="POST" enctype="multipart/form-data" >
-								<input type="hidden" name="cidx" value="${comm_idx}" />
-								<div id="loadValues"></div>
-								<table>
-									<tbody>
-										<tr>
-											<td class="boardLeft">제목</td>
-											<td><input type="text" id="board_title" name="board_title"/></td>
-										</tr>
-										<tr>
-											<td class="boardLeft">내용</td>
-											<td><textarea name="board_content" id="summernote" rows="8" cols="90" style="resize:none;"></textarea></td>
-										</tr>
-										<tr style="vertical-align:middle;">
-											<td>공개범위</td>
-											<td>
-												<span style="float:left;">
-												<input type="radio" name="boardScope" id="boardScopeA" value="A" checked/><label for="boardScopeA">전체공개</label>
-												<input type="radio" name="boardScope" id="boardScopeC" value="C" /><label for="boardScopeC">커뮤니티공개</label>
-												<input type="hidden" name="boardScopeValue" value="" />
-												</span>
-												<span style="float:right;">
-													<input onclick="cancelBoard();" type="button" value="취소"/>&nbsp;&nbsp;&nbsp;&nbsp;
-													<input onclick="insertCommunityBoard();" type="button" value="등록" />
-												</span>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-								</form>
+								<div class="container">
+									<header class="major">
+										<h2 style="font-size:3.5em;">DevCoummunity</h2>
+										<p>DevCoummunity에 오신 것을 환영합니다.<!-- <br />
+										이용 수칙에 관해 잘 읽어주시고 활동해주세요. --></p>
+										
+									</header>
+									<!-- <p>공지사항 블라블라<br />이용수칙 블라블라<br /></p> -->
 								</div>
 							</section>
+						<div class="main-content-area">	
+							<c:if test="${not empty acList}">
+								<c:forEach items="${acList}" var="acList" varStatus="acStatus">
+									<div class="container container-solid">
+										<header class='major'>
+											<span style="color:#4acaa8; font-size:3em; line-height:1.5em;">${acList.comm_name}</span>
+											<c:if test="${fn:indexOf(userBean.user_comm_idxs, acList.comm_idx) > -1}">
+												<span></span>
+											</c:if>
+											<c:if test="${fn:indexOf(userBean.user_comm_idxs, acList.comm_idx) < 0}">
+												<span class="signUpCommunity" onclick="signUpCommunity('${acList.comm_idx}');" style="float:right; margin-top:2.5em;">커뮤니티 가입신청</span>
+											</c:if>
+										</header>
+										<br />
+										<table>
+											<tbody>
+												<tr>
+													<td>커뮤니티 관리자</td>
+													<td>${acList.manager_name}</td>
+													<td>개설일</td>
+													<td>${fn:substring(acList.reg_date, 2, 16)}</td>
+													<td>회원수</td>
+													<td>${acList.total_member} 명</td>
+												</tr>
+												<tr>
+													<td>소개글</td>
+													<c:if test="${empty acList.comm_intro}"><td colspan="3"> * 소개글이 없습니다.</td></c:if>
+													<c:if test="${not empty acList.comm_intro}"><td colspan="3">${acList.comm_intro}</td></c:if>
+													<td>게시글 수</td>
+													<td>${acList.total_board} 개</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</c:forEach>
+							</c:if>
+						</div>
 
 					</div>
 
+				<!-- Footer -->
+				<section id="footer" >
+					<div class="container" align="center">
+						<ul class="copyright">
+							<li>&copy;2021 DevCommunity.</li>
+						</ul>
+					</div>
+				</section>
 			</div>
+
+
 
 
 <!-- Modal -->
@@ -336,166 +360,13 @@
 		</div>
 	</div>
 </div>
-
-
-
-<script type="text/javascript">
-	document.addEventListener("DOMContentLoaded", function(){
-		$("#summernote").summernote({
-			height: 350,
-			lang: "ko-KR",
-			disableResizeEditor: true,
-			focus: true,
-			codemirror: {
-			      mode: 'text/html',
-			      htmlMode: true,
-			      lineNumbers: true,
-			      theme: 'monokai'
-			},
-			/* toolbar: [
-                // [groupName, [list of button]]
-                ['Font Style', ['fontname']],
-                ['style', ['bold', 'italic', 'underline']],
-                ['font', ['strikethrough']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['paragraph']],
-                ['height', ['height']],
-                ['Insert', ['picture']],
-                ['Insert', ['link']],
-                ['Misc', ['fullscreen']]
-            ], */
-            
-            callbacks: {	//여기 부분이 이미지를 첨부하는 부분
-				onImageUpload : function(files) {
-					for(var i = 0; i < files.length; i++){
-						uploadSummernoteImageFile(files[i],this);
-					}
-				},
-				onPaste: function (e) {
-					var clipboardData = e.originalEvent.clipboardData;
-					if (clipboardData && clipboardData.items && clipboardData.items.length) {
-						var item = clipboardData.items[0];
-						if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
-							e.preventDefault();
-						}
-					}
-				}
-			}
-		});
-		
-		var containerDiv = document.getElementById("loadValues");
-		var ul = document.createElement("ul");
-		var li = document.createElement("li");
-		
-		function uploadSummernoteImageFile(file, editor) { // 이미지 파일 업로드..
-			const frmData = new FormData();
-			frmData.append("file", file);
 			
-			fetch("<%=request.getContextPath()%>/user/board/tempImagesUpload",{
-				method: "POST",
-				body: frmData
-			}).then(res => res.json())
-			.then((data) => {
-				if(data.result == false){
-					top.location.href = "<%=request.getContextPath()%>/";
-				}
-				$(editor).summernote('insertImage', data.url);
-				
-				li.style.display = "none";
-				li.innerHTML += '<input type="hidden" name="realFileName" value="'+data.realFileName+'" />';
-				li.innerHTML += '<input type="hidden" name="resPathValue" value="'+data.url+'" />';
-				ul.appendChild(li);
-				containerDiv.appendChild(ul);
-				
-				$('#imageBoard > ul').append('<li><img src="'+data.url+'" width="40%;" height="auto"/></li>');
-
-			});
-			
-			
-			/* $.ajax({
-				data : data,
-				type : "POST",
-				url : "/board/uploadSummernoteImageFile",
-				contentType : false,
-				processData : false,
-				success : function(data) {
-	            	//항상 업로드된 파일의 url이 있어야 한다.
-					$(editor).summernote('insertImage', data.url);
-				}
-			}); */
-		}
-	});
-</script>
-
 	<script type="text/javascript">
-		function uSearch(list){
-			var contentArea = document.querySelector(".main-content-area");
-			contentArea.innerHTML = "";
-			var output;
-			var reqDate;
-			var ucIdxs = "";
-			<c:if test="${not empty ucList}">
-			<c:forEach items="${ucList}" var="ucLists" varStatus="status">
-				if(ucIdxs.trim() == "") {}
-				else {ucIdxs += ",";}
-				ucIdxs += "${ucLists.comm_idx}";
-			</c:forEach>
-			</c:if>
-			for(var i = 0; i < list.length; i++){
-				reqDate = list[i].reg_date.split(" ")[0];
-				output = "";
-				output += "<div class='container container-solid'>";
-				output += "<header class='major'>";
-				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
-				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
-					output += "";
-				}else if(list[i].comm_user_stat_cd == "R"){
-					output += "<span style='float:right; margin-top:2.5em;'>승인 대기 중</span>";
-				}else{
-					output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
-				}
-				output += "</header><br />";
-				output += "<table><tbody>"
-				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
-				output += "<td>개설일</td><td>"+reqDate+"</td>";
-				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
-				output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
-				output += "</tbody></table>";
-				output += "</div>";
-				contentArea.innerHTML += output;
-			}
-			
-		}
 		
 		function moveToCommunityView(value){
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
 		
-		function cancelBoard(){
-			location.href = history.back();
-		}
-		
-		function insertCommunityBoard(){ // 제목, 내용 등 검증하고 submit 처리 해야함.
-			const frm = document.boardFrm;
-			const title = frm.board_title.value;
-			const content = frm.board_content.value;
-			
-			const cidx = frm.cidx.value;
-			
-			var scopes = document.getElementsByName("boardScope");
-			for(var i = 0; i < scopes.length; i++){
-				if(scopes[i].checked == true){
-					frm.boardScopeValue.value = scopes[i].value;
-				}
-			}
-			
-			if(!title) { alert("제목을 입력해주세요."); document.querySelector("#board_title").focus(); return; }
-			if(!content) { alert("내용을 입력해주세요."); document.querySelector("#summernote").focus(); return; }
-			
-			frm.submit();
-			
-		}
 		
 		
 	</script>

@@ -22,14 +22,12 @@
 	input[type="radio"] + label{padding-right:2em !important;}
 	.container{padding:0 !important;}
 	.container-solid{border-top:solid 6px #f4f4f4;}
-	.signUpCommunity:hover{cursor:pointer;}
+	.signUpCommunity:hover, .signCancelCommunity:hover{cursor:pointer;}
 	.communityList { color: #333; text-decoration: none; display: inline-block; padding: 15px 0; position: relative; }
 	.communityList:after { background: none repeat scroll 0 0 transparent; bottom: 0; content: ""; display: block; height: 2px;
 		left: 50%; position: absolute; background: #b9f; transition: width 0.3s ease 0s, left 0.3s ease 0s; width: 0;
 	}
 	.communityList:hover:after { width: 100%; left: 0; }
-	.communitySearchTd:hover{cursor:pointer;}
-	.communitySearchTd{padding: 0.25em 0.25em;}
 	.replyBtn:hover, .replyspan:hover{cursor: pointer !important;}
 	.replytb{padding:0; }
 	.replyModify:hover, .replyDelete:hover, .replyModifySave:hover, .replyCancel:hover{cursor:pointer;}
@@ -38,23 +36,24 @@
 	<c:if test="${empty userBean}">
 		location.href="<%=request.getContextPath()%>/";
 	</c:if>
-	
 	<c:if test="${not empty result}">
 		<c:if test="${result == false}">
 			<c:if test="${status == 'SESSION_TIMEOUT'}">
 				moveToMain();
 			</c:if>
-			<c:if test="${status == 'PARSING_FAIL'}">
-				alert("오류가 발생했습니다. 다시 시도해주세요.");
-			</c:if>
 		</c:if>
 		<c:if test="${result == true}">
-			<c:if test="${status == 'DELETE'}">
+			<c:if test="${status == 'UPDATE'}">
 				alert("성공했습니다.");
 				location.reload();
 			</c:if>
+			<c:if test="${status == 'DELETE'}">
+				alert("성공했습니다.");
+				location.href="<%=request.getContextPath()%>/";
+			</c:if>
 		</c:if>
 	</c:if>
+	
 	var communityPassed = false;
 	window.onload = function (){
 		const userInfoBtn = document.querySelector("#userMyPage");
@@ -75,11 +74,7 @@
 			document.querySelector(".modal-open").style.overflow = "auto";
 		});
 		
-		document.querySelector("#inSearchBtn").addEventListener("click", function(){
-			inCommunitySearch();
-		});
-		
-	}		
+	}
 	
 	function ucListview(){
 		<c:if test="${not empty ucList}">
@@ -210,6 +205,17 @@
 					</ul>
 				</nav>
 				</c:if>
+				<!-- 
+				<footer>
+					<ul class="icons">
+						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+						<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					</ul>
+				</footer>
+				 -->
 			</section>
 
 		<!-- Wrapper -->
@@ -221,7 +227,18 @@
 						<!-- One -->
 							<section id="one">
 								<div class="image main" data-position="center">
+									<!-- <img src="/resources/images/banner.jpg" alt="" /> -->
 									<div style="width:10%;"></div>
+									<!-- <c:if test="${not empty ucList}">
+									<div style="width:20%; margin:auto;">
+									<select id="searchScopeTxt">
+											<option value="0">=== 선택 ===</option>
+											<c:forEach items="${ucList}" var="ucList" varStatus="status">
+												<option value="${ucList.comm_name}">${ucList.comm_name}</option>
+											</c:forEach>
+										</select>
+									</div>
+									</c:if> -->
 									<div style="width:2%;"></div>
 									<div style="width:20%; margin:auto;">
 										<select id="searchTxt">
@@ -243,116 +260,81 @@
 								</div>
 								<div class="container">
 									<header class="major">
-										<c:if test="${not empty commInfo}">
-											<h2 style="margin: 0; font-size:3.5em;">${commInfo.comm_name}</h2>
-											<table>
-												<tbody>
-													<tr>
-														<td class="communitySearchTd">
-															<select id="inCommunity_searchTxt">
-																<option value="0">=== 선택 ===</option>
-																<option value="inCommunity_content">내용</option>
-																<option value="inCommunity_title">제목</option>
-																<option value="inCommunity_writer">작성자</option>
-															</select>
-														</td>
-														<td class="communitySearchTd">
-															<input type="text" id="inCommunity_SearchInputTxt" onKeyPress="if(event.keyCode==13) inCommunitySearch();"/>
-														</td>
-														<td class="communitySearchTd" id="inSearchBtn">
-															<input type="button" value="검색" />
-														</td>
-														<td class="communitySearchTd">
-															<span style="float: right;" onclick="moveToMain();"><a href="#">메인페이지로 이동</a></span><br />
-															<span style="float: right;" onclick="communityBoardWrite();"><a href="#">글쓰기</a></span>
-															<span style="display:none;"><button type="button" id="boardModalBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#boardModal"></button></span>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-											
-											
-										</c:if>
-										<c:if test="${empty commInfo}"><h2>잉여잉여잉여잉여</h2></c:if>
-									</header>	
+										<h2 style="font-size:3.5em;">DevCoummunity</h2>
+										<p>DevCoummunity에 오신 것을 환영합니다.<!-- <br />
+										이용 수칙에 관해 잘 읽어주시고 활동해주세요. --></p>
+										
+									</header>
+									<!-- <p>공지사항 블라블라<br />이용수칙 블라블라<br /></p> -->
 								</div>
 							</section>
-							
-							<c:if test="${not empty datalist}">
-								<c:forEach items="${datalist}" var="slist" varStatus="status">
-									<div class="main-content-area">	
-										<div class="container container-solid">
-											<div class='content_inner' style='display:flex;'>	
-												<div style="width:23em;">
-													<header class="major">
-														<h2>${slist.board_title}</h2>
-													</header>
-												</div>
-												<div style="width:22em;">
-													<span style="float:right;">작성일 &nbsp;&nbsp;${slist.reg_date}<br />작성자 &nbsp;&nbsp;${slist.writer_nick}
-														<c:if test="${slist.board_uidx == userBean.user_idx}">
-														<span onclick="modifyBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
-														<span onclick="deleteBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
-														</c:if>
-													</span>
-												</div>
-											</div>
-											<div class='content-area'><p>${slist.board_content}</p></div>
-											<div class='container_outer'>
-												<table><tbody><tr>
-												<td style='width:12%;'>댓글작성</td>
-												<td><textarea id="textArea_${slist.board_idx}" name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>
-												<td class='replyBtn' style='width:15%;'><input type='button' value='등록' onclick='replyInsert("${slist.board_idx}");'/></td>
-												</tr></tbody></table>
-											</div>
-											<c:if test="${not empty slist.replyList}">
-												<c:forEach items="${slist.replyList}" var="cbReplyList" varStatus="replyStatus">
-													<div class='replyDiv' style="padding-bottom:1em;">
-														<table style="margin:0.25em;">
-															<tbody>
-																<tr style='vertical-align:middle;'>
-																	<c:if test="${empty cbReplyList.reply_res_path}">
-																		<td rowspan="2" class='replytb' style='width:5%;'><span><img src="/resources/images/default_profile.png" style="width:25px; height:25px;" /></span></td>
-																	</c:if>
-																	<c:if test="${not empty cbReplyList.reply_res_path}">
-																		<td rowspan="2" class='replytb' style='width:5%;'><span><img src="${cbReplyList.reply_res_path}" style="width:25px; height:25px;" /></span></td>
-																	</c:if>
-																	<td rowspan="2" class='replytb' style="width:15%;">${cbReplyList.reply_nick}</td>
-																	<td rowspan="2" class='replytb' style="width:auto;"><span name='replys' id='replyContent_${cbReplyList.reply_idx}'>${cbReplyList.reply_content}</span></td>
-																	<c:if test="${cbReplyList.reply_uidx == userBean.user_idx}">
-																		<td align="center" class="replytb replyModify" name="replyModis" id="replyModify_${cbReplyList.reply_idx}" style="width:7%;" onclick="replyModify('${cbReplyList.reply_idx}');"><span><a>수정</a></span></td>
-																		<td align="center" class="replytb replyModifySave" name="replyModiSaves" id="replyModifySave_${cbReplyList.reply_idx}" style="width:7%; display:none;" onclick="replyModifySave('${cbReplyList.reply_idx}');"><span><a>저장</a></span></td>
-																		<td align="center" class="replytb replyDelete" name="replyDels" id="replyDelete_${cbReplyList.reply_idx}" style="width:7%;" onclick="replyDelete('${cbReplyList.reply_idx}');"><span><a>삭제</a></span></td>
-																		<td align="center" class="replytb replyCancel" name="replyCans" id="replyCancel_${cbReplyList.reply_idx}" style="width:7%; display:none;" onclick="replyCancel('${cbReplyList.reply_idx}');"><span><a>취소</a></span></td>
-																	</c:if>
-																</tr>
-																<tr>
-																	<td colspan="4" align="center" class="replytb" style="background-color:#fafafa;">
-																		<c:if test="${cbReplyList.modify_date == null}"><span style="font-size:0.75em;">${fn:substring(cbReplyList.reg_date, 2, 16)}</span></c:if>
-																		<c:if test="${cbReplyList.modify_date != null}"><span style="font-size:0.75em;">${fn:substring(cbReplyList.modify_date, 2, 16)}</span></c:if>
-																	</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</c:forEach>
-											</c:if>
-											<c:if test="${empty slist.replyList}">
-												<div style="padding-bottom:1em;"><span> * 작성된 댓글이 없습니다. </span></div>
-											</c:if>
-										</div><br />
-									</div>
-								</c:forEach>
-							</c:if>
-							<c:if test="${empty datalist}">
-							<div class="main-content-area2">	
+						<div class="main-content-area">	
+							<c:if test="${not empty usbList}">
+							<c:forEach items="${usbList}" var="usbList" varStatus="usbStatus">
 								<div class="container container-solid">
-									<header class="major">
-										<h2>등록된 게시글이 없습니다.</h2>
-									</header>
+									<div class='content_inner' style="display:flex;">
+										<div style="width:45em;">
+											<header class='major'>
+												<h2>${usbList.board_title}</h2>
+											</header>
+										</div>
+										<div style="width:17em;">
+											<span style="float:right;">커뮤니티 &nbsp;&nbsp;${usbList.comm_name}<br />작성일 &nbsp;&nbsp;${fn:substring(usbList.reg_date, 2, 16)}<br />작성자 &nbsp;&nbsp;${usbList.writer_nick}
+											<c:if test="${usbList.board_uidx == userBean.user_idx}">
+												<span style="cursor:pointer;" onclick="modifyBoard('${usbList.board_idx}');"><a>&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
+												<span style="cursor:pointer;" onclick="deleteBoard('${usbList.board_idx}');"><a>&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
+											</c:if>
+											</span>
+										</div>
+									</div>
+									<div class="content-area">
+										<p>${usbList.board_content}</p>
+									</div>
+									<div class="container_outer">
+										<table style="margin:0 0 1.25em 0;"><tbody><tr>
+											<td style="width:12%;" align="center">댓글<br />작성</td>
+											<td><textarea id="txtArea_${usbList.board_idx}" name="replyTxtArea" style="resize:none; max-height:5em; overflow:hidden;" placeholder="댓글을 남겨주세요."></textarea></td>
+											<td class="replyBtn" style="width:15%;" onclick="replyInsert('${usbList.board_idx}');"><input type="button" value="등록" /></td>
+										</tr></tbody></table>
+									</div>
+									<c:if test="${empty usbList.replyList}">
+										<div style="padding-bottom:1em;"><span> * 작성된 댓글이 없습니다. </span></div>
+									</c:if>
+									<c:if test="${not empty usbList.replyList}">
+										<div class="replyDiv" style="padding-bottom:1em;">
+											<c:forEach items="${usbList.replyList}" var="usbBoardReply" varStatus="usbReplyStatus">
+												<table style="margin:0.25em;">
+													<tbody>
+														<tr style="vertical-align:middle;">
+															<c:if test="${empty usbBoardReply.reply_res_path}"><td rowspan="2" class="replytb" style="width:5%;"><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td></c:if>
+															<c:if test="${not empty usbBoardReply.reply_res_path}"><td rowspan="2" class="replytb" style="width:5%;"><span><img src="${usbBoardReply.reply_res_path}" style="width:25px; height:25px;" /></span></td></c:if>
+															<td rowspan="2" class="replytb" style="width:15%;">${usbBoardReply.reply_nick}</td>
+															<td rowspan="2" class="replytb" style="width:auto;"><span name="replys" id="replyContent_${usbBoardReply.reply_idx}">${usbBoardReply.reply_content}</span></td>
+															<c:if test="${usbBoardReply.reply_uidx == userBean.user_idx}">
+															<td align="center" class="replytb replyModify" name="replyModis" id="replyModify_${usbBoardReply.reply_idx}" style="width:7%;" onclick="replyModify('${usbBoardReply.reply_idx}');"><span><a>수정</a></span></td>
+															<td align="center" class="replytb replyModifySave" name="replyModiSaves" id="replyModifySave_${usbBoardReply.reply_idx}" style="width:7%; display:none;" onclick="replyModifySave('${usbBoardReply.reply_idx}');"><span><a>저장</a></span></td> 
+															<td align="center" class="replytb replyDelete" name="replyDels" id="replyDelete_${usbBoardReply.reply_idx}" style="width:7%;" onclick="replyDelete('${usbBoardReply.reply_idx}');"><span><a>삭제</a></span></td>
+															<td align="center" class="replytb replyCancel" name="replyCans" id="replyCancel_${usbBoardReply.reply_idx}" style="width:7%; display:none;" onclick="replyCancel('${usbBoardReply.reply_idx}');"><span><a>취소</a></span></td>
+															</c:if>
+															<c:if test="${usbBoardReply.reply_uidx != userBean.user_idx}">
+															<td colspan="2" align="center" class="replytb" name="replyblank" id="replyblank_${usbBoardReply.reply_idx}" style="width:7%;"><span>&nbsp;</span></td>
+															<td colspan="2" align="center" class="replytb" name="replyblank2" id="replyblacks_${usbBoardReply.reply_idx}" style="width:7%;"><span>&nbsp;</span></td>
+															</c:if>
+														</tr>
+														<tr>
+															<c:if test="${empty usbBoardReply.modify_date}"><td class="replytb" colspan="4" align="center" style="background-color:#fafafa;"><span style="font-size:0.75em;">${fn:substring(usbBoardReply.reg_date, 2, 16)}</span></td></c:if>
+															<c:if test="${not empty usbBoardReply.modify_date}"><td class="replytb" colspan="4" align="center" style="background-color:#fafafa;"><span style="font-size:0.75em;">${fn:substring(usbBoardReply.modify_date, 2, 16)}</span></td></c:if>
+														</tr>
+													</tbody>
+												</table>
+											</c:forEach>
+										</div>
+									</c:if>
 								</div>
-							</div>
-							</c:if>
+							</c:forEach>
+						</c:if>
+						</div>
+
 					</div>
 
 				<!-- Footer -->
@@ -364,6 +346,8 @@
 					</div>
 				</section>
 			</div>
+
+
 
 
 <!-- Modal -->
@@ -430,65 +414,38 @@
 		</div>
 	</div>
 </div>
-
-	<script type="text/javascript">
-		function uSearch(list){
-			var contentArea = document.querySelector(".main-content-area");
-			contentArea.innerHTML = "";
-			var output;
-			var reqDate;
-			var ucIdxs = "";
-			<c:if test="${not empty ucList}">
-			<c:forEach items="${ucList}" var="ucLists" varStatus="status">
-				if(ucIdxs.trim() == "") {}
-				else {ucIdxs += ",";}
-				ucIdxs += "${ucLists.comm_idx}";
-			</c:forEach>
-			</c:if>
-			for(var i = 0; i < list.length; i++){
-				reqDate = list[i].reg_date.split(" ")[0];
-				output = "";
-				output += "<div class='container container-solid'>";
-				output += "<header class='major'>";
-				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
-				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
-					output += "";
-				}else if(list[i].comm_user_stat_cd == "R"){
-					output += "<span style='float:right; margin-top:2.5em;'>승인 대기 중</span>";
-				}else{
-					output += "<span class='signUpCommunity' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'>커뮤니티 가입신청</span>";
-				}
-				output += "</header><br />";
-				output += "<table><tbody>"
-				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
-				output += "<td>개설일</td><td>"+reqDate+"</td>";
-				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
-				output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
-				output += "</tbody></table>";
-				output += "</div>";
-				contentArea.innerHTML += output;
-			}
 			
-		}
+	<script type="text/javascript">
 		
 		function moveToCommunityView(value){
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
 		}
 		
-		function communityBoardWrite(){
-			location.href="<%=request.getContextPath()%>/user/communityBoard.do?cidx="+${commInfo.comm_idx};
-		}
-		
 		let boardFlag;
 		function modifyBoard(idx){
 			boardFlag = "modify";
-			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&idx="+idx;
+			enterFlag = "um";
+			location.href="<%=request.getContextPath()%>/board/userBoardModify.do?flag="+boardFlag+"&enterFlag="+enterFlag+"&idx="+idx;
 		}
 		
 		function deleteBoard(idx){
 			if(confirm("게시글을 삭제하시겠습니까?")){
 				boardFlag = "delete";
-				location.href="<%=request.getContextPath()%>/board/userBoardDelete.do?flag="+boardFlag+"&idx="+idx;
+				const boardDelData = {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({idx, boardFlag})
+				};
+				fetch("/board/userBoardDelete.do",boardDelData)
+					.then(res => res.json())
+					.then((data) => {
+						if(data.result){
+							alert("성공했습니다.");
+							location.reload();
+						}else{
+							alert("실패했습니다.");
+						}
+					});
 			}
 		}
 		
@@ -499,10 +456,11 @@
 			for(var i = 0; i < txtAreas.length; i++){
 				tmp = txtAreas[i].id.substring(txtAreas[i].id.indexOf("_")+1);
 				if(bidx == tmp){
-					replyContent = txtAreas[i].value;
+					replyContent = txtAreas[i].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
 					break;
 				}
 			}
+			if(!replyContent || replyContent.trim().length == 0) {alert("내용을 입력해주세요."); return;}
 			const replyInsertData = {
 					method: "POST",
 					headers: {"Content-Type": "application/json"},
@@ -518,6 +476,7 @@
 						alert(data.msg);
 					}
 				});
+			
 		}
 		
 		var retmp;
@@ -554,7 +513,7 @@
 			for(var i = 0; i < modiTxtAreas.length; i++){
 				retmp = modiTxtAreas[i].id.substring(modiTxtAreas[i].id.indexOf("_")+1);
 				if(idx == retmp){
-					replyModifyContent = modiTxtAreas[i].value;
+					replyModifyContent = modiTxtAreas[i].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
 				}
 			}
 			const replyModifyData = {
@@ -617,19 +576,7 @@
 			}
 		}
 		
-		function inCommunitySearch(){
-			const insBox = document.querySelector("#inCommunity_searchTxt");
-			const inCondition = insBox.options[insBox.selectedIndex].value;
-			const inSearchValue = document.querySelector("#inCommunity_SearchInputTxt").value;
-			
-			if(inCondition == "0"){ alert("검색할 항목을 선택해주세요."); return; }
-			if(!inSearchValue) { alert("검색할 단어를 입력해주세요."); return; }
-			
-			/* fetch("/community/communityBoardSearchAsValues.do?condition="+inCondition+"&searchValue="+inSearchValue+"&cidx="+${commInfo.comm_idx})
-				.then(res => res.json())
-				.then(data => drawCommunityBoardSearchResult(data)); */
-			location.href="<%=request.getContextPath()%>/community/communityBoardSearchAsValues.do?condition="+inCondition+"&searchValue="+inSearchValue+"&cidx="+${commInfo.comm_idx};
-		}
+		
 	</script>
 
 

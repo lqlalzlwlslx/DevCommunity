@@ -94,4 +94,8 @@ public interface CommunityDao {
 
 	int userCommunityExit(int cidx, int uidx) throws Exception;
 
+	ArrayList<Community> selectUserSignCommunityList(int user_idx) throws Exception;
+
+	ArrayList<Community> selectUserAllCommunityList() throws Exception;
+
 }

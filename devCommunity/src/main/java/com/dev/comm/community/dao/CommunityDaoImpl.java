@@ -283,5 +283,17 @@ public class CommunityDaoImpl implements CommunityDao {
 		map.put("uidx", uidx);
 		return sqlSession.delete("community.userCommunityExit", map);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Community> selectUserSignCommunityList(int user_idx) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectUserSignCommunityList", user_idx);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Community> selectUserAllCommunityList() throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectUserAllCommunityList");
+	}
 	
 }

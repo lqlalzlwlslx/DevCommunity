@@ -16,8 +16,8 @@
 	}
 	.flex_item1, .flex_item2{
 		flex: 1;
-		overflow: auto;
-		align: center;
+		overflow: hidden;
+		vertical-align: center;
 	}
 </style>
 <script type="text/javascript">

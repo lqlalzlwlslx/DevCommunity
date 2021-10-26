@@ -50,59 +50,20 @@
 		location.href="<%=request.getContextPath()%>/signUpFrm.do";
 	}
 	
-	function searchCondition(dCondition, dValue){
+	function searchCondition(){
 		const sBox = document.querySelector("#searchTxt");
 		let condition = sBox.options[sBox.selectedIndex].value;
 		let searchValue = document.querySelector("#searchInputTxt").value;
-		
-		if(dCondition){
-			condition = dCondition;
-			searchValue = dValue;
-		}
 		
 		if(condition == "0"){ alert("검색할 항목을 선택해주세요."); return; }
 		if(!searchValue){ alert("검색할 단어를 입력해주세요."); return; }
 		
 		<c:if test="${empty userBean}">
-			fetch("/community/searchAsValues.do?condition="+condition+"&searchValue="+searchValue)
-				.then(res => res.json())
-				.then(data => drawSearchResult(data));
+			location.href="<%=request.getContextPath()%>/visitor/community/searchAsValues.do?condition="+condition+"&searchValue="+searchValue;
 		</c:if>
 		<c:if test="${not empty userBean}">
-			fetch("/community/userSearchAsValues.do?condition="+condition+"&searchValue="+searchValue)
-				.then(res => res.json())
-				.then(data => drawUserSearchResult(data));
+			location.href="<%=request.getContextPath()%>/community/userSearchAsValues.do?condition="+condition+"&searchValue="+searchValue;
 		</c:if>
-	}
-	
-	function drawSearchResult(data){ // empty userBean searchResult.
-		console.log(data);
-		if(data.result == true){
-			if(data.status == "COMMUNITY_SEARCH"){ //커뮤니티 이름 검색 result.
-				vSearch(data.searchDataList);
-			}else if(data.status == "BOARD_SEARCH"){ // 제목, 내용, 작성자..
-				vSearchBoard(data.searchDataList);
-			}
-		}else{
-			alert('검색 결과가 없습니다.');
-		}
-	}
-	
-	function drawUserSearchResult(data){ // not empty userBeanSearchResult.
-		console.log(data);
-		if(data.result){
-			if(data.status == "COMMUNITY_SEARCH"){
-				uSearch(data.searchDataList, data.condition, data.searchValue);
-			}else{
-				uSearchBoard(data.searchDataList);
-			}
-		}else{
-			if(data.status == "SESSION_TIMEOUT"){
-				location.href="<%=request.getContextPath()%>/logout.do";
-			}else{
-				alert("검색 결과가 없습니다.");
-			}
-		}
 	}
 	
 	function signUpCommunity(idx){
@@ -126,8 +87,7 @@
 					.then((data) => {
 						if(data.result == true){
 							alert(data.msg);
-							//location.reload();
-							statusTxt(data.cidx, data.condition, data.searchValue);
+							location.reload();
 						}
 					});
 				
@@ -148,7 +108,7 @@
 				.then(res => res.json())
 				.then((data) => {
 					if(data.result){
-						statusTxt(data.cidx);
+						location.reload();
 					}
 				});
 		}
@@ -184,6 +144,10 @@
 	
 	function findPasswd(){
 		location.href="<%=request.getContextPath()%>/findPasswd.do";
+	}
+	
+	function allCommunityView(){
+		location.href="<%=request.getContextPath()%>/community/allCommunityView.do";
 	}
 </script>
 	

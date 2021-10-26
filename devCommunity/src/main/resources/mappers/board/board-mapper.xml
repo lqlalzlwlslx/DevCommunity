@@ -296,6 +296,7 @@
 	<![CDATA[
 		SELECT b.board_idx,
 			b.comm_idx,
+			b.comm_name,
 			b.board_uidx,
 			b.board_scope,
 			b.board_title,
@@ -309,6 +310,7 @@
 		FROM (
 			SELECT board_idx,
 				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = bd.comm_idx) as comm_name,
 				board_uidx,
 				board_scope,
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_SCOP' AND conf_type_cd = board_scope) as board_scope_nm,
@@ -320,7 +322,7 @@
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
 				reg_date,
 				modify_date
-			FROM dec_community_board ) b
+			FROM dec_community_board bd) b
 		WHERE b.board_scope IN ('A', 'C')
 		AND b.comm_idx IN (SELECT comm_idx FROM dec_community_user cu WHERE b.board_uidx = cu.user_idx)
 		AND b.board_stat_cd = 'A'

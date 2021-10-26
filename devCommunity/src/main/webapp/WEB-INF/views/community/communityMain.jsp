@@ -198,6 +198,7 @@
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li onclick="moveToFaQ();" style="cursor:pointer;"><a> 1:1 문의하기 </a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
+						<li style="cursor:pointer;" onclick="allCommunityView();"><a>전체 커뮤니티 보기</a></li>
 						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
 						<li id="ucEmpty"style="display:none;"><a>가입된 커뮤니티가 없습니다.</a></li>
@@ -331,7 +332,7 @@
 											</div>
 											<div class='content-area'><p>${cbList.board_content}</p></div>
 											<div class='container_outer'>
-												<table><tbody><tr>
+												<table style="margin:0 0 1.25em 0;"><tbody><tr>
 												<td style='width:12%;'>댓글작성</td>
 												<td><textarea id="textArea_${cbList.board_idx}" name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>
 												<td class='replyBtn' style='width:15%;'><input type='button' value='등록' onclick='replyInsert("${cbList.board_idx}");'/></td>
@@ -339,7 +340,7 @@
 											</div>
 											<c:if test="${not empty cbList.replyList}">
 												<c:forEach items="${cbList.replyList}" var="cbReplyList" varStatus="replyStatus">
-													<div class='replyDiv'>
+													<div class='replyDiv' style="padding-bottom:1em;">
 														<table style="margin:0.25em;">
 															<tbody>
 																<tr style='vertical-align:middle;'>
@@ -374,7 +375,7 @@
 												</c:forEach>
 											</c:if>
 											<c:if test="${empty cbList.replyList}">
-												<div><span> * 작성된 댓글이 없습니다. </span></div>
+												<div style="padding-bottom:1em;"><span> * 작성된 댓글이 없습니다. </span></div>
 											</c:if>
 										</div><br />
 									</div>
@@ -395,7 +396,7 @@
 				<section id="footer" >
 					<div class="container" align="center">
 						<ul class="copyright">
-							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							<li>&copy;2021 DevCommunity.</li>
 						</ul>
 					</div>
 				</section>

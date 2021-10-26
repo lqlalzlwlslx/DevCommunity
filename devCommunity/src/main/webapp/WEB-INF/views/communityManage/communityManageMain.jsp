@@ -211,6 +211,7 @@
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li onclick="moveToFaQ();" style="cursor:pointer;"><a> 1:1 문의하기 </a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
+						<li style="cursor:pointer;" onclick="allCommunityView();"><a>전체 커뮤니티 보기</a></li>
 						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
 						<li id="ucEmpty"style="display:none;"><a>가입된 커뮤니티가 없습니다.</a></li>
@@ -364,7 +365,7 @@
 				<section id="footer" >
 					<div class="container" align="center">
 						<ul class="copyright">
-							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							<li>&copy;2021 DevCommunity.</li>
 						</ul>
 					</div>
 				</section>

@@ -160,10 +160,6 @@
 		
 	}
 	
-	document.addEventListener("DOMContentLoaded", function(){
-		//getMainUserBoardList();
-	});
-	
 </script>
 </head>
 <body>
@@ -192,6 +188,7 @@
 						<li onclick="moveToMain();"><a href="#">메인페이지 이동</a></li>
 						<li onclick="moveToFaQ();" style="cursor:pointer;"><a> 1:1 문의하기 </a></li>
 						<li><a href="#" id="userMyPage">마이페이지</a></li>
+						<li style="cursor:pointer;" onclick="allCommunityView();"><a>전체 커뮤니티 보기</a></li>
 						<li id="ucLi"><a id="ucListView">커뮤니티</a></li>
 						<c:if test="${empty ucList}">
 						<li id="ucEmpty"style="display:none;"><a>가입된 커뮤니티가 없습니다.</a></li>
@@ -272,14 +269,70 @@
 								</div>
 							</section>
 						<div class="main-content-area">	
-							<div class="container container-solid">
-								<header class="major">
-									<h2>board_title</h2>
-									<!-- <p>DevCoummunity에 오신 것을 환영합니다.<br />
-									이용 수칙에 관해 잘 읽어주시고 활동해주세요.</p> -->
-								</header>
-								<p>board_content</p>
-							</div>
+							<c:if test="${not empty ubList}">
+							<c:forEach items="${ubList}" var="ubList" varStatus="ubStatus">
+								<div class="container container-solid">
+									<div class='content_inner' style="display:flex;">
+										<div style="width:45em;">
+											<header class='major'>
+												<h2>${ubList.board_title}</h2>
+											</header>
+										</div>
+										<div style="width:17em;">
+											<span style="float:right;">커뮤니티 &nbsp;&nbsp;${ubList.comm_name}<br />작성일 &nbsp;&nbsp;${fn:substring(ubList.reg_date, 2, 16)}<br />작성자 &nbsp;&nbsp;${ubList.writer_nick}
+											<c:if test="${ubList.board_uidx == userBean.user_idx}">
+												<span style="cursor:pointer;" onclick="modifyBoard('${ubList.board_idx}');"><a>&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
+												<span style="cursor:pointer;" onclick="deleteBoard('${ubList.board_idx}');"><a>&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
+											</c:if>
+											</span>
+										</div>
+									</div>
+									<div class="content-area">
+										<p>${ubList.board_content}</p>
+									</div>
+									<div class="container_outer">
+										<table style="margin:0 0 1.25em 0;"><tbody><tr>
+											<td style="width:12%;" align="center">댓글<br />작성</td>
+											<td><textarea id="txtArea_${ubList.board_idx}" name="replyTxtArea" style="resize:none; max-height:5em; overflow:hidden;" placeholder="댓글을 남겨주세요."></textarea></td>
+											<td class="replyBtn" style="width:15%;" onclick="replyInsert('${ubList.board_idx}');"><input type="button" value="등록" /></td>
+										</tr></tbody></table>
+									</div>
+									<c:if test="${empty ubList.replyList}">
+										<div style="padding-bottom:1em;"><span> * 작성된 댓글이 없습니다. </span></div>
+									</c:if>
+									<c:if test="${not empty ubList.replyList}">
+										<div class="replyDiv" style="padding-bottom:1em;">
+											<c:forEach items="${ubList.replyList}" var="ubBoardReply" varStatus="ubReplyStatus">
+												<table style="margin:0.25em;">
+													<tbody>
+														<tr style="vertical-align:middle;">
+															<c:if test="${empty ubBoardReply.reply_res_path}"><td rowspan="2" class="replytb" style="width:5%;"><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td></c:if>
+															<c:if test="${not empty ubBoardReply.reply_res_path}"><td rowspan="2" class="replytb" style="width:5%;"><span><img src="${ubBoardReply.reply_res_path}" style="width:25px; height:25px;" /></span></td></c:if>
+															<td rowspan="2" class="replytb" style="width:15%;">${ubBoardReply.reply_nick}</td>
+															<td rowspan="2" class="replytb" style="width:auto;"><span name="replys" id="replyContent_${ubBoardReply.reply_idx}">${ubBoardReply.reply_content}</span></td>
+															<c:if test="${ubBoardReply.reply_uidx == userBean.user_idx}">
+															<td align="center" class="replytb replyModify" name="replyModis" id="replyModify_${ubBoardReply.reply_idx}" style="width:7%;" onclick="replyModify('${ubBoardReply.reply_idx}');"><span><a>수정</a></span></td>
+															<td align="center" class="replytb replyModifySave" name="replyModiSaves" id="replyModifySave_${ubBoardReply.reply_idx}" style="width:7%; display:none;" onclick="replyModifySave('${ubBoardReply.reply_idx}');"><span><a>저장</a></span></td> 
+															<td align="center" class="replytb replyDelete" name="replyDels" id="replyDelete_${ubBoardReply.reply_idx}" style="width:7%;" onclick="replyDelete('${ubBoardReply.reply_idx}');"><span><a>삭제</a></span></td>
+															<td align="center" class="replytb replyCancel" name="replyCans" id="replyCancel_${ubBoardReply.reply_idx}" style="width:7%; display:none;" onclick="replyCancel('${ubBoardReply.reply_idx}');"><span><a>취소</a></span></td>
+															</c:if>
+															<c:if test="${ubBoardReply.reply_uidx != userBean.user_idx}">
+															<td colspan="2" align="center" class="replytb" name="replyblank" id="replyblank_${ubBoardReply.reply_idx}" style="width:7%;"><span>&nbsp;</span></td>
+															<td colspan="2" align="center" class="replytb" name="replyblank2" id="replyblacks_${ubBoardReply.reply_idx}" style="width:7%;"><span>&nbsp;</span></td>
+															</c:if>
+														</tr>
+														<tr>
+															<c:if test="${empty ubBoardReply.modify_date}"><td class="replytb" colspan="4" align="center" style="background-color:#fafafa;"><span style="font-size:0.75em;">${fn:substring(ubBoardReply.reg_date, 2, 16)}</span></td></c:if>
+															<c:if test="${not empty ubBoardReply.modify_date}"><td class="replytb" colspan="4" align="center" style="background-color:#fafafa;"><span style="font-size:0.75em;">${fn:substring(ubBoardReply.modify_date, 2, 16)}</span></td></c:if>
+														</tr>
+													</tbody>
+												</table>
+											</c:forEach>
+										</div>
+									</c:if>
+								</div>
+							</c:forEach>
+						</c:if>
 						</div>
 						<!-- Two -->
 							<!-- <section id="two">
@@ -688,7 +741,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				<section id="footer" >
 					<div class="container" align="center">
 						<ul class="copyright">
-							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							<li>&copy;2021 DevCommunity.</li>
 						</ul>
 					</div>
 				</section>
@@ -763,221 +816,9 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 </div>
 			
 	<script type="text/javascript">
-		function uSearch(list, condition, searchValue){
-			var contentArea = document.querySelector(".main-content-area");
-			contentArea.innerHTML = "";
-			var output;
-			var reqDate;
-			var ucIdxs = "";
-			<c:if test="${not empty ucList}">
-			<c:forEach items="${ucList}" var="ucLists" varStatus="status">
-				if(ucIdxs.trim() == "") {}
-				else {ucIdxs += ",";}
-				ucIdxs += "${ucLists.comm_idx}";
-			</c:forEach>
-			</c:if>
-			for(var i = 0; i < list.length; i++){
-				reqDate = list[i].reg_date.split(" ")[0];
-				output = "";
-				output += "<div class='container container-solid'>";
-				output += "<header class='major'>";
-				output += "<span style='color:#4acaa8; font-size:3em; line-height:1.5em;'>"+list[i].comm_name+"</span>";
-				if(ucIdxs.indexOf(list[i].comm_idx) > -1){
-					output += "";
-				}else if(list[i].comm_user_stat_cd == "R"){
-					output += "<span class='signCancelCommunity' style='float:right; margin-top:2.5em;' id='signCommunityCancel_"+list[i].comm_idx+"' name='signCancels' onclick='signCancel("+list[i].comm_idx+")' ><a>승인 대기 중</a></span>";
-				}else{
-					output += "<span class='signUpCommunity' id='signUpCommunity_"+list[i].comm_idx+"' name='signUpSpans' onclick='signUpCommunity("+list[i].comm_idx+");' style='float:right; margin-top:2.5em;'><a>커뮤니티 가입신청</a></span>";
-				}
-				output += "</header><br />";
-				output += "<table><tbody>"
-				output += "<tr><td>커뮤니티 관리자</td><td>"+list[i].manager_name+"</td>";
-				output += "<td>개설일</td><td>"+reqDate+"</td>";
-				output += "<td>회원수</td><td>"+list[i].total_member+" 명</td></tr>";
-				if(list[i].comm_intro == null){
-					output += "<tr><td>소개글</td><td colspan='3'> * 소개글이 없습니다. </td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
-				}else{
-					output += "<tr><td>소개글</td><td colspan='3'>"+list[i].comm_intro+"</td><td>게시글 수</td><td>"+list[i].total_board+" 개</td></tr>";
-				}
-				output += "</tbody></table>";
-				output += "</div>";
-				contentArea.innerHTML += output;
-			}
-			
-		}
 		
 		function moveToCommunityView(value){
 			top.location.href="<%=request.getContextPath()%>/user/moveToCommunityView.do?idx="+value;
-		}
-		
-		function getMainUserBoardList(){
-			fetch("/board/userMainBoardList.do")
-			.then(res => res.json())
-			.then(data => showMainBoardList(data));
-		}
-		
-		let contentArea = document.querySelector(".main-content-area");
-		contentArea.innerHTML = "";
-		let output = "";
-		function showMainBoardList(res){
-			if(res.result == false) { location.href="<%=request.getContextPath()%>/"; }
-			
-			if(res.result){
-				let ubList = res.ubList;
-				const login_id = "${userBean.login_id}";
-				const user_idx = "${userBean.user_idx}";
-				const usercommidxs = "${userBean.user_comm_idxs}";
-				const usercommreqidxs = "${userBean.user_comm_req_idxs}";
-				let board_writerId;
-				let boardReplyList;
-				//console.log(ubList);
-				for(let i = 0; i < ubList.length; i++){
-					board_writerId = ubList[i].writer_id;
-					boardReplyList = ubList[i].replyList;
-					//console.log(boardReplyList);
-					output = "";
-					output += "<div class='container container-solid'>";
-					output += "<div class='content_inner' style='display:flex;'>";
-					output += "<div style='width:22em;'>";
-					output += "<header class='major'>";
-					output += "<h2>"+ubList[i].board_title+"</h2>";
-					output += "</header>";
-					output += "</div>";
-					output += "<div style='width:23em;'>";
-					output += "<span style='float:right;'>커뮤니티 &nbsp;&nbsp;"+ubList[i].comm_name+"<br />작성일 &nbsp;&nbsp;"+ubList[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+ubList[i].writer_nick;
-					if(login_id == board_writerId){
-						output += "<span onclick='modifyBoard("+ubList[i].board_idx+")'><a href='#'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>";
-						output += "<span onclick='deleteBoard("+ubList[i].board_idx+")'><a href='#'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>";
-					}
-					output += "</span>";
-					output += "</div>";
-					output += "</div>";	//content_inner.
-					output += "<div class='content-area'><p>"+ubList[i].board_content+"</p></div>";
-					output += "<div class='container_outer'>";
-					/* if(usercommidxs.indexOf(ubList[i].comm_idx) > -1){
-						output += "<div style='float:right; padding:0.75em;'></div>";
-					}else if(usercommreqidxs.indexOf(ubList[i].comm_idx) > -1){
-						output += "<div style='float:right; padding:0.75em; cursor:pointer;' onclick='signCancel("+ubList[i].comm_idx+");'><span><a></a>승인 대기 중</span></div>";
-					}else{
-						output += "<div style='float:right; padding:0.75em; cursor:pointer;' onclick='signUpCommunity("+ubList[i].comm_idx+");'><span><a></a>커뮤니티 가입신청</span></div>";
-					} */
-					//output += "<div style='float:right; padding:0.25em;'>bbb</div>";
-					output += "<table><tbody><tr>";
-					output += "<td style='width:12%;' align='center'>댓글<br />작성</td>";
-					output += "<td><textarea id='txtArea_"+ubList[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
-					output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+ubList[i].board_idx+");'><input type='button' value='등록' /></td>";
-					output += "</tr></tbody></table>";
-					output += "</div>"; // container_outer.
-					if(boardReplyList.length > 0){
-						//output += "<span class='replyspan'><a> ▼ 댓글보기 </a></span>";	// ▼  ▲
-						output += "<div class='replyDiv'>";
-						for(var j = 0; j < boardReplyList.length; j++){
-							output += "<table style='margin:0.25em;'><tbody>";
-							output += "<tr style='vertical-align:middle;'>";
-							if(boardReplyList[j].reply_res_path == null){
-								output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td>";
-							}else{
-								output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='"+boardReplyList[j].reply_res_path+"' style='width:25px; height:25px;' /></span></td>";
-							}
-							output += "<td rowspan='2' class='replytb' style='width:15%;'>"+boardReplyList[j].reply_nick+"</td>";
-							output += "<td rowspan='2' class='replytb' style='width:auto;'><span name='replys' id='replyContent_"+boardReplyList[j].reply_idx+"'>"+boardReplyList[j].reply_content+"</span></td>";
-							if(boardReplyList[j].reply_uidx == user_idx){
-								output += "<td align='center' class='replytb replyModify' name='replyModis' id='replyModify_"+boardReplyList[j].reply_idx+"' style='width:7%;' onclick='replyModify("+boardReplyList[j].reply_idx+");'><span><a>수정</a></span></td>";
-								output += "<td align='center' class='replytb replyModifySave' name='replyModiSaves' id='replyModifySave_"+boardReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyModifySave("+boardReplyList[j].reply_idx+");'><span><a>저장</a></span></td>";
-								output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+boardReplyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+boardReplyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
-								output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+boardReplyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+boardReplyList[j].reply_idx+");'><span><a>취소</a></span></td>";
-							}else{
-								output += "<td colspan='2' align='center' class='replytb' name='replyblank' id='replyblank_"+boardReplyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
-								output += "<td colspan='2' align='center' class='replytb' name='replyblank2' id='replyblanks_"+boardReplyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
-							}
-							output += "</tr>"
-							if(boardReplyList[j].modify_date == null){
-								boardReplyList[j].reg_date = boardReplyList[j].reg_date.substring(2, boardReplyList[j].reg_date.lastIndexOf(":"));
-								output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+boardReplyList[j].reg_date+"</span></td></tr>";
-							}else{
-								boardReplyList[j].modify_date = boardReplyList[j].modify_date.substring(2, boardReplyList[j].modify_date.lastIndexOf(":"));
-								output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+boardReplyList[j].modify_date+"</span></td></tr>";
-							}
-							output += "</tbody></table>";
-						}
-						output += "</div>";
-					}else{
-						output += "<div><span> * 작성된 댓글이 없습니다. </span></div>";
-					}
-					output += "</div><br />";
-					contentArea.innerHTML += output;
-				}
-			}
-		}
-		
-		function uSearchBoard(list){
-			let contentArea = document.querySelector(".main-content-area");
-			contentArea.innerHTML = "";
-			let output = "";
-			const login_id = "${userBean.login_id}";
-			const user_idx = "${userBean.user_idx}";
-			let board_writerId;
-			let replyList;
-			for(let i = 0; i < list.length; i++){
-				replyList = list[i].replyList;
-				output = "";
-				output += "<div class='container container-solid'>";
-				output += "<div class='content_inner' style='display:flex;'>";
-				output += "<div style='width:22em;'>";
-				output += "<header class='major'>";
-				output += "<h2>"+list[i].board_title+"</h2>";
-				output += "</header>";
-				output += "</div>";
-				output += "<div style='width:23em;'>";
-				output += "<span style='float:right;'>작성일 &nbsp;&nbsp;"+list[i].reg_date+"<br />작성자 &nbsp;&nbsp;"+list[i].writer_nick+"</span>";
-				output += "</div>";
-				output += "</div>";	//content_inner.
-				output += "<div class='content-area'><p>"+list[i].board_content+"</p></div>";
-				output += "<div class='container_outer'>";
-				output += "<table><tbody><tr>";
-				output += "<td style='width:12%'>댓글작성</td>";
-				output += "<td><textArea id='txtArea_"+list[i].board_idx+"' name='replyTxtArea' style='resize:none; max-height:5em; overflow:hidden;'></textarea></td>";
-				output += "<td class='replyBtn' style='width:15%;' onclick='replyInsert("+list[i].board_idx+");'><input type='button' value='등록' /></td>";
-				output += "</tr></tboby></table>";
-				output += "</div>";	//container_outer.
-				if(replyList.length > 0){
-					output += "<div class='replyDiv'>";
-					for(let j = 0; j < replyList.length; j++){
-						output += "<table style='margin:0.25em;'><tbody>";
-						output += "<tr style='vertical-align:middle;'>";
-						if(replyList[j].reply_res_path == null){
-							output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='/resources/images/default_profile.png' style='width:25px; height:25px;'/></span></td>";
-						}else{
-							output += "<td rowspan='2' class='replytb' style='width:5%;'><span><img src='"+replyList[j].reply_res_path+"' style='width:25px; height:25px;' /></span></td>";
-						}
-						output += "<td rowspan='2' class='replytb' style='width:15%;'>"+replyList[j].reply_nick+"</td>";
-						output += "<td rowspan='2' class='replytb' style='width:auto;'><span name='replys' id='replyContent_"+replyList[j].reply_idx+"'>"+replyList[j].reply_content+"</span></td>";
-						if(replyList[j].reply_uidx == user_idx){
-							output += "<td align='center' class='replytb replyModify' name='replyModis' id='replyModify_"+replyList[j].reply_idx+"' style='width:7%;' onclick='replyModify("+replyList[j].reply_idx+");'><span><a>수정</a></span></td>";
-							output += "<td align='center' class='replytb replyModifySave' name='replyModiSaves' id='replyModifySave_"+replyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyModifySave("+replyList[j].reply_idx+");'><span><a>저장</a></span></td>";
-							output += "<td align='center' class='replytb replyDelete' name='replyDels' id='replyDelete_"+replyList[j].reply_idx+"' style='width:7%;' onclick='replyDelete("+replyList[j].reply_idx+");'><span><a>삭제</a></span></td>";
-							output += "<td align='center' class='replytb replyCancel' name='replyCans' id='replyCancel_"+replyList[j].reply_idx+"' style='width:7%; display:none;' onclick='replyCancel("+replyList[j].reply_idx+");'><span><a>취소</a></span></td>";
-						}else{
-							output += "<td colspan='2' align='center' class='replytb' name='replyblank' id='replyblank_"+replyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
-							output += "<td colspan='2' align='center' class='replytb' name='replyblank2' id='replyblanks_"+replyList[j].reply_idx+"' style='width:7%;'>&nbsp;</td>";
-						}
-						output += "</tr>"
-						if(replyList[j].modify_date == null){
-							replyList[j].reg_date = replyList[j].reg_date.substring(2, replyList[j].reg_date.lastIndexOf(":"));
-							output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].reg_date+"</span></td></tr>";
-						}else{
-							replyList[j].modify_date = replyList[j].modify_date.substring(2, replyList[j].modify_date.lastIndexOf(":"));
-							output += "<tr><td class='replytb' colspan='4' align='center' style='background-color:#fafafa;'><span style='font-size:0.75em;'>"+replyList[j].modify_date+"</span></td></tr>";
-						}
-						output += "</tbody></table>";
-					}
-					output += "</div>";
-				}else{
-					output += "<div><span> * 작성된 댓글이 없습니다. </span></div>";
-				}
-				output += "</div><br />";
-				contentArea.innerHTML += output;
-			}
 		}
 		
 		let boardFlag;
@@ -1133,23 +974,6 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 						}
 					});
 			}
-		}
-		
-		function statusTxt(cidx){	//가입신청 -> 승인대기 텍스트 변경
-			if(con && val){
-				searchCondition(con, val); //임시방편...
-			}else{
-				location.reload();
-			}
-			/* var signSpans = document.getElementsByName("signUpSpans");
-			var signSpansIdx;
-			for(var i = 0; i < signSpans.length; i++){
-				signSpansIdx = signSpans[i].id.substring(signSpans[i].id.indexOf("_")+1);
-				if(cidx == signSpansIdx){
-					signSpans[i].style.display = "none";
-					break;
-				}
-			} */
 		}
 		
 	</script>

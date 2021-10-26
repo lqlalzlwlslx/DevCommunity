@@ -137,7 +137,7 @@
 									<tr style="display:none;" id="modifyInquiryAnswers_${inquiryList.inquiry_idx}" name="modifyInquiryAnswerArea">
 										<td colspan="2" align="center" style="border-right:1px groove aliceblue; vertical-align:middle;">답변수정</td>
 										<td colspan="4">
-											<textarea style="resize:none;" id="modifyInquiryAnswerTxt_${inquiryList.inquiry_idx}" name="modifyInquiryAnswers">${inquiryList.inquiry_answer}</textarea>
+											<textarea style="resize:none;" id="modifyInquiryAnswerTxt_${inquiryList.inquiry_idx}" name="modifyInquiryAnswers">${fn:replace(inquiryList.inquiry_answer, '<br />', '&#10;')}</textarea>
 										</td>
 										<td align="center" style="vertical-align:middle;" onclick="modifyInquiryAnswer('${inquiryList.inquiry_idx}');"><span style="cursor:pointer;"><input type="button" value="답변수정" /></span></td>
 									</tr>
