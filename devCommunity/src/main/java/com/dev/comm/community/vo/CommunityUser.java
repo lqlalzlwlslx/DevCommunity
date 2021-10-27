@@ -67,12 +67,6 @@ public class CommunityUser {
 	public void setLogin_date(String login_date) {
 		this.login_date = login_date;
 	}
-	@Override
-	public String toString() {
-		return "CommunityUser [comm_idx=" + comm_idx + ", user_idx=" + user_idx + ", comm_role_cd=" + comm_role_cd
-				+ ", comm_role_nm=" + comm_role_nm + ", comm_user_stat_cd=" + comm_user_stat_cd + ", comm_user_stat_nm="
-				+ comm_user_stat_nm + ", reg_date=" + reg_date + ", login_date=" + login_date + "]";
-	}
 	
 	
 

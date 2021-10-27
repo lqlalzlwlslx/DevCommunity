@@ -35,22 +35,5 @@ public class BoardFile {
 	public void setReal_file_path(String real_file_path) {
 		this.real_file_path = real_file_path;
 	}
-	@Override
-	public String toString() {
-		return "BoardFile [file_idx=" + file_idx + ", board_idx=" + board_idx + ", org_file_name=" + org_file_name
-				+ ", real_file_path=" + real_file_path + "]";
-	}
-	
-	
 
 }
-/*
-CREATE TABLE Dec_community_board_file (
-  file_idx              bigint(20)       unsigned      NOT NULL                              auto_increment,   // file_idx
-  board_idx             bigint(20)       unsigned      NOT NULL,                                               // board_idx
-  org_file_name         varchar(512)                   NOT NULL,                                               // org_file_name
-  real_file_path        varchar(512)                   NOT NULL,                                               // server에 업로드 되는 경로 DocumentDirRs/boardfile/(uidx)/(board_idx)/(file_idx)_org_file_name
-
-  PRIMARY KEY(file_idx)
-) DEFAULT CHARSET=UTF8;
-*/

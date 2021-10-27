@@ -195,6 +195,29 @@ public class UserDaoImpl implements UserDao {
 		return (ArrayList) sqlSession.selectList("user.selectCommunityUsersLoginIdAsClosure", comm_idx);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<BlackList> selectBlackListUsersDaily() throws Exception {
+		return (ArrayList) sqlSession.selectList("user.selectBlackListUsersDaily");
+	}
+
+	@Override
+	public BlackList selectBlackListUserReleaseStatusCheck(BlackList blackList) throws Exception {
+		return sqlSession.selectOne("user.selectBlackListUserReleaseStatusCheck", blackList);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<CommunityBlackList> selectCommunityBlackListUsersDaily() throws Exception {
+		return (ArrayList) sqlSession.selectList("user.selectCommunityBlackListUsersDaily");
+	}
+
+	@Override
+	public CommunityBlackList selectCommunityBlackListUserReleaseStatusCheck(CommunityBlackList communityBlackList)
+			throws Exception {
+		return sqlSession.selectOne("user.selectCommunityBlackListUserReleaseStatusCheck", communityBlackList);
+	}
+
 
 	
 }

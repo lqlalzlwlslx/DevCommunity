@@ -295,5 +295,15 @@ public class CommunityDaoImpl implements CommunityDao {
 	public ArrayList<Community> selectUserAllCommunityList() throws Exception {
 		return (ArrayList) sqlSession.selectList("community.selectUserAllCommunityList");
 	}
+
+	@Override
+	public CommunityBlackList deleteCommunityUserBlackList2(CommunityBlackList cbl) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("uidx", cbl.getUser_idx());
+		map.put("cidx", cbl.getComm_idx());
+		CommunityBlackList cb = sqlSession.selectOne("community.selectCommunityBlackListUserInfo", map);
+		sqlSession.delete("community.deleteCommunityUserBlackList", cbl);
+		return cb;
+	}
 	
 }

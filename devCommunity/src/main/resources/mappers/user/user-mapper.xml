@@ -46,7 +46,7 @@
 			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd IN ('A', 'CB')) as user_comm_idxs,
 			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd = 'R') as user_comm_req_idxs,
 			login_flag
-		FROM dec_user
+		FROM dec_user u
 		WHERE user_idx = #{user_idx}
 	]]>
 	</select>
@@ -170,7 +170,7 @@
 			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd IN ('A', 'CB')) as user_comm_idxs,
 			(SELECT GROUP_CONCAT(comm_idx) FROM dec_community_user cu WHERE u.user_idx = cu.user_idx AND cu.comm_user_stat_cd = 'R') as user_comm_req_idxs,
 			login_flag
-		FROM dec_user
+		FROM dec_user u
 		WHERE user_role_cd <> 99
 	]]>
 	</select>
@@ -203,8 +203,8 @@
 			]]>
 		</selectKey>
 	<![CDATA[
-		INSERT INTO dec_blacklist(user_idx, bl_cont, start_date, end_date)
-		VALUES(#{user_idx}, #{bl_cont}, NOW(), #{end_date})
+		INSERT INTO dec_blacklist(user_idx, bl_cont, bl_scope, start_date, end_date)
+		VALUES(#{user_idx}, #{bl_cont}, #{bl_scope}, NOW(), #{end_date})
 	]]>
 	</insert>
 	
@@ -238,14 +238,12 @@
 	<select id="selectOneUserBlackListInfo" parameterType="_int" resultType="blackList">
 	<![CDATA[   
 		SELECT bl_idx,
-			bl_flag,
 			user_idx,
 			bl_cont,
 			start_date,
 			end_date
 		FROM dec_blacklist
 		WHERE user_idx = #{user_idx}
-		AND bl_flag = 'S'
 	]]>
 	</select>
 	
@@ -261,6 +259,8 @@
 		UPDATE dec_blacklist_log
 		SET release_date = NOW()
 		WHERE bl_idx = #{bl_idx}
+		AND user_idx = #{user_idx}
+		AND bl_flag = 'S'
 	]]>
 	</update>
 	
@@ -321,7 +321,8 @@
 			bl_cont,
 			bl_scope,
 			DATE_FORMAT(start_date, '%y-%m-%d') as start_date,
-			DATE_FORMAT(end_date, '%y-%m-%d') as end_date
+			DATE_FORMAT(end_date, '%y-%m-%d') as end_date,
+			DATE_FORMAT(DATE_ADD(end_date, INTERVAL 1 DAY), '%Y-%m-%d') as bl_release_date
 		FROM dec_blacklist
 		WHERE user_idx = #{user_idx}
 	]]>
@@ -363,7 +364,75 @@
 	]]>
 	</select>
 	
+	<select id="selectBlackListUsersDaily" resultType="blackList">
+	<![CDATA[
+		SELECT t.*
+		FROM (
+			SELECT bl_idx,
+				user_idx,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = bl.user_idx) as user_nick,
+				bl_cont,
+				bl_scope,
+				start_date,
+				end_date,
+				DATE_FORMAT(DATE_ADD(end_date, INTERVAL 1 DAY), '%Y-%m-%d') as bl_release_date
+			FROM dec_blacklist bl
+		) t
+	]]>
+	</select>
 	
+	<select id="selectBlackListUserReleaseStatusCheck" parameterType="blackList" resultType="blackList">
+	<![CDATA[
+		SELECT bl_idx,
+			user_idx,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = bl.user_idx) as user_nick,
+			bl_cont,
+			bl_scope,
+			start_date,
+			end_date,
+			DATE_ADD(end_date, INTERVAL 1 DAY) as bl_release_date
+		FROM dec_blacklist bl
+		WHERE bl.bl_idx = #{bl_idx}
+		AND DATE_FORMAT(NOW(), '%Y-%m-%d') >= DATE_FORMAT(DATE_ADD(end_date, INTERVAL 1 DAY), '%Y-%m-%d')
+	]]>
+	</select>
+	
+	<select id="selectCommunityBlackListUsersDaily" resultType="communityBlackList">
+	<![CDATA[
+		SELECT t.*
+		FROM (
+			SELECT bl_idx,
+				comm_idx,
+				(SELECT comm_name FROM dec_community c WHERE c.comm_idx = cbl.comm_idx) as comm_name,
+				user_idx,
+				(SELECT nick_name FROM dec_user u WHERE u.user_idx = cbl.user_idx) as user_nick,
+				bl_comm_cont,
+				bl_comm_scope,
+				start_date,
+				end_date,
+				DATE_FORMAT(DATE_ADD(end_date, INTERVAL 1 DAY), '%Y-%m-%d') as bl_release_date
+			FROM dec_comm_blacklist cbl
+		) t
+	]]>
+	</select>
+	
+	<select id="selectCommunityBlackListUserReleaseStatusCheck" parameterType="communityBlackList" resultType="communityBlackList">
+	<![CDATA[
+		SELECT bl_idx,
+			comm_idx,
+			(SELECT comm_name FROM dec_community c WHERE c.comm_idx = cbl.comm_idx) as comm_name,
+			user_idx,
+			(SELECT nick_name FROM dec_user u WHERE u.user_idx = cbl.user_idx) as user_nick,
+			bl_comm_cont,
+			bl_comm_scope,
+			start_date,
+			end_date,
+			DATE_ADD(end_date, INTERVAL 1 DAY) as bl_release_date
+		FROM dec_comm_blacklist cbl
+		WHERE cbl.bl_idx = #{bl_idx}
+		AND DATE_FORMAT(NOW(), '%Y-%m-%d') >= DATE_FORMAT(DATE_ADD(end_date, INTERVAL 1 DAY), '%Y-%m-%d')
+	]]>
+	</select>
 	
 	
 	

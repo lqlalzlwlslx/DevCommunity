@@ -76,13 +76,5 @@ public class Reply {
 	public void setReply_res_path(String reply_res_path) {
 		this.reply_res_path = reply_res_path;
 	}
-	@Override
-	public String toString() {
-		return "Reply [reply_idx=" + reply_idx + ", board_idx=" + board_idx + ", reply_uidx=" + reply_uidx
-				+ ", reply_nick=" + reply_nick + ", reply_content=" + reply_content + ", reg_date=" + reg_date
-				+ ", modify_date=" + modify_date + ", reply_stat_cd=" + reply_stat_cd + ", reply_stat_nm="
-				+ reply_stat_nm + ", reply_res_path=" + reply_res_path + "]";
-	}
-	
 
 }

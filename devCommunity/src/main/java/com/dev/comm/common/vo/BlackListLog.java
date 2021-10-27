@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 public class BlackListLog {
 	
 	private int bl_log_idx;
+	private String bl_flag;
 	private int bl_idx;
 	private int user_idx;
 	private String bl_cont;
@@ -18,6 +19,12 @@ public class BlackListLog {
 	}
 	public void setBl_log_idx(int bl_log_idx) {
 		this.bl_log_idx = bl_log_idx;
+	}
+	public String getBl_flag() {
+		return bl_flag;
+	}
+	public void setBl_flag(String bl_flag) {
+		this.bl_flag = bl_flag;
 	}
 	public int getBl_idx() {
 		return bl_idx;
@@ -61,13 +68,6 @@ public class BlackListLog {
 	public void setBl_scope(int bl_scope) {
 		this.bl_scope = bl_scope;
 	}
-	@Override
-	public String toString() {
-		return "BlackListLog [bl_log_idx=" + bl_log_idx + ", bl_idx=" + bl_idx + ", user_idx=" + user_idx + ", bl_cont="
-				+ bl_cont + ", start_date=" + start_date + ", end_date=" + end_date + ", release_date=" + release_date
-				+ "]";
-	}
-	
 	
 
 }

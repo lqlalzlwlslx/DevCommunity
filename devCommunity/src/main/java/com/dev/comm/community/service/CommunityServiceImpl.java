@@ -234,5 +234,10 @@ public class CommunityServiceImpl implements CommunityService {
 	public ArrayList<Community> selectUserAllCommunityList() throws Exception {
 		return communityDao.selectUserAllCommunityList();
 	}
+
+	@Override
+	public CommunityBlackList deleteCommunityUserBlackList2(CommunityBlackList cbl) throws Exception {
+		return communityDao.deleteCommunityUserBlackList2(cbl);
+	}
 	
 }

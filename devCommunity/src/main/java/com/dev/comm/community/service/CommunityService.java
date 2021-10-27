@@ -3,6 +3,8 @@ package com.dev.comm.community.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.springframework.stereotype.Service;
+
 import com.dev.comm.board.vo.Board;
 import com.dev.comm.community.vo.Community;
 import com.dev.comm.community.vo.CommunityBlackList;
@@ -10,6 +12,7 @@ import com.dev.comm.community.vo.CommunityClosure;
 import com.dev.comm.community.vo.CommunityUser;
 import com.dev.comm.user.vo.User;
 
+@Service
 public interface CommunityService {
 
 	ArrayList<Community> selectUserCommunityList(User user) throws Exception;
@@ -97,5 +100,7 @@ public interface CommunityService {
 	ArrayList<Community> selectUserSignCommunityList(int user_idx) throws Exception;
 
 	ArrayList<Community> selectUserAllCommunityList() throws Exception;
+
+	CommunityBlackList deleteCommunityUserBlackList2(CommunityBlackList cbl) throws Exception;
 
 }

@@ -278,16 +278,5 @@ public class User {
 		this.user_comm_req_idxs = user_comm_req_idxs;
 	}
 
-	@Override
-	public String toString() {
-		return "User [user_idx=" + user_idx + ", comm_idx=" + comm_idx + ", user_stat_cd=" + user_stat_cd
-				+ ", user_name=" + user_name + ", login_id=" + login_id + ", nick_name=" + nick_name + ", password="
-				+ password + ", user_role_cd=" + user_role_cd + ", reg_date=" + reg_date + ", login_date=" + login_date
-				+ ", pwd_date=" + pwd_date + ", profile_src=" + profile_src + ", user_stat_nm=" + user_stat_nm
-				+ ", access_status=" + access_status + ", access_ip=" + access_ip + ", black_sdate=" + black_sdate
-				+ ", black_edate=" + black_edate + ", user_comm_role=" + user_comm_role + ", user_comm_req_date="
-				+ user_comm_req_date + ", user_comm_login_date=" + user_comm_login_date + ", tryed=" + tryed
-				+ ", second_mail=" + second_mail + ", bl_scope=" + bl_scope + "]";
-	}
 
 }

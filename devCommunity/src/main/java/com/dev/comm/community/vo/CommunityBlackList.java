@@ -7,12 +7,15 @@ public class CommunityBlackList {
 	
 	private int bl_idx;
 	private long comm_idx;
+	private String comm_name;
 	private int user_idx;
+	private String user_nick;
 	private String bl_comm_cont;
 	private int bl_comm_scope;
 	private int bl_scope;
 	private String start_date;
 	private String end_date;
+	private String bl_release_date;
 	private String bl_flag;
 	
 	public int getBl_idx() {
@@ -32,6 +35,18 @@ public class CommunityBlackList {
 	}
 	public void setUser_idx(int user_idx) {
 		this.user_idx = user_idx;
+	}
+	public String getComm_name() {
+		return comm_name;
+	}
+	public void setComm_name(String comm_name) {
+		this.comm_name = comm_name;
+	}
+	public String getUser_nick() {
+		return user_nick;
+	}
+	public void setUser_nick(String user_nick) {
+		this.user_nick = user_nick;
 	}
 	public String getStart_date() {
 		return start_date;
@@ -63,16 +78,17 @@ public class CommunityBlackList {
 	public void setBl_comm_scope(int bl_comm_scope) {
 		this.bl_comm_scope = bl_comm_scope;
 	}
+	public String getBl_release_date() {
+		return bl_release_date;
+	}
+	public void setBl_release_date(String bl_release_date) {
+		this.bl_release_date = bl_release_date;
+	}
 	public int getBl_scope() {
 		return bl_scope;
 	}
 	public void setBl_scope(int bl_scope) {
 		this.bl_scope = bl_scope;
-	}
-	@Override
-	public String toString() {
-		return "CommunityBlackList [bl_idx=" + bl_idx + ", comm_idx=" + comm_idx + ", user_idx=" + user_idx
-				+ ", start_date=" + start_date + ", end_date=" + end_date + "]";
 	}
 	
 	

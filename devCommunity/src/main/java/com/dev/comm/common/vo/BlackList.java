@@ -7,10 +7,12 @@ public class BlackList {
 	
 	private int bl_idx;
 	private int user_idx;
+	private String user_nick;
 	private String bl_cont;
 	private int bl_scope;
 	private String start_date;
 	private String end_date;
+	private String bl_release_date;
 	private String bl_flag;
 	
 	public int getBl_idx() {
@@ -24,6 +26,12 @@ public class BlackList {
 	}
 	public void setUser_idx(int user_idx) {
 		this.user_idx = user_idx;
+	}
+	public String getUser_nick() {
+		return user_nick;
+	}
+	public void setUser_nick(String user_nick) {
+		this.user_nick = user_nick;
 	}
 	public String getBl_cont() {
 		return bl_cont;
@@ -49,18 +57,17 @@ public class BlackList {
 	public void setEnd_date(String end_date) {
 		this.end_date = end_date;
 	}
+	public String getBl_release_date() {
+		return bl_release_date;
+	}
+	public void setBl_release_date(String bl_release_date) {
+		this.bl_release_date = bl_release_date;
+	}
 	public String getBl_flag() {
 		return bl_flag;
 	}
 	public void setBl_flag(String bl_flag) {
 		this.bl_flag = bl_flag;
 	}
-	@Override
-	public String toString() {
-		return "BlackList [bl_idx=" + bl_idx + ", user_idx=" + user_idx + ", bl_cont=" + bl_cont + ", start_date="
-				+ start_date + ", end_date=" + end_date + "]";
-	}
-	
-	
 
 }

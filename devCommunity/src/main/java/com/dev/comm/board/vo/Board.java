@@ -139,14 +139,4 @@ public class Board {
 	public void setReply_total(int reply_total) {
 		this.reply_total = reply_total;
 	}
-	@Override
-	public String toString() {
-		return "Board [board_idx=" + board_idx + ", comm_idx=" + comm_idx + ", board_uidx=" + board_uidx
-				+ ", board_scope=" + board_scope + ", board_title=" + board_title + ", board_content=" + board_content
-				+ ", reg_date=" + reg_date + ", modify_date=" + modify_date + ", board_stat_cd=" + board_stat_cd
-				+ ", board_stat_nm=" + board_stat_nm + ", replyList=" + replyList + ", writer_id=" + writer_id
-				+ ", writer_nick=" + writer_nick + ", real_file_name=" + real_file_name + ", res_path=" + res_path
-				+ "]";
-	}
-
 }

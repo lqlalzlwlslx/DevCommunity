@@ -925,6 +925,7 @@
 			/* if(confirm("승인 하시겠습니까?")){
 				
 			} */
+			var win = window.open("<%=request.getContextPath()%>/common/showMessageBox.do", "msgBox", "width=500,height=150,toolbar=0,menubar=no,location=no,scrollbars=no,resizeable=no,status=no");
 			confirmStatus = "A";
 			const confirmSignData = {
 					method: "POST",
@@ -934,6 +935,7 @@
 			fetch("/community/communityConfirmSignAsStatus.do", confirmSignData)
 				.then(res => res.json())
 				.then((data) => {
+					win.close();
 					if(data.result) {
 						alert("성공했습니다.");
 						reqUsersHide(data.uidx, "settle");
@@ -945,6 +947,7 @@
 			/* if(confirm("반려 하시겠습니까?")){
 				
 			} */
+			var win = window.open("<%=request.getContextPath()%>/common/showMessageBox.do", "msgBox", "width=500,height=150,toolbar=0,menubar=no,location=no,scrollbars=no,resizeable=no,status=no");
 			confirmStatus = "D";
 			const rejectSignData = {
 					method: "POST",
@@ -954,6 +957,7 @@
 			fetch("/community/communityRejectSignAsStatus.do", rejectSignData)
 				.then(res => res.json())
 				.then((data) => {
+					win.close();
 					if(data.result){
 						alert("성공했습니다.");
 						reqUsersHide(data.uidx, "reject");

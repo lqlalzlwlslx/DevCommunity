@@ -2,11 +2,14 @@ package com.dev.comm.user.dao;
 
 import java.util.ArrayList;
 
+import org.springframework.stereotype.Repository;
+
 import com.dev.comm.common.vo.BlackList;
 import com.dev.comm.common.vo.Conf;
 import com.dev.comm.community.vo.CommunityBlackList;
 import com.dev.comm.user.vo.User;
 
+@Repository
 public interface UserDao {
 
 	User selectUserInfoAsLogin(User user) throws Exception;
@@ -70,5 +73,13 @@ public interface UserDao {
 	String getUserCommunityStatus(int user_idx, long comm_idx) throws Exception;
 
 	ArrayList<User> selectCommunityUsersLoginIdAsClosure(int comm_idx) throws Exception;
+
+	ArrayList<BlackList> selectBlackListUsersDaily() throws Exception;
+
+	BlackList selectBlackListUserReleaseStatusCheck(BlackList blackList) throws Exception;
+
+	ArrayList<CommunityBlackList> selectCommunityBlackListUsersDaily() throws Exception;
+
+	CommunityBlackList selectCommunityBlackListUserReleaseStatusCheck(CommunityBlackList communityBlackList) throws Exception;
 
 }

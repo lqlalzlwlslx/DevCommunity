@@ -157,7 +157,11 @@ public class UserController {
 				result = false;
 				BlackList blinfo = userService.selectBlackListUserInfo(tUser);
 				obj.addProperty("result", result);
-				obj.addProperty("msg", "로그인 시도하신 계정은 "+ blinfo.getBl_scope() +"일 활동정지 된 계정입니다.\n" + blinfo.getEnd_date() + "일 이후 로그인이 가능합니다.");
+				if(blinfo.getEnd_date().startsWith("9999-")) {
+					obj.addProperty("msg", "로그인 시도하신 계정은 무기한 활동정지 된 계정입니다.\n문의사항은 관리자에게 메일로 문의바랍니다.");
+				}else {
+					obj.addProperty("msg", "로그인 시도하신 계정은 "+ blinfo.getBl_scope() +"일 활동정지 된 계정입니다.\n" + blinfo.getBl_release_date() + "일 이후 로그인이 가능합니다.");
+				}
 				return obj.toString();
 			}
 			
@@ -658,6 +662,7 @@ public class UserController {
 				
 				userService.updateUserBlackListStatus(user_idx);
 				userService.insertBlackListUserLog(bl);
+				BlackList blinfo = userService.selectBlackListUserInfo(userService.selectUserInfoAsIdx(user_idx));
 				
 				mailFrom = "devcomm00@gmail.com";
 				mailTo = userService.getLoginIdAsIdx(user_idx);
@@ -667,6 +672,7 @@ public class UserController {
 				mailContent += "<br />";
 				mailContent += "활동 규칙에 의해 현재 시간부터";
 				mailContent += endDate +" 기간까지 활동정지 되었습니다.";
+				mailContent += blinfo.getBl_release_date() +"일 이후 이용 가능합니다.";
 				mailContent += "<br />";
 				mailContent += "감사합니다.";
 				

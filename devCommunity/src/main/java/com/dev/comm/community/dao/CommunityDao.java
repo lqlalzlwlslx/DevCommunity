@@ -98,4 +98,6 @@ public interface CommunityDao {
 
 	ArrayList<Community> selectUserAllCommunityList() throws Exception;
 
+	CommunityBlackList deleteCommunityUserBlackList2(CommunityBlackList cbl) throws Exception;
+
 }

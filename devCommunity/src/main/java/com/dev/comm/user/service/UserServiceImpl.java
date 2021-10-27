@@ -172,5 +172,26 @@ public class UserServiceImpl implements UserService {
 		return userDao.selectCommunityUsersLoginIdAsClosure(comm_idx);
 	}
 
+	@Override
+	public ArrayList<BlackList> selectBlackListUsersDaily() throws Exception {
+		return userDao.selectBlackListUsersDaily();
+	}
+
+	@Override
+	public BlackList selectBlackListUserReleaseStatusCheck(BlackList blackList) throws Exception {
+		return userDao.selectBlackListUserReleaseStatusCheck(blackList);
+	}
+
+	@Override
+	public ArrayList<CommunityBlackList> selectCommunityBlackListUsersDaily() throws Exception {
+		return userDao.selectCommunityBlackListUsersDaily();
+	}
+
+	@Override
+	public CommunityBlackList selectCommunityBlackListUserReleaseStatusCheck(CommunityBlackList communityBlackList)
+			throws Exception {
+		return userDao.selectCommunityBlackListUserReleaseStatusCheck(communityBlackList);
+	}
+
 	
 }

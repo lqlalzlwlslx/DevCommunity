@@ -34,21 +34,6 @@ public class Conf {
 	public void setConf_etc(String conf_etc) {
 		this.conf_etc = conf_etc;
 	}
-	@Override
-	public String toString() {
-		return "Conf [conf_type=" + conf_type + ", conf_type_cd=" + conf_type_cd + ", conf_name=" + conf_name + ", conf_etc="
-				+ conf_etc + "]";
-	}
 	
 
 }
-/*
-create table dec_conf (
-  conf_type             varchar(10)                    not null,                                                // type: user_stat, comm_stat ...
-  conf_type_cd          varchar(64)                    not null,                                                // cd : 00, 01, 02 ...
-  conf_name             varchar(256)                                default '',                                 // cd_name : 활성, 비활성 ...
-  conf_etc              varchar(128)                                default '',                                 // etc...
-
-  primary key(conf_type, conf_type_cd)
-) default charset=utf8;
-*/
