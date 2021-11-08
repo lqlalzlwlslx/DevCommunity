@@ -316,16 +316,16 @@
 									<div class="main-content-area">	
 										<div class="container container-solid">
 											<div class='content_inner' style='display:flex;'>	
-												<div style="width:23em;">
+												<div style="width:45em;">
 													<header class="major">
 														<h2>${cbList.board_title}</h2>
 													</header>
 												</div>
-												<div style="width:22em;">
-													<span style="float:right;">작성일 &nbsp;&nbsp;${cbList.reg_date}<br />작성자 &nbsp;&nbsp;${cbList.writer_nick}
+												<div style="width:20em;">
+													<span style="float:right;">작성일 &nbsp;&nbsp;${fn:substring(cbList.reg_date, 2, 16)}<br />작성자 &nbsp;&nbsp;${cbList.writer_nick}
 														<c:if test="${cbList.board_uidx == userBean.user_idx}">
-														<span onclick="modifyBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
-														<span onclick="deleteBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
+														<span onclick="modifyBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
+														<span onclick="deleteBoard(${cbList.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
 														</c:if>
 													</span>
 												</div>

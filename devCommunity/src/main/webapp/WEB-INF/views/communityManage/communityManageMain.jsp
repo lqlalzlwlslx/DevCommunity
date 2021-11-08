@@ -310,7 +310,7 @@
 											</tr>
 											<tr>
 												<td>커뮤니티 소개글</td>
-												<td class="modifyIntro" colspan="2"><span id="commintro_txt"><c:if test="${empty comminfo.comm_intro}"><span> * 소개글을 수정해주세요.</span></c:if><c:if test="${not empty comminfo.comm_intro}">${comminfo.comm_intro}</c:if></span></td>
+												<td class="modifyIntro" colspan="2"><span id="commintro_txt"><c:if test="${empty comminfo.comm_intro}"> * 소개글을 수정해주세요.</c:if><c:if test="${not empty comminfo.comm_intro}">${comminfo.comm_intro}</c:if></span></td>
 												<td class="modifyIntro1" align="center" style="display:none;" onclick="modifySave('${comminfo.comm_idx}')"><span><input type="button" style="background-color:#4acaa8;" value="변경" /></span></td>
 												<td class="modifyIntro2" align="center" style="display:none;" onclick="modifyCancel('${comminfo.comm_idx}');"><span><input type="button" style="background-color:#4acaa8;" value="취소" /></span></td>
 												<td colspan="2" class="modifyIntro4" align="center" onclick="modifyCommunityIntro('${comminfo.comm_idx}');"><span><input type="button" style="background-color:#4acaa8;" value="소개글 수정" /></span></td>

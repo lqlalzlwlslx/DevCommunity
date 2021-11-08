@@ -206,9 +206,10 @@
 				if(idx == txtid){
 					//inquiryAnswer = txts[i].value;
 					inquiryAnswer = txts[i].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+					txts[i].value = "";
+					break;
 				}
 			}
-			return;
 			if(!inquiryAnswer) { alert("답변을 작성 후 등록해주세요."); return; }
 			const answerData = {
 					method: "POST",

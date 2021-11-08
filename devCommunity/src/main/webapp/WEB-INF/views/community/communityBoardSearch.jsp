@@ -273,7 +273,7 @@
 											
 											
 										</c:if>
-										<c:if test="${empty commInfo}"><h2>잉여잉여잉여잉여</h2></c:if>
+										<c:if test="${empty commInfo}"></c:if>
 									</header>	
 								</div>
 							</section>
@@ -283,16 +283,16 @@
 									<div class="main-content-area">	
 										<div class="container container-solid">
 											<div class='content_inner' style='display:flex;'>	
-												<div style="width:23em;">
+												<div style="width:45em;">
 													<header class="major">
 														<h2>${slist.board_title}</h2>
 													</header>
 												</div>
-												<div style="width:22em;">
-													<span style="float:right;">작성일 &nbsp;&nbsp;${slist.reg_date}<br />작성자 &nbsp;&nbsp;${slist.writer_nick}
+												<div style="width:20em;">
+													<span style="float:right;">작성일 &nbsp;&nbsp;${fn:substring(slist.reg_date, 2, 16)}<br />작성자 &nbsp;&nbsp;${slist.writer_nick}
 														<c:if test="${slist.board_uidx == userBean.user_idx}">
-														<span onclick="modifyBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
-														<span onclick="deleteBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
+														<span onclick="modifyBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
+														<span onclick="deleteBoard(${slist.board_idx})"><a href="#">&nbsp;&nbsp;&nbsp;&nbsp;삭제</a></span>
 														</c:if>
 													</span>
 												</div>
@@ -324,6 +324,10 @@
 																		<td align="center" class="replytb replyModifySave" name="replyModiSaves" id="replyModifySave_${cbReplyList.reply_idx}" style="width:7%; display:none;" onclick="replyModifySave('${cbReplyList.reply_idx}');"><span><a>저장</a></span></td>
 																		<td align="center" class="replytb replyDelete" name="replyDels" id="replyDelete_${cbReplyList.reply_idx}" style="width:7%;" onclick="replyDelete('${cbReplyList.reply_idx}');"><span><a>삭제</a></span></td>
 																		<td align="center" class="replytb replyCancel" name="replyCans" id="replyCancel_${cbReplyList.reply_idx}" style="width:7%; display:none;" onclick="replyCancel('${cbReplyList.reply_idx}');"><span><a>취소</a></span></td>
+																	</c:if>
+																	<c:if test="${cbReplyList.reply_uidx != userBean.user_idx}">
+																		<td colspan="2" align="center" class="replytb" style="width:7%;">&nbsp;</td>
+																		<td colspan="2" align="center" class="replytb" style="width:7%;">&nbsp;</td>
 																	</c:if>
 																</tr>
 																<tr>

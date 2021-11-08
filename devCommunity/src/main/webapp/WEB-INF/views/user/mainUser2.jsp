@@ -278,7 +278,7 @@
 												<h2>${ubList.board_title}</h2>
 											</header>
 										</div>
-										<div style="width:17em;">
+										<div style="width:20em;">
 											<span style="float:right;">커뮤니티 &nbsp;&nbsp;${ubList.comm_name}<br />작성일 &nbsp;&nbsp;${fn:substring(ubList.reg_date, 2, 16)}<br />작성자 &nbsp;&nbsp;${ubList.writer_nick}
 											<c:if test="${ubList.board_uidx == userBean.user_idx}">
 												<span style="cursor:pointer;" onclick="modifyBoard('${ubList.board_idx}');"><a>&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
@@ -857,6 +857,7 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 				tmp = txtAreas[i].id.substring(txtAreas[i].id.indexOf("_")+1);
 				if(bidx == tmp){
 					replyContent = txtAreas[i].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+					txtAreas[i].value = "";
 					break;
 				}
 			}

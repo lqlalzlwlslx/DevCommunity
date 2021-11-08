@@ -467,7 +467,7 @@
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'BOARD_STAT' AND conf_type_cd = board_stat_cd) as board_stat_nm,
 				(SELECT login_id FROM dec_user u WHERE u.user_idx = board_uidx) as writer_id,
 				(SELECT nick_name FROM dec_user u WHERE u.user_idx = board_uidx) as writer_nick,
-				(SELECT count(*) FROM dec_community_board_reply r WHERE r.board_idx = b.board_idx) as reply_total
+				(SELECT count(*) FROM dec_community_board_reply r WHERE r.board_idx = b.board_idx AND reply_stat_cd = 'A') as reply_total
 			FROM dec_community_board b
 			WHERE b.comm_idx = #{comm_idx}
 			AND b.board_stat_cd IN ('A')

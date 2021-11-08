@@ -545,7 +545,11 @@ public class CommunityController {
 					if(commInfo != null) model.addAttribute("commInfo", commInfo);
 					
 				}else {
+					Community commInfo = communityService.selectCommunityDetailView((int)cidx);
+					
 					model.addAttribute("result", false);
+					if(userCommunityList != null) model.addAttribute("ucList", userCommunityList);
+					if(commInfo != null) model.addAttribute("commInfo", commInfo);
 					model.addAttribute("msg", "검색 결과가 없습니다.");
 				}
 			}catch(Exception e) {

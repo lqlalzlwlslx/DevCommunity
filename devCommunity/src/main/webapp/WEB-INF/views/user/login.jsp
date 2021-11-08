@@ -47,6 +47,10 @@
 		}
 	}
 	
+	document.addEventListener("DOMContentLoaded", function(){
+		document.querySelector("#id_field").focus();
+	});
+	
 </script>
 </head>
 <body>
