@@ -305,7 +305,7 @@
 			(SELECT nick_name FROM dec_user u WHERE u.user_idx = cu.user_idx) as nick_name,
 			cu.reg_date as user_comm_req_date,
 			cu.login_date as user_comm_login_date,
-			IFNULL((SELECT count(*) FROM dec_community_board cb WHERE cu.user_idx = cb.board_uidx), 0) as user_comm_board_count,
+			IFNULL((SELECT count(*) FROM dec_community_board cb WHERE cu.user_idx = cb.board_uidx AND cb.comm_idx = cu.comm_idx), 0) as user_comm_board_count,
 			(SELECT profile_src FROM dec_user u WHERE u.user_idx = cu.user_idx) as profile_src
 		FROM dec_community_user cu
 		WHERE cu.comm_idx = #{comm_idx}

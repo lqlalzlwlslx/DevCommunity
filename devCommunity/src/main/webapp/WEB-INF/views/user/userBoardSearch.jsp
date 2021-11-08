@@ -278,7 +278,7 @@
 												<h2>${usbList.board_title}</h2>
 											</header>
 										</div>
-										<div style="width:17em;">
+										<div style="width:20em;">
 											<span style="float:right;">커뮤니티 &nbsp;&nbsp;${usbList.comm_name}<br />작성일 &nbsp;&nbsp;${fn:substring(usbList.reg_date, 2, 16)}<br />작성자 &nbsp;&nbsp;${usbList.writer_nick}
 											<c:if test="${usbList.board_uidx == userBean.user_idx}">
 												<span style="cursor:pointer;" onclick="modifyBoard('${usbList.board_idx}');"><a>&nbsp;&nbsp;&nbsp;&nbsp;수정</a></span>
