@@ -41,6 +41,10 @@
 			<c:if test="${status == 'SESSION_TIMEOUT'}">
 				moveToMain();
 			</c:if>
+			<c:if test="${status == 'NO_RESULT'}">
+				<c:if test="${not empty msg}">alert("${msg}");</c:if>
+				moveToMain();
+			</c:if>
 		</c:if>
 		<c:if test="${result == true}">
 			<c:if test="${status == 'UPDATE'}">

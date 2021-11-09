@@ -108,6 +108,7 @@
 				.then(res => res.json())
 				.then((data) => {
 					if(data.result){
+						alert("가입신청이 취소되었습니다.");
 						location.reload();
 					}
 				});

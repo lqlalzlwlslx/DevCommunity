@@ -421,7 +421,7 @@ public class CommunityController {
 		
 		if(condition.equals("community")) {
 			searchValues = new ArrayList<Community>();
-			searchValues = communityService.selectUserCommunityListAsSearchValues(searchTxt);
+			searchValues = communityService.selectUserCommunityListAsSearchValues(searchTxt, user.getUser_idx());
 			
 			if(searchValues.size() > 0) { //여기서 토탈 회원 가공하는 걸 추가적으로 하면 될듯...
 				Community comm = null;
@@ -441,6 +441,8 @@ public class CommunityController {
 				model.addAttribute("uscList", searchCommunityResult);
 				return new ModelAndView("user/userCommunitySearch");
 			}else { //결과가 없을때.
+				model.addAttribute("result", false);
+				model.addAttribute("status", "NO_RESULT");
 				model.addAttribute("msg", "검색 결과가 없습니다.");
 				return new ModelAndView("user/mainUser2");
 			}
@@ -1122,7 +1124,8 @@ public class CommunityController {
 		if(user == null) return new ModelAndView("redirect:/");
 		
 		ArrayList<Community> userCommunityList = communityService.selectUserCommunityList(user);
-		ArrayList<Community> allCommList = communityService.selectUserAllCommunityList();
+//		ArrayList<Community> allCommList = communityService.selectUserAllCommunityList();
+		ArrayList<Community> allCommList = communityService.selectUserAllCommunityList(user.getUser_idx());
 		if(allCommList != null && allCommList.size() > 0) {
 			for(int i = 0; i < allCommList.size(); i++) {
 				allCommList.get(i).setTotal_member(communityService.selectCountCommunityUser(allCommList.get(i)));

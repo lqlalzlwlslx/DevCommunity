@@ -119,7 +119,7 @@
 	]]>
 	</select>
 	
-	<select id="selectUserCommunityListAsSearchValues" parameterType="java.lang.String" resultType="community">
+	<select id="selectUserCommunityListAsSearchValues" parameterType="java.util.HashMap" resultType="community">
 	<![CDATA[
 		SELECT comm_idx,
 			comm_name,
@@ -131,8 +131,12 @@
 			(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
 			comm_reg_cont,
 			comm_intro,
-			reg_date
-		FROM dec_community c
+			reg_date,
+			CASE WHEN 1 = IFNULL((SELECT count(*) FROM dec_community_user cu WHERE cu.user_idx = #{user_idx} AND cu.comm_idx = cc.comm_idx AND cu.comm_user_stat_cd = 'A'), 0) THEN "A"
+				 WHEN 1 = IFNULL((SELECT count(*) FROM dec_community_user cu WHERE cu.user_idx = #{user_idx} AND cu.comm_idx = cc.comm_idx AND cu.comm_user_stat_cd = 'R'), 0) THEN "R"
+				 ELSE "N"
+			END as comm_extra
+		FROM dec_community cc
 		WHERE comm_stat_cd = 'A'
 		AND comm_name LIKE CONCAT('%', #{value}, '%')
 	]]>
@@ -522,7 +526,7 @@
 	]]>
 	</select>
 	
-	<select id="selectUserAllCommunityList" resultType="community">
+	<select id="selectUserAllCommunityList" resultType="community" parameterType="_int">
 	<![CDATA[
 		SELECT c.*
 		FROM (
@@ -535,8 +539,12 @@
 				comm_stat_cd,
 				(SELECT conf_name FROM dec_conf WHERE conf_type = 'COMM_STAT' AND conf_type_cd = comm_stat_cd) as comm_stat_nm,
 				comm_intro,
-				reg_date
-			FROM dec_community
+				reg_date,
+				CASE WHEN 1 = IFNULL((SELECT count(*) FROM dec_community_user cu WHERE cu.user_idx = #{user_idx} AND cu.comm_idx = cc.comm_idx AND cu.comm_user_stat_cd = 'A'), 0) THEN "A"
+					 WHEN 1 = IFNULL((SELECT count(*) FROM dec_community_user cu WHERE cu.user_idx = #{user_idx} AND cu.comm_idx = cc.comm_idx AND cu.comm_user_stat_cd = 'R'), 0) THEN "R"
+					 ELSE "N"
+				END as comm_extra
+			FROM dec_community cc
 			WHERE comm_stat_cd = 'A'
 		) c
 		ORDER BY reg_date ASC

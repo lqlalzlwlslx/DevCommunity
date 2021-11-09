@@ -47,6 +47,8 @@ public class Community {
 	
 	private int comm_sign_request;
 	
+	private String comm_extra;
+	
 	public long getComm_idx() {
 		return comm_idx;
 	}
@@ -215,6 +217,12 @@ public class Community {
 	}
 	public void setTotal_black_board(int total_black_board) {
 		this.total_black_board = total_black_board;
+	}
+	public String getComm_extra() {
+		return comm_extra;
+	}
+	public void setComm_extra(String comm_extra) {
+		this.comm_extra = comm_extra;
 	}
 
 }

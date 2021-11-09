@@ -91,8 +91,8 @@ public class CommunityServiceImpl implements CommunityService {
 	}
 
 	@Override
-	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception {
-		return communityDao.selectUserCommunityListAsSearchValues(value);
+	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value, int user_idx) throws Exception {
+		return communityDao.selectUserCommunityListAsSearchValues(value, user_idx);
 	}
 
 	@Override
@@ -231,8 +231,8 @@ public class CommunityServiceImpl implements CommunityService {
 	}
 
 	@Override
-	public ArrayList<Community> selectUserAllCommunityList() throws Exception {
-		return communityDao.selectUserAllCommunityList();
+	public ArrayList<Community> selectUserAllCommunityList(int user_idx) throws Exception {
+		return communityDao.selectUserAllCommunityList(user_idx);
 	}
 
 	@Override

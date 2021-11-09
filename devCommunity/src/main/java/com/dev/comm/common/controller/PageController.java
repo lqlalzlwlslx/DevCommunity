@@ -76,7 +76,7 @@ public class PageController {
 	public ModelAndView mainAdmin(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
 		
 		User admin = SessionManager.getAdminSession(request);
-		if(admin == null) response.sendRedirect(request.getContextPath() + "/logout.do");
+		if(admin == null) response.sendRedirect(request.getContextPath() + "/console/logout.do");
 		
 		return new ModelAndView("console/mainAdmin");
 	}

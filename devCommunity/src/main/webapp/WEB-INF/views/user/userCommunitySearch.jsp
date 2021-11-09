@@ -249,12 +249,23 @@
 									<div class="container container-solid">
 										<header class='major'>
 											<span style="color:#4acaa8; font-size:3em; line-height:1.5em;">${uscList.comm_name}</span>
-											<c:if test="${fn:indexOf(userBean.user_comm_idxs, uscList.comm_idx) > -1}">
+											<!-- <c:if test="${fn:indexOf(userBean.user_comm_idxs, uscList.comm_idx) > -1}">
 												<span></span>
 											</c:if>
 											<c:if test="${fn:indexOf(userBean.user_comm_idxs, uscList.comm_idx) < 0}">
 												<span class="signUpCommunity" onclick="signUpCommunity('${uscList.comm_idx}');" style="float:right; margin-top:2.5em;">커뮤니티 가입신청</span>
-											</c:if>
+											</c:if> -->
+											<c:choose>
+												<c:when test="${uscList.comm_extra == 'A'}">
+													<span style="cursor:pointer; float:right; margin-top:2.5em;" onclick="moveToCommunityView('${uscList.comm_idx}');"><a>커뮤니티로 이동</a></span>
+												</c:when>
+												<c:when test="${uscList.comm_extra == 'R'}">
+													<span style="cursor:pointer; float:right; margin-top:2.5em;" onclick="signCancel('${uscList.comm_idx}');"><a>승인 대기중</a></span>
+												</c:when>
+												<c:otherwise>
+													<span style="cursor:pointer; float:right; margin-top:2.5em;" onclick="signUpCommunity('${uscList.comm_idx}');"><a>커뮤니티 가입신청</a></span>
+												</c:otherwise>
+											</c:choose>
 										</header>
 										<br />
 										<table>

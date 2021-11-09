@@ -107,8 +107,11 @@ public class CommunityDaoImpl implements CommunityDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value) throws Exception {
-		return (ArrayList)sqlSession.selectList("community.selectUserCommunityListAsSearchValues", value);
+	public ArrayList<Community> selectUserCommunityListAsSearchValues(String value, int user_idx) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("value", value);
+		map.put("user_idx", user_idx);
+		return (ArrayList)sqlSession.selectList("community.selectUserCommunityListAsSearchValues", map);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -292,8 +295,8 @@ public class CommunityDaoImpl implements CommunityDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<Community> selectUserAllCommunityList() throws Exception {
-		return (ArrayList) sqlSession.selectList("community.selectUserAllCommunityList");
+	public ArrayList<Community> selectUserAllCommunityList(int user_idx) throws Exception {
+		return (ArrayList) sqlSession.selectList("community.selectUserAllCommunityList", user_idx);
 	}
 
 	@Override

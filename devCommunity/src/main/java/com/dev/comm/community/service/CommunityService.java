@@ -43,7 +43,7 @@ public interface CommunityService {
 
 	String selectCommunityUserStatusAsIdx(long comm_idx, int user_idx) throws Exception;
 
-	ArrayList<Community> selectUserCommunityListAsSearchValues(String searchTxt) throws Exception;
+	ArrayList<Community> selectUserCommunityListAsSearchValues(String searchTxt, int user_idx) throws Exception;
 
 	ArrayList<User> selectCommunityAllMembers(Community comm) throws Exception;
 
@@ -99,8 +99,8 @@ public interface CommunityService {
 
 	ArrayList<Community> selectUserSignCommunityList(int user_idx) throws Exception;
 
-	ArrayList<Community> selectUserAllCommunityList() throws Exception;
-
+	ArrayList<Community> selectUserAllCommunityList(int user_idx) throws Exception;
+	
 	CommunityBlackList deleteCommunityUserBlackList2(CommunityBlackList cbl) throws Exception;
 
 }
